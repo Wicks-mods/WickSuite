@@ -681,6 +681,22 @@ C_TooltipInfo.GetHyperlink = function(link)
     return { lines = lines }
 end
 
+-- What the game writes on an equipped weapon. The temporary coating is
+-- a line like "Instant Poison (23 min) (60 Charges)", which is where a
+-- product has to read it from on a client whose functions all go quiet.
+C_TooltipInfo.GetInventoryItem = function(unit, slot)
+    if S.TEMPENCH_API and S.TEMPENCH_API.tooltip == false then return nil end
+    local lines = { { leftText = "Some Weapon" }, { leftText = "One-Hand" } }
+    local e = S.TEMPENCH[slot]
+    if e then
+        lines[#lines + 1] = { leftText = ("%s (%d min) (%d Charges)"):format(
+            S.TEMPENCH_NAME or "Instant Poison",
+            math.floor((e.remainingTimeMs or 0) / 60000), e.chargesRemaining or 0) }
+    end
+    lines[#lines + 1] = { leftText = "Durability 57 / 75" }
+    return { lines = lines }
+end
+
 function GetInventoryItemID(unit, inv)
     -- S.EQUIPPED_IDS lets a test dress the character, which is what
     -- counting set pieces needs.
@@ -698,7 +714,7 @@ S.TEMPENCH = { [16] = { remainingTimeMs = 1800000, chargesRemaining = 40, enchan
 -- Which calls for reading a coating this client has. Three real clients
 -- offer three different shapes and no addon can tell from the inside
 -- which it is on, so a check has to be able to take them away.
-S.TEMPENCH_API = S.TEMPENCH_API or { paperdoll = true, item = true, classic = true }
+S.TEMPENCH_API = S.TEMPENCH_API or { paperdoll = true, item = true, classic = true, tooltip = true }
 function GetInventoryItemTexture(unit, inv) return inv and inv >= 20 and inv <= 23 and 133633 or nil end
 function GetInventoryItemLink(_, slot) return S.EQUIPPED and S.EQUIPPED[slot] or nil end
 function GetInventorySlotInfo() return 20 end

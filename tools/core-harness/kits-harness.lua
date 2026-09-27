@@ -441,11 +441,24 @@ if MODERN then
     check(ns.Poisons:Hand("off").coated == false,
         "an uncoated hand reads bare on the classic global, not coated")
 
-    -- Nothing at all is the one case where it cannot know.
-    S.TEMPENCH_API = { paperdoll = false, item = false, classic = false }
+    -- The live client: all three calls present, none of them answering,
+    -- both blades poisoned and both reading bare. The game still writes
+    -- it on the item, so that is where it reads it from.
+    S.TEMPENCH_API = { paperdoll = false, item = false, classic = false, tooltip = true }
+    S.TEMPENCH_NAME = "Instant Poison"
+    local h = ns.Poisons:Hand("main")
+    check(h.coated == true, "with every call silent it reads the weapon's tooltip instead")
+    check(h.via == "tooltip", "and says so: " .. tostring(h.via))
+    check(h.msLeft == 1800000, "the minutes come off the line: " .. tostring(h.msLeft))
+    check(h.charges == 40, "and the charges: " .. tostring(h.charges))
+    check(h.coating == "Instant Poison",
+        "with the name, which no call ever gave: " .. tostring(h.coating))
+
+    -- Only when even that is gone is there nothing to know.
+    S.TEMPENCH_API = { paperdoll = false, item = false, classic = false, tooltip = false }
     check(ns.Poisons:Hand("main").coated == false,
-        "with no call at all it says bare rather than erroring")
-    S.TEMPENCH_API = { paperdoll = true, item = true, classic = true }
+        "with nothing at all it says bare rather than erroring")
+    S.TEMPENCH_API = { paperdoll = true, item = true, classic = true, tooltip = true }
 end
 
 io.write("== which poison a hand reaches for ==" .. string.char(10))
