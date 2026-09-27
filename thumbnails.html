@@ -226,6 +226,7 @@ const SHOTS = {
   comforts: 'images/comforts/screenshots/main.png',
   beasts:   'images/beasts/screenshots/main.png',
   gear:     'images/gear/screenshots/main.png',
+  poisons:  'images/poisons/screenshots/main.png',
 };
 function Shot({ which, style={}, accent=G, size='auto', origin='left top', glowAt='20% 25%' }) {
   return (
@@ -568,6 +569,37 @@ function ComfortsThumb() {
   );
 }
 
+function PoisonsThumb() {
+  return (
+    <div style={{width:460,height:260,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
+      <DungeonBg width={460} height={260} glowX="25%" glowY="45%" glowColor={G} accent="#6B21A8" opacity={0.2}/>
+      <div style={{position:'absolute',left:-20,top:'50%',transform:'translateY(-50%)',
+        width:200,height:200,borderRadius:'50%',
+        background:`radial-gradient(circle, ${G}22 0%, transparent 70%)`,pointerEvents:'none'}}/>
+      <div style={{position:'absolute',left:20,top:18,bottom:18,width:128,
+        display:'flex',flexDirection:'column',justifyContent:'flex-start',gap:10}}>
+        <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
+          <WickWordmark size={22}/>
+          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>POISONS</div>
+        </div>
+        <div style={{height:1,width:'100%',background:BR}}/>
+        <div style={{fontFamily:FU,fontSize:10,color:TX,lineHeight:1.35,fontWeight:500}}>Rogue kit.<br/>Blades and points.</div>
+        <div style={{display:'flex',flexDirection:'column',gap:3,marginTop:'auto'}}>
+          {['A key per hand to recoat','Combo points over your target','Weapon swaps for the opener'].map(f=>(
+            <div key={f} style={{display:'flex',alignItems:'center',gap:4}}>
+              <div style={{width:3,height:3,borderRadius:'50%',background:G}}/>
+              <span style={{fontFamily:FM,fontSize:6.5,color:MDIM}}>{f}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{position:'absolute',right:14,top:14,bottom:14,left:160}}>
+        <Shot which="poisons" size="contain" origin="center" glowAt="50% 50%"/>
+      </div>
+    </div>
+  );
+}
+
 function BeastsThumb() {
   return (
     <div style={{width:460,height:260,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
@@ -877,6 +909,7 @@ const FOREVER_ADDONS = [
   { key:'gear',      name:'Gear',       short:'Gear',       mono:'GR',  accent:G, slash:'/wgear',     tag:'what to chase while levelling' },
   { key:'trade',     name:'Trade Hall', short:'Trade Hall', mono:'TH',  accent:G, slash:'/wth',       tag:'earnings and the trade board' },
   { key:'kit',       name:'Class Kits', short:'Class Kits', mono:'KIT', accent:G, slash:null,         tag:'one per class', bare:true },
+  { key:'poisons',   name:'Poisons',    short:'Poisons',    mono:'PT',  accent:G, slash:'/wpt',       tag:'the rogue kit' },
   { key:'survivors', name:'Survivors',  short:'Survivors',  mono:'SV',  accent:G, slash:'/survivors', tag:'wave survival minigame' },
 ];
 
@@ -1272,6 +1305,7 @@ const ONLY_COMPONENTS = {
   social_bags: { Comp: () => <AddonSocial which="bags"/>, w: 1200, h: 630 },
   social_trade: { Comp: () => <AddonSocial which="trade"/>, w: 1200, h: 630 },
   social_gear: { Comp: () => <AddonSocial which="gear"/>, w: 1200, h: 630 },
+  social_poisons: { Comp: () => <AddonSocial which="poisons"/>, w: 1200, h: 630 },
   milestone:   { Comp: Milestone,                                          w: 1200, h: 630 },
   cd:       { Comp: CDThumb,            w: 460, h: 260 },
   bis:      { Comp: BISThumb,           w: 460, h: 260 },
@@ -1285,6 +1319,7 @@ const ONLY_COMPONENTS = {
   core:     { Comp: CoreThumb,          w: 460, h: 260 },
   comforts: { Comp: ComfortsThumb,      w: 460, h: 260 },
   beasts:   { Comp: BeastsThumb,        w: 460, h: 260 },
+  poisons:  { Comp: PoisonsThumb,       w: 460, h: 260 },
   gear:     { Comp: GearThumb,          w: 460, h: 260 },
   travel:   { Comp: TravelThumb,        w: 460, h: 260 },
   wardrobe: { Comp: WardrobeThumb,      w: 460, h: 260 },
