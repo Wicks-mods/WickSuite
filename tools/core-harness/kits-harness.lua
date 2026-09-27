@@ -166,18 +166,44 @@ do
         local fill = host.priTrack.__statusTex
         check(fill ~= nil, "the primary bar has a fill texture")
         if fill then
-            local was = fill.__color
-            check(was ~= nil, "and the fill was painted with a colour")
-            local before = was and table.concat(was, ",")
+            -- Blue is more than half of what makes a bar read as mana,
+            -- so the test is the channel that carries the meaning.
+            local function bluest(t) return t and t.__color and t.__color[3] > t.__color[1] end
+            local function reddest(t) return t and t.__color and t.__color[1] > t.__color[3] end
+            local function yellowish(t)
+                local c = t and t.__color
+                return c and c[1] > 0.6 and c[2] > 0.6 and c[3] < 0.5
+            end
+
+            -- Out of form, the top bar is mana. The host has to be up
+            -- for a redraw to reach it.
+            host:Show()
+            S.STANCE = 0
+            F.UpdateResourceBar()
+            check(bluest(fill), "out of form the top bar is mana blue")
+
+            -- A theme must not touch it. This used to assert the
+            -- opposite: both bars were palette tokens, which on a druid
+            -- made the top bar orange for rage and orange for the theme
+            -- with no way to tell which.
+            local before = table.concat(fill.__color, ",")
             Chrome:SetTheme("shaman")
-            local after = fill.__color and table.concat(fill.__color, ",")
-            check(after ~= before,
-                "the fill repaints on a theme change: " .. tostring(before) .. " -> " .. tostring(after))
-            -- The two bars still have to be told apart after a repaint.
-            local mana = host.manaTrack.__statusTex
-            check(mana and mana.__color and table.concat(mana.__color, ",") ~= after,
-                "and the mana bar stays a different colour from the primary")
+            check(table.concat(fill.__color, ",") == before,
+                "and a theme leaves it alone: mana is blue under every one")
             Chrome:SetTheme("fel")
+
+            -- And the colour says which resource it is.
+            S.POWER_TYPE = 1
+            F.UpdateResourceBar()
+            check(reddest(fill), "rage reads red")
+            S.POWER_TYPE = 3
+            F.UpdateResourceBar()
+            check(yellowish(fill), "energy reads yellow")
+            S.POWER_TYPE = 0
+            F.UpdateResourceBar()
+
+            local mana = host.manaTrack.__statusTex
+            check(bluest(mana), "and the bar underneath is always mana blue")
         end
     end
 end

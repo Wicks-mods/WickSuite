@@ -555,7 +555,16 @@ function HasPetUI() return true, CLASS == "HUNTER" end
 local PET = { happiness = 2, damage = 100, rate = 1, loyalty = "Best Friend", total = 12, used = 7, diet = { "Meat", "Fish" } }
 S.PET = PET
 local function petHappiness() if COMBAT and MODERN then return SECRET, SECRET, SECRET end return PET.happiness, PET.damage, PET.rate end
-function UnitPowerType() return 0 end
+-- Mana by default. A druid changes it by changing form, which is what
+-- makes the bar under a nameplate mean different things.
+function UnitPowerType() return S.POWER_TYPE or 0 end
+-- The client's own power colours, which a product should prefer over
+-- its own constants.
+PowerBarColor = {
+    MANA   = { r = 0.00, g = 0.00, b = 1.00 },
+    RAGE   = { r = 1.00, g = 0.00, b = 0.00 },
+    ENERGY = { r = 1.00, g = 0.96, b = 0.41 },
+}
 -- Nameplates. One plate, handed out for whichever unit is asked about,
 -- which is enough to check that something attaches to the right anchor.
 S.NAMEPLATE = nil
