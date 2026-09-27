@@ -797,17 +797,17 @@ do
     ns.UI:RefreshStrip()
 
     local st, sk = pstrip.swapStealth, pstrip.swapStrike
-    check(st ~= nil and sk ~= nil, "a button per key on the strip")
-    -- Each rides the hand it belongs to rather than sitting in a block
-    -- of its own, so the strip is the two hands and nothing else.
+    check(st ~= nil and sk ~= nil, "a button per key on the end of the strip")
+    -- In a block of their own. Riding the hands put a secure button on
+    -- top of a secure button and the press stopped swapping anything,
+    -- so nothing here may overlap a blade.
     local function anchoredTo(b)
         for _, pt in ipairs(b.__points or {}) do if pt[2] then return pt[2] end end
     end
-    check(anchoredTo(st) == pstrip.mainBtn, "the stealth swap rides the main hand")
-    check(anchoredTo(sk) == pstrip.offBtn, "and the strike swap the off hand")
-    -- Both sit on top of a button, so the click has to be theirs.
-    check(st:GetFrameLevel() > pstrip.mainBtn:GetFrameLevel(),
-        "and takes the click off the blade underneath it")
+    check(anchoredTo(st) ~= pstrip.mainBtn and anchoredTo(st) ~= pstrip.offBtn,
+        "the swap buttons sit clear of the blades rather than on top of them")
+    check(pstrip:GetWidth() > 199, "and the strip is wider for them: "
+        .. tostring(pstrip:GetWidth()))
 
     -- Clicking one has to do what the key does, which means the same
     -- macro rather than a second copy of the logic.
@@ -816,17 +816,16 @@ do
     check(sk:GetAttribute("macrotext") == ns.swap.macro.strike,
         "and the strike button the strike key's")
 
-    -- Each icon is the hand it sits on. It used to be the weapon that
-    -- key would put in your main hand, which meant the picture beside
-    -- the word Main was your off hand.
-    local function faces() return ns.swap:Faces() end
-    check(faces().stealth.id == SWORD, "the main hand entry shows your main hand")
-    check(faces().strike.id == DAGGER, "and the off hand entry shows your off hand")
+    -- The icon is what that key would put in your main hand, and the
+    -- fel edge marks the one already there, which is the press that
+    -- would do nothing.
+    check(sk.live:IsShown(), "the slow weapon is marked as the one you are holding")
+    check(not st.live:IsShown(), "and the dagger is not")
     S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = DAGGER, SWORD
     S.fire("PLAYER_EQUIPMENT_CHANGED")
     ns.UI:RefreshStrip()
-    check(faces().stealth.id == DAGGER and faces().strike.id == SWORD,
-        "swapping your hands over swaps the icons with them")
+    check(st.live:IsShown() and not sk.live:IsShown(),
+        "swapping your hands over moves the mark")
 
     -- A pair it cannot read greys out. Hiding a protected frame in a
     -- fight is refused, and a strip that changes shape mid-pull is its
@@ -837,6 +836,7 @@ do
     check(ns.swap.pair == nil, "two daggers is a pair it cannot use")
     check(st:IsShown() and sk:IsShown(), "the buttons stay up rather than vanishing")
     check(st.icon.__desaturated == true, "greyed instead: " .. tostring(st.icon.__desaturated))
+    check(not st.live:IsShown() and not sk.live:IsShown(), "and neither is marked live")
 
     -- Refreshing mid-fight touches nothing protected, which is what the
     -- twenty second ticker does.
@@ -849,14 +849,14 @@ do
     -- And does it on its own. The swap keys work mid-fight, so the
     -- icons have to follow them mid-fight; they used to sit behind the
     -- same guard that stops the macro being rewritten.
-    check(ns.swap:Faces().stealth.id == SWORD, "the main hand shows the sword before the swap")
+    check(sk.live:IsShown(), "the slow weapon is marked before the swap")
     S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = DAGGER, SWORD
     S.fire("PLAYER_EQUIPMENT_CHANGED")
-    check(ns.swap:Faces().stealth.id == DAGGER,
-        "a swap made in combat moves the icons without waiting for the fight to end")
+    check(st.live:IsShown() and not sk.live:IsShown(),
+        "a swap made in combat moves the mark without waiting for the fight to end")
     S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = SWORD, DAGGER
     S.fire("PLAYER_EQUIPMENT_CHANGED")
-    check(ns.swap:Faces().stealth.id == SWORD, "and back again")
+    check(sk.live:IsShown(), "and back again")
     COMBAT = false
 end
 
