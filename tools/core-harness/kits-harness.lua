@@ -763,6 +763,31 @@ do
     S.EQUIPPED_IDS[16] = SWORD
     S.fire("PLAYER_EQUIPMENT_CHANGED")
 
+    -- The login order. At init the client cannot yet say what is in
+    -- your hands, so the pair comes back empty and both macros are
+    -- written as empty strings. Nothing re-ran until the gear changed,
+    -- which meant equipping something by hand to wake the keys up.
+    S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = nil, nil
+    ns.swap:Update()
+    check(ns.swap.pair == nil and ns.swap.macro.stealth == "",
+        "with nothing readable in your hands the keys are empty")
+
+    S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = SWORD, DAGGER
+    -- Equipment arriving rather than changing: this is the event a
+    -- login gives you, and the one the keys were not listening for.
+    S.fire("UNIT_INVENTORY_CHANGED", "player")
+    check(ns.swap.macro.stealth ~= "",
+        "gear arriving fills them in without anything being equipped by hand: "
+        .. ns.swap.macro.stealth:gsub(string.char(10), " | "))
+
+    -- And the other half: the inventory is there but the item is not
+    -- described yet, so which hand holds the dagger is unanswerable.
+    S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = nil, nil
+    ns.swap:Update()
+    S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = SWORD, DAGGER
+    S.fire("GET_ITEM_INFO_RECEIVED", SWORD)
+    check(ns.swap.macro.stealth ~= "", "and so does the item description landing late")
+
     -- Riding a different ability, for a rogue who opens the second
     -- round with something else.
     S.CHAT = {}
