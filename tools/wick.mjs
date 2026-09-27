@@ -249,10 +249,10 @@ function composeFBCaption(addon, version, changelogBody) {
     const cleaned = sanitizeMarkdownForFB(changelogBody);
     if (cleaned) {
       lines.push("What's new:");
-      const trimmed = cleaned.length > 1500
-        ? cleaned.slice(0, 1500).replace(/\s+\S*$/, "") + "..."
-        : cleaned;
-      lines.push(trimmed);
+      // Headlines, for the same reason Discord gets them: a changelog
+      // explains a decision and defends it, and a feed wants the line
+      // that says what changed.
+      lines.push(...headlines(cleaned, 8));
       lines.push("");
     }
   }
@@ -377,6 +377,42 @@ function resolveDiscordAnnouncementsChannel(config, token) {
   return ch.id;
 }
 
+// A changelog bullet is written to explain a decision and defend it,
+// which is right in a repository and wrong in a feed. The first
+// sentence is the one that says what changed; the rest is the
+// reasoning, and it stays where it belongs.
+//
+// Bullets only, since the prose between them is all reasoning. Headings
+// go too: a feed post does not need Added and Changed.
+function headlines(body, max) {
+  const out = [];
+  let current = null;
+  const flush = () => {
+    if (current === null) return;
+    const one = current.replace(/\s+/g, " ").trim();
+    // Up to the first full stop that ends a sentence rather than sitting
+    // inside a version number or an abbreviation.
+    const m = one.match(/^(.*?[.!?])(\s|$)/);
+    const said = (m ? m[1] : one).trim();
+    if (said) out.push("- " + said.replace(/^[-*]\s*/, ""));
+    current = null;
+  };
+  for (const raw of body.split("\n")) {
+    const line = raw.trimEnd();
+    if (/^\s*[-*]\s+/.test(line)) {
+      flush();
+      current = line.replace(/^\s*[-*]\s+/, "");
+    } else if (current !== null && /^\s+\S/.test(line)) {
+      current += " " + line.trim();      // a wrapped bullet
+    } else {
+      flush();
+    }
+    if (out.length >= max) break;
+  }
+  flush();
+  return out.slice(0, max);
+}
+
 function composeDiscordEmbed(addon, version, changelogBody) {
   const cfUrl = `https://www.curseforge.com/wow/addons/${addon.cf_slug}`;
   const descLines = [];
@@ -386,10 +422,9 @@ function composeDiscordEmbed(addon, version, changelogBody) {
     if (cleaned && !/^\(edit this entry/i.test(cleaned)) {
       descLines.push("");
       descLines.push("**What's new**");
-      const trimmed = cleaned.length > 2000
-        ? cleaned.slice(0, 2000).replace(/\s+\S*$/, "") + "..."
-        : cleaned;
-      descLines.push(trimmed);
+      descLines.push(...headlines(cleaned, 10));
+      descLines.push("");
+      descLines.push(`[Full changelog](https://github.com/Wicksmods/${addon.repo || addon.folder}/blob/main/CHANGELOG.md)`);
     }
   }
   // Parse accent hex → decimal int for Discord's color field.
