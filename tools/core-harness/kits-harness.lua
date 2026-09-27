@@ -447,6 +447,59 @@ if MODERN then
         "with no call at all it says bare rather than erroring")
     S.TEMPENCH_API = { paperdoll = true, item = true, classic = true }
 end
+
+io.write("== which poison a hand reaches for ==" .. string.char(10))
+do
+    -- Crippling is the highest item level in the bag, which is the
+    -- shape that used to win: the list was ranked on level alone and a
+    -- poison that slows kept taking a slot meant for damage.
+    local INSTANT, DEADLY, CRIPPLING, WOUND = 6947, 2892, 3775, 10918
+    S.ITEMS[INSTANT]   = { name = "Instant Poison IV",   classID = 0, subClassID = 6, itemLevel = 42 }
+    S.ITEMS[DEADLY]    = { name = "Deadly Poison III",   classID = 0, subClassID = 6, itemLevel = 44 }
+    S.ITEMS[CRIPPLING] = { name = "Crippling Poison II", classID = 0, subClassID = 6, itemLevel = 60 }
+    S.ITEMS[WOUND]     = { name = "Wound Poison II",     classID = 0, subClassID = 6, itemLevel = 46 }
+    -- A staged bag holds only what is staged. The others are staged
+    -- empty, or the stub hands out a default item in every free slot
+    -- and the bag is not the one this check describes.
+    for bag = 1, 4 do S.SLOT_ITEMS[bag] = {} end
+    S.SLOT_ITEMS[0] = { { id = INSTANT, count = 5 }, { id = DEADLY, count = 5 },
+                        { id = CRIPPLING, count = 5 }, { id = WOUND, count = 5 } }
+    ns.Poisons:UpdateMacros()
+
+    local m = ns.Poisons:ChoiceFor("main")
+    local o = ns.Poisons:ChoiceFor("off")
+    check(m and m.itemID == INSTANT,
+        "the main hand takes Instant, not the highest level thing in the bag: "
+        .. tostring(m and m.name))
+    check(o and o.itemID == DEADLY, "and the off hand takes Deadly: " .. tostring(o and o.name))
+    check(ns.Poisons:Rank({ name = "Crippling Poison II" }, "main")
+          > ns.Poisons:Rank({ name = "Wound Poison II" }, "main"),
+        "a poison that slows ranks below every damage one")
+    check(ns.Poisons:Rank({ name = "Some New Coating" }, "main")
+          > ns.Poisons:Rank({ name = "Instant Poison IV" }, "main"),
+        "a coating it has never met loses to a damage poison")
+    check(ns.Poisons:Rank({ name = "Some New Coating" }, "main")
+          < ns.Poisons:Rank({ name = "Crippling Poison II" }, "main"),
+        "and beats one it knows is utility")
+
+    -- Carrying nothing but utility, it still puts something on rather
+    -- than leaving the key empty.
+    S.SLOT_ITEMS[0] = { { id = CRIPPLING, count = 5 } }
+    ns.Poisons:UpdateMacros()
+    m = ns.Poisons:ChoiceFor("main")
+    check(m and m.itemID == CRIPPLING, "with only Crippling carried, that is what the key uses")
+
+    -- Pinning still wins outright.
+    S.SLOT_ITEMS[0] = { { id = INSTANT, count = 5 }, { id = CRIPPLING, count = 5 } }
+    PA.db.profile.pinned.main = CRIPPLING
+    ns.Poisons:UpdateMacros()
+    m = ns.Poisons:ChoiceFor("main")
+    check(m and m.itemID == CRIPPLING and m.pinned, "a pin beats the ranking")
+    PA.db.profile.pinned.main = nil
+    ns.Poisons:UpdateMacros()
+    check(ns.Poisons:ChoiceFor("main").itemID == INSTANT, "and clearing it goes back to Instant")
+end
+
 -- Combo points over the target's nameplate. The point of the design is
 -- that it never compares the value, so the same code has to survive the
 -- number arriving secret. Run it both ways.
