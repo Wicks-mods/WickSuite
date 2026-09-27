@@ -951,13 +951,24 @@ const SOCIAL = {
   bags: { label: 'BAGS', title: true, tagline: 'Bags and bank in one window, sorted the way you say.', features: ['Auto-categorize by class + subclass', 'Masonry layout, resizable', 'Bank panel with buy-slot button'] },
   trade: { label: 'TRADE', title: true, tagline: 'What a run earned, and what trade chat is offering.', features: ['Session earnings with gold per hour', 'Loot valued at vendor price, marked when unknown', 'The trade channel as a board', 'Badges, item icons, filters and search'] },
   gear: { label: 'GEAR', title: true, tagline: 'What to chase while levelling, and where it drops.', features: ['Upgrades scored against what you wear', 'Dungeons, crafted, quest rewards and sets', 'Live set bonuses read from the client', 'Try on, dressing room, link in chat'] },
+  poisons: { label: 'POISONS', title: true, tagline: 'The rogue kit: coatings, combo points and weapon swaps.', features: ['What coats each blade, and how long is left', 'One key per hand to recoat', 'Combo points over your target, energy under them', 'Weapon swap keys for a dagger opener'] },
 };
 
 // 1200x630, which is what Facebook asks for and what a boosted post
 // wants. The announce used to attach the 460x260 thumbnail, so every
 // post was an upscale of a small picture.
 function AddonSocial({ which }) {
-  const s = SOCIAL[which] || { label: '', tagline: '', features: [] };
+  // A card with no entry used to render perfectly and say nothing,
+  // which is how one went out carrying a wordmark and a screenshot.
+  // Fall back to what the roster knows, and say the copy is missing
+  // rather than leaving a blank that looks deliberate.
+  const roster = [...FOREVER_ADDONS, ...SUITE_ADDONS].find(a => a.key === which);
+  const s = SOCIAL[which] || {
+    label: (roster ? roster.short : which).toUpperCase(),
+    title: true,
+    tagline: roster ? roster.tag : '',
+    features: ['No copy for this one yet: add it to SOCIAL in thumbnails.html'],
+  };
   return (
     <div style={{width:1200,height:630,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
       <DungeonBg width={1200} height={630} glowX="22%" glowY="45%" glowColor={G} accent="#6B21A8" opacity={0.18}/>
