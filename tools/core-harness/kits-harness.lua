@@ -383,6 +383,7 @@ end
 io.write("== Poisons and Things ==\n")
 CLASS = "ROGUE"
 local PNS = S.loadAddon(ADDONS_DIR .. "/WicksPoisonsAndThings", "WicksPoisonsAndThings", { "Core.lua", "Poisons.lua", "Combo.lua", "Swap.lua", "UI.lua" })
+local ns = PNS
 S.fire("ADDON_LOADED", "WicksPoisonsAndThings")
 S.fire("PLAYER_LOGIN")
 dumpErrors()
@@ -407,6 +408,44 @@ check(#S.CHAT >= 3, "/wpt status prints")
 if MODERN then
     check(pline:find("coated true") ~= nil, "main hand reads as coated from the temporary enchantment")
     check(pline:find("minutes 30") ~= nil, "time left read: " .. pline:sub(1, 90))
+end
+
+-- Which call a client offers for reading a coating is not something an
+-- addon can know from the inside, and asking only the one it was
+-- written against is how two poisoned blades read as bare. Take them
+-- away one at a time: the answer has to survive any two going missing.
+if MODERN then
+    local function coated()
+        return ns.Poisons:Hand("main").coated == true, ns.Poisons:Hand("main").via
+    end
+    local ok, via = coated()
+    check(ok, "the coating reads with every call present, via " .. tostring(via))
+
+    S.TEMPENCH_API = { paperdoll = false, item = true, classic = true }
+    ok, via = coated()
+    check(ok, "and without C_PaperDollInfo, via " .. tostring(via))
+
+    S.TEMPENCH_API = { paperdoll = false, item = false, classic = true }
+    ok, via = coated()
+    check(ok, "and on the classic global alone, via " .. tostring(via))
+    local h30 = ns.Poisons:Hand("main")
+    check(h30.msLeft == 1800000, "with the time still read off it: " .. tostring(h30.msLeft))
+    check(h30.charges == 40, "and the charges: " .. tostring(h30.charges))
+
+    S.TEMPENCH_API = { paperdoll = true, item = false, classic = false }
+    ok = coated()
+    check(ok, "and on C_PaperDollInfo alone")
+
+    -- A bare weapon still has to read as bare through every path.
+    S.TEMPENCH_API = { paperdoll = false, item = false, classic = true }
+    check(ns.Poisons:Hand("off").coated == false,
+        "an uncoated hand reads bare on the classic global, not coated")
+
+    -- Nothing at all is the one case where it cannot know.
+    S.TEMPENCH_API = { paperdoll = false, item = false, classic = false }
+    check(ns.Poisons:Hand("main").coated == false,
+        "with no call at all it says bare rather than erroring")
+    S.TEMPENCH_API = { paperdoll = true, item = true, classic = true }
 end
 -- Combo points over the target's nameplate. The point of the design is
 -- that it never compares the value, so the same code has to survive the
@@ -498,7 +537,6 @@ S.fire("PLAYER_TARGET_CHANGED")
 S.HAS_TARGET = false
 S.fire("PLAYER_TARGET_CHANGED")
 check(not combo:IsShown(), "losing the target hides it again")
-local ns = PNS
 io.write("== the weapon swap keys ==\n")
 do
     -- A slow main hand and a dagger off hand, which is the setup the

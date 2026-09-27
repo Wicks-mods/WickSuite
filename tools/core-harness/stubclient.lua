@@ -629,7 +629,20 @@ function CanGuildBankRepair() return S.GUILD_REPAIR == true end
 function GetGuildBankWithdrawMoney() return S.GUILD_FUNDS or 0 end
 function SaveBindings() end
 function GetCurrentBindingSet() return 1 end
-function GetWeaponEnchantInfo() return true, 600, 1, 0, false end
+function GetWeaponEnchantInfo()
+    if S.TEMPENCH_API and S.TEMPENCH_API.classic == false then return nil end
+    -- Main hand, off hand, ranged: four values each, has/expiry/charges/id.
+    local out = {}
+    for _, slot in ipairs({ 16, 17, 18 }) do
+        local e = S.TEMPENCH[slot]
+        out[#out + 1] = e and true or false
+        out[#out + 1] = e and e.remainingTimeMs or nil
+        out[#out + 1] = e and e.chargesRemaining or nil
+        out[#out + 1] = e and e.enchantID or nil
+    end
+    return out[1], out[2], out[3], out[4], out[5], out[6], out[7], out[8],
+           out[9], out[10], out[11], out[12]
+end
 function GetItemCooldown() return 0, 0, 1 end
 function PlaySound() end
 SOUNDKIT = { UI_AUTOLOOT_COMPLETE = 798 }
@@ -682,6 +695,10 @@ INVSLOT_AMMO, INVSLOT_RANGED = 0, 18
 INVSLOT_MAINHAND, INVSLOT_OFFHAND = 16, 17
 -- Temporary weapon enchantments. Main hand coated, off hand bare.
 S.TEMPENCH = { [16] = { remainingTimeMs = 1800000, chargesRemaining = 40, enchantID = 603 } }
+-- Which calls for reading a coating this client has. Three real clients
+-- offer three different shapes and no addon can tell from the inside
+-- which it is on, so a check has to be able to take them away.
+S.TEMPENCH_API = S.TEMPENCH_API or { paperdoll = true, item = true, classic = true }
 function GetInventoryItemTexture(unit, inv) return inv and inv >= 20 and inv <= 23 and 133633 or nil end
 function GetInventoryItemLink(_, slot) return S.EQUIPPED and S.EQUIPPED[slot] or nil end
 function GetInventorySlotInfo() return 20 end
@@ -912,7 +929,10 @@ if MODERN then
         CanPetEatItem = function(id) return id == 6948 end,   -- the mock bags hold only Hearthstones
     }
     C_PaperDollInfo = { AmmoNeeded = function() return CLASS == "HUNTER" end, IsRangedSlotShown = function() return true end,
-        GetTemporaryEnchantmentInfo = function(slot) return S.TEMPENCH[slot] end }
+        GetTemporaryEnchantmentInfo = function(slot)
+            if S.TEMPENCH_API and S.TEMPENCH_API.paperdoll == false then return nil end
+            return S.TEMPENCH[slot]
+        end }
     C_ClassColor = { GetClassColor = function(tok) local c = RAID_CLASS_COLORS[tok]; return c and { r = c.r, g = c.g, b = c.b } end }
     C_XMLUtil = {
         GetTemplateInfo = function(t)
@@ -991,7 +1011,9 @@ if MODERN then
         GetItemSpell = function() return "Hearth", 8690 end,
         GetItemQualityColor = function(q) return 1, 1, 1, "|cffffffff" end,
         GetItemCooldown = function() return 0, 0, 1 end,
-        GetWeaponEnchantInfo = function(slot) local e = S.TEMPENCH[slot]
+        GetWeaponEnchantInfo = function(slot)
+            if S.TEMPENCH_API and S.TEMPENCH_API.item == false then return nil end
+            local e = S.TEMPENCH[slot]
             if not e then return { enchants = {} } end
             return { enchants = { { hasEnchant = true, timeLeft = e.remainingTimeMs, charges = e.chargesRemaining, enchantID = e.enchantID, enchantIconID = 132273 } } } end,
     }
