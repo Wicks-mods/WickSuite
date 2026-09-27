@@ -816,15 +816,17 @@ do
     check(sk:GetAttribute("macrotext") == ns.swap.macro.strike,
         "and the strike button the strike key's")
 
-    -- The edge marks the weapon already in your main hand, which is the
-    -- one not worth pressing.
-    check(sk.live:IsShown(), "the slow weapon is marked as the one you are holding")
-    check(not st.live:IsShown(), "and the dagger is not")
+    -- Each icon is the hand it sits on. It used to be the weapon that
+    -- key would put in your main hand, which meant the picture beside
+    -- the word Main was your off hand.
+    local function faces() return ns.swap:Faces() end
+    check(faces().stealth.id == SWORD, "the main hand entry shows your main hand")
+    check(faces().strike.id == DAGGER, "and the off hand entry shows your off hand")
     S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = DAGGER, SWORD
     S.fire("PLAYER_EQUIPMENT_CHANGED")
     ns.UI:RefreshStrip()
-    check(st.live:IsShown() and not sk.live:IsShown(),
-        "swapping your hands over moves the mark")
+    check(faces().stealth.id == DAGGER and faces().strike.id == SWORD,
+        "swapping your hands over swaps the icons with them")
 
     -- A pair it cannot read greys out. Hiding a protected frame in a
     -- fight is refused, and a strip that changes shape mid-pull is its
@@ -835,7 +837,6 @@ do
     check(ns.swap.pair == nil, "two daggers is a pair it cannot use")
     check(st:IsShown() and sk:IsShown(), "the buttons stay up rather than vanishing")
     check(st.icon.__desaturated == true, "greyed instead: " .. tostring(st.icon.__desaturated))
-    check(not st.live:IsShown() and not sk.live:IsShown(), "and neither is marked live")
 
     -- Refreshing mid-fight touches nothing protected, which is what the
     -- twenty second ticker does.
@@ -845,17 +846,17 @@ do
     local okTick = pcall(function() ns.UI:RefreshSwap() end)
     check(okTick, "the strip can redraw the swap block in combat")
 
-    -- And does it on its own. The swap keys work mid-fight, so the mark
-    -- has to follow them mid-fight; it used to sit behind the same
-    -- guard that stops the macro being rewritten.
-    check(sk.live:IsShown(), "the slow weapon is marked before the swap")
+    -- And does it on its own. The swap keys work mid-fight, so the
+    -- icons have to follow them mid-fight; they used to sit behind the
+    -- same guard that stops the macro being rewritten.
+    check(ns.swap:Faces().stealth.id == SWORD, "the main hand shows the sword before the swap")
     S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = DAGGER, SWORD
     S.fire("PLAYER_EQUIPMENT_CHANGED")
-    check(st.live:IsShown() and not sk.live:IsShown(),
-        "a swap made in combat moves the mark without waiting for the fight to end")
+    check(ns.swap:Faces().stealth.id == DAGGER,
+        "a swap made in combat moves the icons without waiting for the fight to end")
     S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = SWORD, DAGGER
     S.fire("PLAYER_EQUIPMENT_CHANGED")
-    check(sk.live:IsShown(), "and back again")
+    check(ns.swap:Faces().stealth.id == SWORD, "and back again")
     COMBAT = false
 end
 
