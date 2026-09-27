@@ -228,7 +228,10 @@ local function newMock(kind, name)
         elseif k == "GetChecked" then return function() return t.__checked end
         elseif k == "SetChecked" then return function(_, v) t.__checked = v end
         elseif k == "IsMouseOver" then return function() return false end
-        elseif k == "GetFrameLevel" then return function() return 1 end
+        -- Recorded rather than fixed at 1, so a check can ask which of
+        -- two overlapping buttons the click belongs to.
+        elseif k == "SetFrameLevel" then return function(_, v) t.__level = v end
+        elseif k == "GetFrameLevel" then return function() return t.__level or 1 end
         elseif k == "GetFrameStrata" then return function() return "MEDIUM" end
         elseif k == "SetAlpha" then return function(_, a) t.__alpha = a end
         elseif k == "GetAlpha" then return function() return t.__alpha or 1 end

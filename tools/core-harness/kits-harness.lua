@@ -797,8 +797,17 @@ do
     ns.UI:RefreshStrip()
 
     local st, sk = pstrip.swapStealth, pstrip.swapStrike
-    check(st ~= nil and sk ~= nil, "a button per key on the end of the strip")
-    check(pstrip:GetWidth() > 199, "the strip is wider for them: " .. tostring(pstrip:GetWidth()))
+    check(st ~= nil and sk ~= nil, "a button per key on the strip")
+    -- Each rides the hand it belongs to rather than sitting in a block
+    -- of its own, so the strip is the two hands and nothing else.
+    local function anchoredTo(b)
+        for _, pt in ipairs(b.__points or {}) do if pt[2] then return pt[2] end end
+    end
+    check(anchoredTo(st) == pstrip.mainBtn, "the stealth swap rides the main hand")
+    check(anchoredTo(sk) == pstrip.offBtn, "and the strike swap the off hand")
+    -- Both sit on top of a button, so the click has to be theirs.
+    check(st:GetFrameLevel() > pstrip.mainBtn:GetFrameLevel(),
+        "and takes the click off the blade underneath it")
 
     -- Clicking one has to do what the key does, which means the same
     -- macro rather than a second copy of the logic.
