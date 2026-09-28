@@ -52,6 +52,7 @@ function CreateFrame(kind, name, parent, template)
     end
     rawset(f, "GetName", function() return name end)
     rawset(f, "GetChildren", function() return end)
+    rawset(f, "IsForbidden", function() return false end)
     rawset(f, "GetRegions", function() return end)
     rawset(f, "GetParent", function() return f.__parent end)
     rawset(f, "SetParent", function(_, p) f.__parent = p end)
@@ -359,7 +360,7 @@ check(ns:G().installed == true, "installer marks itself done")
 io.write("== window skins ==\n")
 do
     -- A window built the way Blizzard's portrait-frame template builds one.
-    local cf = realCreateFrame("Frame", "CharacterFrame")
+    local cf = CreateFrame("Frame", "CharacterFrame")
     cf.NineSlice = realCreateFrame("Frame"); cf.Bg = S.newMock("Texture")
     cf.CloseButton = realCreateFrame("Button"); cf.Inset = realCreateFrame("Frame")
     cf.Inset.NineSlice = realCreateFrame("Frame")
