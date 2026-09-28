@@ -192,6 +192,39 @@ check(flag == true, "Check toggles")
 check(Chrome:Button(panel.content, "Go").label:GetText() == "Go", "Button label")
 
 
+io.write("== what the client refused ==" .. string.char(10))
+do
+    -- Three attempts at the bag popup were each a guess about which call
+    -- was refused. The popup does not name it and a forbidden action
+    -- never reaches the taint log, so the event that does name it is the
+    -- only source, and nothing was listening.
+    S.CHAT = {}
+    S.fire("ADDON_ACTION_FORBIDDEN", "WicksBags", "SortBags()")
+    local said = table.concat(S.CHAT, " | ")
+    check(said:find("SortBags()", 1, true) ~= nil,
+        "a forbidden call is named in chat: " .. said:sub(1, 80))
+    check(#Core.Restrict:Refusals() == 1, "and kept for later")
+
+    -- Once per distinct call: a popup in a loop is not a wall of chat.
+    S.CHAT = {}
+    S.fire("ADDON_ACTION_FORBIDDEN", "WicksBags", "SortBags()")
+    check(#S.CHAT == 0, "the same one again says nothing")
+    check(Core.Restrict:Refusals()[1].count == 2, "but is counted: "
+        .. tostring(Core.Restrict:Refusals()[1].count))
+
+    -- A different call is worth saying.
+    S.CHAT = {}
+    S.fire("ADDON_ACTION_BLOCKED", "WicksBags", "UseContainerItem()")
+    check(#S.CHAT > 0, "a different call is said")
+    check(#Core.Restrict:Refusals() == 2, "and kept alongside the first")
+
+    -- Somebody else's addon is not our business.
+    S.CHAT = {}
+    S.fire("ADDON_ACTION_FORBIDDEN", "SomeOtherAddon", "CastSpellByName()")
+    check(#S.CHAT == 0, "another addon's refusal is not reported as ours")
+    check(#Core.Restrict:Refusals() == 2, "nor recorded")
+end
+
 -- ---------- themes --------------------------------------------------------
 io.write("== themes ==\n")
 check(#Chrome.Themes == 10 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes plus custom, warlock is fel")
