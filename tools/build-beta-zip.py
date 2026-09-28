@@ -26,8 +26,9 @@ FOLDERS = [
 SKIP_DIRS = {".git", ".github", "node_modules"}
 
 # What a player needs and nothing else.
-ALLOWED_EXT = {"lua", "toc", "xml", "svg", "png", "tga", "blp"}
-ALLOWED_NAMES = {"README.md", "CHANGELOG.md", "LICENSE"}
+ALLOWED_EXT = {"lua", "toc", "xml", "svg", "png", "tga", "blp", "ttf"}
+# Bundled fonts ship with their licence, which the licence requires.
+ALLOWED_NAMES = {"README.md", "CHANGELOG.md", "LICENSE", "PT_Sans_Narrow_OFL.txt"}
 
 # Must never appear in a public package, by path.
 FORBIDDEN_NAME = re.compile(
