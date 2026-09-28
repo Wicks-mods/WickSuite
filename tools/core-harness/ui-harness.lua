@@ -382,6 +382,16 @@ do
     check(okP, "skins a portrait-frame window: " .. tostring(errP or ""))
     check(cf.NineSlice.__a == 0, "its Blizzard border is faded")
     check(rawget(cf, "wuiBG") == nil and rawget(cf, "backdrop") == nil, "nothing of ours written into their frame")
+    -- A screen-sized holder, like ContainerFrameContainer, is refused.
+    rawset(UIParent, "GetSize", function() return 1920, 1080 end)
+    local holder = CreateFrame("Frame", "ContainerFrameContainer")
+    holder:SetSize(1920, 1080)
+    local ns9 = holder.NineSlice
+    ns.PanelSkins:Skin(holder)
+    check(ns.PanelSkins.screenSized(holder), "a screen-sized holder is recognised")
+    local kids = 0
+    for _, f in ipairs(S.frames) do if f.__parent == holder then kids = kids + 1 end end
+    check(kids == 0, "and gets no panel of ours")
 end
 
 io.write("== settings window ==\n")
