@@ -79,6 +79,13 @@ end
 local function noop() end
 local function stubGlobal(name, v) if rawget(_G, name) == nil then rawset(_G, name, v) end end
 table.wipe = table.wipe or wipe
+C_NamePlate = C_NamePlate or {}
+C_NamePlate.SetNamePlateSize = C_NamePlate.SetNamePlateSize or noop
+C_NamePlate.GetNamePlates = C_NamePlate.GetNamePlates or function() return {} end
+stubGlobal("C_NamePlateManager", { SetNamePlateHitTestInsets = noop })
+stubGlobal("C_CVar", {})
+C_CVar.SetCVar = C_CVar.SetCVar or noop
+C_CVar.SetCVarBitfield = C_CVar.SetCVarBitfield or noop
 string.split = string.split or function(sep, s, limit) return strsplit(sep, s) end
 -- The client's heal prediction calculator: every getter answers a number.
 stubGlobal("CreateUnitHealPredictionCalculator", function()
@@ -124,7 +131,7 @@ stubGlobal("C_Timer", { After = function(_, fn) fn() end, NewTimer = function(_,
 -- Blizzard frames oUF and the bar module reach for by name.
 for _, n in ipairs({ "TotemFrame", "PlayerFrame", "TargetFrame", "FocusFrame", "PetFrame", "BossTargetFrameContainer",
     "CompactRaidFrameContainer", "EditModeManagerFrame", "MainActionBar", "MultiBarBottomLeft", "MultiBarBottomRight",
-    "MultiBarLeft", "MultiBarRight", "StanceBar", "PetActionBar", "PossessActionBar", "OverrideActionBar",
+    "MultiBarLeft", "MultiBarRight", "BuffFrame", "DebuffFrame", "StanceBar", "PetActionBar", "PossessActionBar", "OverrideActionBar",
     "ActionBarController", "ActionBarActionEventsFrame", "PlayerCastingBarFrame", "PetCastingBarFrame",
     "OverlayPlayerCastingBarFrame", "RuneFrame", "MonkStaggerBar", "AlternatePowerBar", "PlayerFrameAlternatePowerBarArea" }) do
     if rawget(_G, n) == nil then rawset(_G, n, realCreateFrame("Frame", n)) end
@@ -327,6 +334,27 @@ A.db.profile.unitframes.healthColor = "gradient"
 local okU2, errU2 = pcall(function() UF:Update() end)
 check(okU2, "update after settings change: " .. tostring(errU2 or ""))
 check(not ns.errors or #ns.errors == 0, "no module errors: " .. table.concat(ns.errors or {}, " | "))
+
+io.write("== nameplates ==\n")
+local NP = ns.Nameplates
+check(NP.initialized, "nameplates initialized")
+check(NP.driver ~= nil, "oUF nameplate driver spawned")
+A.db.profile.nameplates.execute = 20
+local okN, errN = pcall(function() NP:Update() end)
+check(okN and NP.curve ~= nil, "execute curve built on a settings change: " .. tostring(errN or ""))
+check(not ns.errors or #ns.errors == 0, "no module errors: " .. table.concat(ns.errors or {}, " | "))
+
+io.write("== buffs ==\n")
+check(ns.Auras.initialized and ns.Auras.buffs and ns.Auras.debuffs, "buff and debuff containers built")
+check(ns.Movers.list.auras_buffs ~= nil, "buffs have a mover")
+
+io.write("== extras and installer ==\n")
+check(ns.Extras.initialized and _G.WicksUI_MarkerBar ~= nil, "raid marker bar built")
+check(_G.WicksUI_Marker1:GetAttribute("macrotext1") == "/tm 1", "marker 1 marks the target")
+local okI, errI = pcall(function() for p = 1, 4 do ns.Install:Show(p) end; ns.Install:ApplyLayout("healer"); ns.Install:Finish() end)
+check(okI, "installer pages and the healer layout: " .. tostring(errI or ""))
+check(A.db.profile.movers.uf_party == "BOTTOM,UIParent,BOTTOM,0,190", "healer layout moved the party frames")
+check(ns:G().installed == true, "installer marks itself done")
 
 io.write("== settings window ==\n")
 local okOpen, errOpen = pcall(function() ns.Config:Open("general") end)
