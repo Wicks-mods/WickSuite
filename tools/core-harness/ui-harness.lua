@@ -310,6 +310,9 @@ check(bar1 and bar1.__drivers and bar1.__drivers.visibility == "show", "bar 1 vi
 local bar7 = _G.WicksUI_Bar7
 check(bar7 and not bar7.__drivers.visibility, "bar 7 off by default")
 check(_G.WicksUI_StanceBar ~= nil and _G.WicksUI_PetBar ~= nil, "stance and pet bars built")
+check(A.db.profile.actionbars.matchedGame == true, "bars matched to the game's once")
+check(A.db.profile.actionbars.bars[6].enable and not A.db.profile.actionbars.bars[2].enable, "game's Action Bar 2 (page 6) on, the page 2 extra bar off")
+check(AB:Label(6) == "Action Bar 2" and AB:Label(2) == "Extra bar, page 2", "bars named the way the game names them")
 check(ns.Movers.list.bar1 ~= nil and ns.Movers.list.stancebar ~= nil, "movers made for the bars")
 
 -- Settings change in combat queues, and applies after.
