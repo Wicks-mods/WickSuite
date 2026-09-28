@@ -356,6 +356,28 @@ check(okI, "installer pages and the healer layout: " .. tostring(errI or ""))
 check(A.db.profile.movers.uf_party == "BOTTOM,UIParent,BOTTOM,0,190", "healer layout moved the party frames")
 check(ns:G().installed == true, "installer marks itself done")
 
+io.write("== window skins ==\n")
+do
+    -- A window built the way Blizzard's portrait-frame template builds one.
+    local cf = realCreateFrame("Frame", "CharacterFrame")
+    cf.NineSlice = realCreateFrame("Frame"); cf.Bg = S.newMock("Texture")
+    cf.CloseButton = realCreateFrame("Button"); cf.Inset = realCreateFrame("Frame")
+    cf.Inset.NineSlice = realCreateFrame("Frame")
+    cf.TitleContainer = { TitleText = S.newMock("FontString") }
+    rawset(cf, "GetRegions", function() return end)
+    rawset(cf, "GetChildren", function() return end)
+    rawset(cf.Inset, "GetRegions", function() return end)
+    rawset(cf.CloseButton, "GetRegions", function() return end)
+    local tab = realCreateFrame("Button", "CharacterFrameTab1")
+    tab.Left, tab.Middle, tab.Right = S.newMock("Texture"), S.newMock("Texture"), S.newMock("Texture")
+    tab.Text = S.newMock("FontString")
+    rawset(cf.NineSlice, "SetAlpha", function(_, a) cf.NineSlice.__a = a end)
+    local okP, errP = pcall(function() ns.PanelSkins:Skin(cf) end)
+    check(okP, "skins a portrait-frame window: " .. tostring(errP or ""))
+    check(cf.NineSlice.__a == 0, "its Blizzard border is faded")
+    check(rawget(cf, "wuiBG") == nil and rawget(cf, "backdrop") == nil, "nothing of ours written into their frame")
+end
+
 io.write("== settings window ==\n")
 local okOpen, errOpen = pcall(function() ns.Config:Open("general") end)
 check(okOpen, "config opens: " .. tostring(errOpen or ""))
