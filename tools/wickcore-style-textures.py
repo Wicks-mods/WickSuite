@@ -8,9 +8,8 @@ over an icon or the minimap.
   Hologram   corners cut at 45 degrees (slice 8), the same cut for masks
   Gilded     a wash that fades out at its sides, gold rules above and below
              it (slice 16), and a circular icon mask
-  Arena      one 6 px notch, top right, on panels (slice 8); square tiles,
-             a square tile ring and masks, and a
-             flat bar with a hard top edge
+  Arena      one 6 px notch, top right (slice 8), on panels and tiles alike,
+             square masks, and a flat bar with a hard top edge
   Frost      a plain square and a hairline outline (slice 4), square masks,
              and a glass bar texture for health and power
 """
@@ -58,7 +57,6 @@ save(shape(64, (12, 12, 12, 12)), "mask-chamfer")
 # Arena: one notch, top right.
 save(shape(32, (0, 6, 0, 0)), "panel-notch")
 save(shape(32, (0, 6, 0, 0), ring=1.25), "ring-notch")
-save(shape(32, (0, 0, 0, 0), ring=1.5), "ring-tile")
 
 # Frost and Arena masks: plain squares. Frost's hairline.
 img, d = canvas(64)
