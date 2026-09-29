@@ -1,69 +1,97 @@
-"""WickCore style textures: the panel, ring and mask shapes each style draws with.
+"""WickCore style textures: the panel, ring and mask shapes each look draws with.
 
 White on transparent, drawn at 8x and scaled down for clean edges, tinted in
-game. Panels and rings are 32x32 and 9-sliced in game with the margin the
-style names (Chrome.Styles in WickCore/Chrome.lua); masks are 64x64 and
-stretched whole over an icon or the minimap.
+game. Panels and rings are 9-sliced in game with the margin the look names
+(Chrome.Styles in WickCore/Chrome.lua); masks are 64x64 and stretched whole
+over an icon or the minimap.
 
-  Obsidian  a 12 px radius (slice 12) and a circular icon mask
-  Hologram  corners cut at 45 degrees (slice 8), the same cut for masks
-  Runic     a small diamond for the corner marks
+  Hologram   corners cut at 45 degrees (slice 8), the same cut for masks
+  Gilded     a wash that fades out at its sides, gold rules above and below
+             it (slice 16), and a circular icon mask
+  Arena      one notched corner, top right (slice 10), square masks
+  Frost      a plain square and a hairline outline (slice 4), square masks
+  Cathedral  a solid stud for the corners
 """
 from PIL import Image, ImageDraw
 
 OUT = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns\WickCore\Media\Textures"
 K = 8
 WHITE = (255, 255, 255, 255)
+CLEAR = (255, 255, 255, 0)
 
 
-def canvas(s):
-    img = Image.new("RGBA", (s * K, s * K), (255, 255, 255, 0))
+def canvas(w, h=None):
+    h = h or w
+    img = Image.new("RGBA", (w * K, h * K), CLEAR)
     return img, ImageDraw.Draw(img)
 
 
-def save(img, s, name):
-    img.resize((s, s), Image.LANCZOS).save(f"{OUT}\\{name}.png")
+def save(img, name):
+    w, h = img.size
+    img.resize((w // K, h // K), Image.LANCZOS).save(f"{OUT}\\{name}.png")
 
 
-def rounded(s, r, ring=None):
+def poly_pts(s, cuts, inset=0):
+    """An octagon-ish outline: cuts = (tl, tr, br, bl) corner cut sizes."""
+    n, i = s * K - 1, inset * K
+    tl, tr, br, bl = (c * K for c in cuts)
+    k = 0.41 * i
+    return [(tl + k, i), (n - tr - k, i), (n - i, tr + k), (n - i, n - br - k),
+            (n - br - k, n - i), (bl + k, n - i), (i, n - bl - k), (i, tl + k)]
+
+
+def shape(s, cuts, ring=None):
     img, d = canvas(s)
-    d.rounded_rectangle([0, 0, s * K - 1, s * K - 1], radius=r * K, fill=WHITE)
+    d.polygon(poly_pts(s, cuts), fill=WHITE)
     if ring:
-        w = ring * K
-        d.rounded_rectangle([w, w, s * K - 1 - w, s * K - 1 - w], radius=max(0, (r - ring)) * K, fill=(255, 255, 255, 0))
+        d.polygon(poly_pts(s, cuts, ring), fill=CLEAR)
     return img
 
-
-def chamfer_pts(s, c, inset=0):
-    n, c, i = s * K - 1, c * K, inset * K
-    return [(c + i * 0.41, i), (n - c - i * 0.41, i), (n - i, c + i * 0.41), (n - i, n - c - i * 0.41),
-            (n - c - i * 0.41, n - i), (c + i * 0.41, n - i), (i, n - c - i * 0.41), (i, c + i * 0.41)]
-
-
-def chamfer(s, c, ring=None):
-    img, d = canvas(s)
-    d.polygon(chamfer_pts(s, c), fill=WHITE)
-    if ring:
-        d.polygon(chamfer_pts(s, c, ring), fill=(255, 255, 255, 0))
-    return img
-
-
-# Obsidian: deep rounding, circular icons.
-save(rounded(32, 12), 32, "panel-r12")
-save(rounded(32, 12, ring=1.25), 32, "ring-r12")
-img, d = canvas(64)
-d.ellipse([0, 0, 64 * K - 1, 64 * K - 1], fill=WHITE)
-save(img, 64, "mask-circle")
 
 # Hologram: cut corners on panels, rings and masks.
-save(chamfer(32, 7), 32, "panel-chamfer")
-save(chamfer(32, 7, ring=1.25), 32, "ring-chamfer")
-save(chamfer(64, 12), 64, "mask-chamfer")
+save(shape(32, (7, 7, 7, 7)), "panel-chamfer")
+save(shape(32, (7, 7, 7, 7), ring=1.25), "ring-chamfer")
+save(shape(64, (12, 12, 12, 12)), "mask-chamfer")
 
-# Runic: the corner mark.
+# Arena: one notch, top right.
+save(shape(32, (0, 9, 0, 0)), "panel-notch")
+save(shape(32, (0, 9, 0, 0), ring=1.25), "ring-notch")
+
+# Frost and Arena masks: plain squares. Frost's hairline.
+img, d = canvas(64)
+d.rectangle([0, 0, 64 * K - 1, 64 * K - 1], fill=WHITE)
+save(img, "mask-square")
+img, d = canvas(32)
+d.rectangle([0, 0, 32 * K - 1, 32 * K - 1], fill=WHITE)
+save(img, "panel-square")
+img, d = canvas(32)
+d.rectangle([0, 0, 32 * K - 1, 32 * K - 1], fill=WHITE)
+d.rectangle([K, K, 31 * K - 1, 31 * K - 1], fill=CLEAR)
+save(img, "ring-hair")
+
+# Gilded: the wash fades out over its outer 16 px left and right; the rules
+# are a line along the top and bottom that fades out the same way.
+W, H = 64, 64
+wash = Image.new("RGBA", (W, H), CLEAR)
+rules = Image.new("RGBA", (W, H), CLEAR)
+for x in range(W):
+    edge = min(x, W - 1 - x)
+    a = min(1.0, edge / 16.0) ** 1.6
+    for y in range(H):
+        wash.putpixel((x, y), (255, 255, 255, int(255 * a)))
+    ra = int(255 * min(1.0, edge / 16.0))
+    rules.putpixel((x, 0), (255, 255, 255, ra))
+    rules.putpixel((x, H - 1), (255, 255, 255, ra))
+wash.save(f"{OUT}\\panel-wash.png")
+rules.save(f"{OUT}\\ring-rules.png")
+img, d = canvas(64)
+d.ellipse([0, 0, 64 * K - 1, 64 * K - 1], fill=WHITE)
+save(img, "mask-circle")
+
+# Cathedral: a solid stud, a diamond with a darker heart.
 img, d = canvas(16)
 m = 16 * K - 1
 d.polygon([(m / 2, 0), (m, m / 2), (m / 2, m), (0, m / 2)], fill=WHITE)
-d.polygon([(m / 2, m * 0.3), (m * 0.7, m / 2), (m / 2, m * 0.7), (m * 0.3, m / 2)], fill=(255, 255, 255, 0))
-save(img, 16, "diamond")
+d.polygon([(m / 2, m * 0.32), (m * 0.68, m / 2), (m / 2, m * 0.68), (m * 0.32, m / 2)], fill=(200, 200, 200, 255))
+save(img, "stud")
 print("ok")
