@@ -58,6 +58,8 @@ def main():
                     help="run the Wick's Probe harness (aura-route watcher)")
     ap.add_argument("--legacy", action="store_true")
     ap.add_argument("--both", action="store_true")
+    ap.add_argument("--styles", action="store_true",
+                    help="with --ui: run once in every WickCore style (Modern, OG, Slate, Obsidian, Runic, Hologram)")
     args = ap.parse_args()
 
     stub = HERE + "/stubclient.lua"
@@ -81,7 +83,11 @@ def main():
         elif args.kits:
             ok = run(HERE + "/kits-harness.lua", mode, args.core, BETA_ADDONS, mode, stub) and ok
         elif args.ui:
-            ok = run(HERE + "/ui-harness.lua", mode, args.core, BETA_ADDONS + "/WicksUI", mode, stub, lua51=True) and ok
+            for style in (["modern", "og", "slate", "obsidian", "runic", "hologram"] if args.styles else [""]):
+                os.environ["WICK_STYLE"] = style
+                if style:
+                    print(f"-- style {style}")
+                ok = run(HERE + "/ui-harness.lua", mode, args.core, BETA_ADDONS + "/WicksUI", mode, stub, lua51=True) and ok
         elif args.gear:
             ok = run(HERE + "/gear-harness.lua", mode, args.core, BETA_ADDONS, mode, stub) and ok
         elif args.probe:
