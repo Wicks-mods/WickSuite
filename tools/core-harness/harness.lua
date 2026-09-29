@@ -227,8 +227,8 @@ end
 
 -- ---------- themes --------------------------------------------------------
 io.write("== themes ==\n")
-check(#Chrome.Themes == 17 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, seven looks' palettes and custom, warlock is fel")
-check(Chrome.ThemeByID.sepia and Chrome.ThemeByID.sepia.look, "a look's palette is a theme")
+check(#Chrome.Themes == 16 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, six looks' palettes and custom, warlock is fel")
+check(Chrome.ThemeByID.rebel and Chrome.ThemeByID.rebel.look, "a look's palette is a theme")
 check(Chrome.activeTheme == "fel" and WickCoreDB.global.theme == "fel", "fel applied from saved default")
 local felBefore = Chrome.Colors.fel[3]
 local bracket = panel.brackets.TOPLEFT[1]
