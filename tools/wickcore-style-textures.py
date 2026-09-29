@@ -8,7 +8,8 @@ over an icon or the minimap.
   Hologram   corners cut at 45 degrees (slice 8), the same cut for masks
   Gilded     a wash that fades out at its sides, gold rules above and below
              it (slice 16), and a circular icon mask
-  Arena      one notched corner, top right (slice 10), square masks
+  Arena      one notched corner, top right (slice 10), square masks, and a
+             flat bar with a hard top edge
   Frost      a plain square and a hairline outline (slice 4), square masks,
              and a glass bar texture for health and power
 """
@@ -106,4 +107,13 @@ for y in range(bh):
     for x in range(bw):
         bar.putpixel((x, y), (v, v, v, a))
 bar.save(f"{OUT}\\bar-glass.png")
+
+# Arena's bar: flat, with a hard light line along the top and a darker base
+# two pixels deep, for a crisp printed edge.
+edge = Image.new("RGBA", (16, 32), CLEAR)
+for y in range(32):
+    v = 255 if y == 0 else (150 if y >= 30 else 225)
+    for x in range(16):
+        edge.putpixel((x, y), (v, v, v, 255))
+edge.save(f"{OUT}\\bar-edge.png")
 print("ok")

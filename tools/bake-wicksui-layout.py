@@ -1,13 +1,24 @@
-"""Bake the hunter profile into WicksUI/Core/Layout.lua as the shipped defaults."""
+"""Bake a Wick's UI profile into WicksUI/Core/Layout.lua as the shipped defaults.
+
+    python bake-wicksui-layout.py [profile]      (default: safe)
+
+The shipped profile is in Wick Modern. If the profile is in another style
+now, its saved Wick Modern snapshot (sizes, positions, minimap, health
+colours) is laid over it first. Every other style snapshot it has is kept,
+so those styles start where the profile had them.
+"""
 import re
+import sys
 from lupa import LuaRuntime
 
 SV = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\WTF\Account\51031842#1\SavedVariables\WicksUI.lua"
 OUT = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns\WicksUI\Core\Layout.lua"
+NAME = sys.argv[1] if len(sys.argv) > 1 else "safe"
 
 L = LuaRuntime()
 L.execute(open(SV, encoding="utf-8").read())
-hunter = L.globals().WicksUIDB.profiles.hunter
+src = L.globals().WicksUIDB.profiles[NAME]
+assert src, "no profile named " + NAME
 
 
 def py(v):
@@ -16,29 +27,35 @@ def py(v):
     return v
 
 
-p = py(hunter)
+p = py(src)
 gen = p["general"]
-modern = gen["styleSizes"]["modern"]
+snaps = dict(gen.get("styleSizes") or {})
+current = gen.get("presetFor") or "modern"
 
-# The OG snapshot: what the profile has now (it is in OG).
-og = {"bars": {k: {"size": b["size"], "spacing": b["spacing"]} for k, b in p["actionbars"]["bars"].items()},
-      "units": {k: {"width": u["width"], "height": u["height"]} for k, u in p["unitframes"]["units"].items()},
-      "minimap": {"square": True, "ring": False, "fill": True}}
-modern = {"bars": modern["bars"], "units": modern["units"],
-          "minimap": {"square": False, "ring": False, "fill": True}}
-
-# The shipped profile is in Modern.
-for k, s in modern["bars"].items():
-    p["actionbars"]["bars"][k]["size"], p["actionbars"]["bars"][k]["spacing"] = s["size"], s["spacing"]
-for k, s in modern["units"].items():
-    p["unitframes"]["units"][k]["width"], p["unitframes"]["units"][k]["height"] = s["width"], s["height"]
-p["minimap"].update(modern["minimap"])
+if current != "modern":
+    m = snaps.get("modern")
+    assert m, NAME + " is in " + current + " and has no Wick Modern snapshot to ship"
+    for k, v in (m.get("bars") or {}).items():
+        p["actionbars"]["bars"][k]["size"], p["actionbars"]["bars"][k]["spacing"] = v["size"], v["spacing"]
+    for k, v in (m.get("units") or {}).items():
+        p["unitframes"]["units"][k]["width"], p["unitframes"]["units"][k]["height"] = v["width"], v["height"]
+    if m.get("minimap"):
+        p["minimap"].update(m["minimap"])
+    if m.get("movers"):
+        p["movers"] = dict(m["movers"])
+    if m.get("healthColor"):
+        p["unitframes"]["healthColor"] = m["healthColor"]
+snaps.pop("modern", None)
 
 # Bookkeeping and per-machine values stay out.
 for k in ["installed", "flatRestored", "ptSans", "shadedDefault", "presetFor", "style", "uiScale",
-          "moversLocked", "styleSizes"]:
+          "moversLocked", "styleSizes", "lookHealth"]:
     gen.pop(k, None)
-gen["styleSizes"] = {"modern": modern, "wick": og}
+# The shipped profile is in Wick Modern; the other styles it has been in
+# keep their snapshots.
+if snaps:
+    gen["styleSizes"] = snaps
+print("baking", NAME, "from", current, "| other styles kept:", sorted(snaps))
 
 blob = repr(p)
 for bad in ["Wickid", "Despliff", "jspli"]:
