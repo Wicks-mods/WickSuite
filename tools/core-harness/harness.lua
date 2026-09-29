@@ -138,7 +138,7 @@ local Chrome = Core.Chrome
 local win = {}
 local panel = Chrome:NewPanel("WicksTestFrame", { title = "Wick's Test", width = 300, height = 200, resizable = true, db = win })
 check(panel.content and panel.title and panel.close and panel.grip and panel.brackets.TOPLEFT, "panel parts")
-check(Chrome:TitleMarkup("Wick's Test"):find("4FC778") and Chrome:TitleMarkup("Wick's Test"):find("D4C8A1"), "two-tone title")
+check(Chrome:TitleMarkup("Wick's Test"):find(Chrome.Hex.fel) and Chrome:TitleMarkup("Wick's Test"):find(Chrome.Hex.text), "two-tone title")
 panel:Show(); panel:Toggle()
 check(panel:IsShown() == false, "Toggle")
 -- Put it somewhere known and check the trip out and back, rather than
@@ -229,7 +229,10 @@ end
 io.write("== themes ==\n")
 check(#Chrome.Themes == 16 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, six looks' palettes and custom, warlock is fel")
 check(Chrome.ThemeByID.rebel and Chrome.ThemeByID.rebel.look, "a look's palette is a theme")
-check(Chrome.activeTheme == "fel" and WickCoreDB.global.theme == "fel", "fel applied from saved default")
+check(Chrome:ThemeSetting() == "auto" and WickCoreDB.global.theme == "auto"
+    and Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "a new install follows the class")
+-- The rest of this section starts from Fel.
+Chrome:SetTheme("fel")
 local felBefore = Chrome.Colors.fel[3]
 local bracket = panel.brackets.TOPLEFT[1]
 local titleFS = Chrome:Text(panel.content, 11, Chrome.Colors.text)
@@ -341,7 +344,7 @@ check(WickCoreDB.global.theme == "shaman", "and left where it was")
 
 WickCoreDB.global.theme = nil                       -- the store has not landed yet
 Chrome:ApplySavedTheme("login")
-check(Chrome.activeTheme == "fel", "with nothing to read it falls back to Fel")
+check(Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "with nothing to read it follows the class")
 check(WickCoreDB.global.theme == nil,
     "and writes nothing, so a late store still has something to restore: " ..
     tostring(WickCoreDB.global.theme))
@@ -492,7 +495,7 @@ page:Show()
 check(built, "options page builds on show")
 Core.Options.root.frame:Show()
 check(Core.Options.root.frame.built, "root page builds on show")
-check(Core.Options.root.frame.themeAuto ~= nil and Core.Options.root.frame.themeNote ~= nil, "theme picker on the root page")
+check(Core.Options.root.frame.themeNote ~= nil and Core.Options.root.frame.themeAuto == nil, "theme picker on the root page, no follow-my-class check")
 A:OpenOptions()
 check(OPENED ~= nil, "OpenOptions")
 Core.Options:ShowExport(A, "WICK1:abc")

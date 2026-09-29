@@ -379,7 +379,7 @@ local okI, errI = pcall(function()
     end
     -- The colours page, Custom picked on its own.
     ns.Install:Show(3)
-    local custom = ns.Install.frame.choices[4]
+    local custom = ns.Install.frame.choices[3]
     custom:GetScript("OnClick")(custom)
     ns.Install:Finish()
 end)
