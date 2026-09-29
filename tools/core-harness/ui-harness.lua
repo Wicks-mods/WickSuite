@@ -366,6 +366,21 @@ io.write("== buffs ==\n")
 check(ns.Auras.initialized and ns.Auras.buffs and ns.Auras.debuffs, "buff and debuff containers built")
 check(ns.Movers.list.auras_buffs ~= nil, "buffs have a mover")
 
+io.write("== comforts ==\n")
+do
+    local CF, CM = ns.Comforts, ns.ComfortsModule
+    check(CM and CM.initialized, "the comforts module starts")
+    check(CF and CF.modules.vendor and CF.modules.loot and CF.modules.tooltips and CF.modules.client and CF.modules.fixes,
+        "Comforts' features carried over and registered")
+    check(not CF.dormant, "with Wick's Comforts not loaded, the built-in copy runs")
+    A.db.profile.comforts.tipIDs = true
+    check(CF.db().tipIDs == true, "its settings are Wick's UI's own")
+    CF.dormant = true
+    check(CF.db().tipIDs == false and CF.db().clientFixes == false, "beside Wick's Comforts, every setting reads as off")
+    CF.dormant = false
+    A.db.profile.comforts.tipIDs = false
+end
+
 io.write("== extras and installer ==\n")
 check(ns.Extras.initialized and _G.WicksUI_MarkerBar ~= nil, "raid marker bar built")
 check(_G.WicksUI_Marker1:GetAttribute("macrotext1") == "/tm 1", "marker 1 marks the target")
