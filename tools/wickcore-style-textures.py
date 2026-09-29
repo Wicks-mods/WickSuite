@@ -10,7 +10,6 @@ over an icon or the minimap.
              it (slice 16), and a circular icon mask
   Arena      one notched corner, top right (slice 10), square masks
   Frost      a plain square and a hairline outline (slice 4), square masks
-  Cathedral  a solid stud for the corners
 """
 from PIL import Image, ImageDraw
 
@@ -88,10 +87,4 @@ img, d = canvas(64)
 d.ellipse([0, 0, 64 * K - 1, 64 * K - 1], fill=WHITE)
 save(img, "mask-circle")
 
-# Cathedral: a solid stud, a diamond with a darker heart.
-img, d = canvas(16)
-m = 16 * K - 1
-d.polygon([(m / 2, 0), (m, m / 2), (m / 2, m), (0, m / 2)], fill=WHITE)
-d.polygon([(m / 2, m * 0.32), (m * 0.68, m / 2), (m / 2, m * 0.68), (m * 0.32, m / 2)], fill=(200, 200, 200, 255))
-save(img, "stud")
 print("ok")

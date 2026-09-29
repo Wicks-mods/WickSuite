@@ -83,7 +83,7 @@ def main():
         elif args.kits:
             ok = run(HERE + "/kits-harness.lua", mode, args.core, BETA_ADDONS, mode, stub) and ok
         elif args.ui:
-            for style in (["modern", "og", "hologram", "rebel", "gilded", "cathedral", "arena", "frost"] if args.styles else [""]):
+            for style in (["modern", "og", "hologram", "rebel", "gilded", "arena", "frost"] if args.styles else [""]):
                 os.environ["WICK_STYLE"] = style
                 if style:
                     print(f"-- style {style}")
