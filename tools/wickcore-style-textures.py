@@ -9,7 +9,8 @@ over an icon or the minimap.
   Gilded     a wash that fades out at its sides, gold rules above and below
              it (slice 16), and a circular icon mask
   Arena      one notched corner, top right (slice 10), square masks
-  Frost      a plain square and a hairline outline (slice 4), square masks
+  Frost      a plain square and a hairline outline (slice 4), square masks,
+             and a glass bar texture for health and power
 """
 from PIL import Image, ImageDraw
 
@@ -87,4 +88,22 @@ img, d = canvas(64)
 d.ellipse([0, 0, 64 * K - 1, 64 * K - 1], fill=WHITE)
 save(img, "mask-circle")
 
+# Frost's glass bar: tinted in game, so white with shading. A bright band
+# over the top third, a clear middle, a slightly deeper base, a light line
+# on the top edge and a dark one on the bottom. Stretched along the bar.
+bw, bh = 16, 32
+bar = Image.new("RGBA", (bw, bh), CLEAR)
+for y in range(bh):
+    t = y / (bh - 1)
+    if y == 0:
+        v, a = 255, 255
+    elif y == bh - 1:
+        v, a = 120, 255
+    elif t < 0.38:
+        v, a = int(255 - 30 * (t / 0.38)), 235
+    else:
+        v, a = int(205 - 55 * ((t - 0.38) / 0.62)), 215
+    for x in range(bw):
+        bar.putpixel((x, y), (v, v, v, a))
+bar.save(f"{OUT}\\bar-glass.png")
 print("ok")
