@@ -292,6 +292,12 @@ check(ns.oUF ~= nil, "oUF embedded in the namespace")
 check(type(_G.WicksUI_oUF) == "table", "oUF published under the X-oUF name")
 check(ns.LAB ~= nil, "LibActionButton reachable")
 
+-- The shipped layout (Core/Layout.lua) may switch whole modules off; the
+-- harness turns every one on so each is exercised.
+for _, d in pairs(ns.defaults.profile) do
+    if type(d) == "table" and d.enable == false then d.enable = true end
+end
+
 io.write("== lifecycle ==\n")
 S.fire("ADDON_LOADED", "WicksUI")
 S.fire("PLAYER_LOGIN")
@@ -357,10 +363,26 @@ check(ns.Movers.list.auras_buffs ~= nil, "buffs have a mover")
 io.write("== extras and installer ==\n")
 check(ns.Extras.initialized and _G.WicksUI_MarkerBar ~= nil, "raid marker bar built")
 check(_G.WicksUI_Marker1:GetAttribute("macrotext1") == "/tm 1", "marker 1 marks the target")
-local okI, errI = pcall(function() for p = 1, 4 do ns.Install:Show(p) end; ns.Install:ApplyLayout("healer"); ns.Install:Finish() end)
-check(okI, "installer pages and the healer layout: " .. tostring(errI or ""))
-check(A.db.profile.movers.uf_party == "BOTTOM,UIParent,BOTTOM,0,190", "healer layout moved the party frames")
+-- Every page, and every answer on it clicked.
+local okI, errI = pcall(function()
+    for p = 1, 6 do
+        ns.Install:Show(p)
+        for _, btn in ipairs(ns.Install.frame.choices) do
+            if btn:IsShown() then btn:GetScript("OnClick")(btn) end
+        end
+    end
+    -- The colours page, Custom picked on its own.
+    ns.Install:Show(3)
+    local custom = ns.Install.frame.choices[3]
+    custom:GetScript("OnClick")(custom)
+    ns.Install:Finish()
+end)
+check(okI, "installer pages and their answers: " .. tostring(errI or ""))
+check(ns.Core.Chrome:ThemeSetting() == "custom", "the colours page sets the theme")
 check(ns:G().installed == true, "installer marks itself done")
+-- The shipped layout is where a fresh profile starts.
+check(ns.defaults.profile.movers.uf_player ~= nil and ns.Movers.list.uf_player.default == ns.defaults.profile.movers.uf_player,
+    "a mover starts at the shipped layout's place")
 
 io.write("== window skins ==\n")
 do
