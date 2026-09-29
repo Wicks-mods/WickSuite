@@ -12,6 +12,8 @@ over an icon or the minimap.
              square masks, and a flat bar with a hard top edge
   Frost      a plain square and a hairline outline (slice 4), square masks,
              and a glass bar texture for health and power
+  Foundry    corners chamfered 6 px with a bevelled steel rim (slice 8), a
+             rivet for panel corners, and a bevelled metal bar
 """
 from PIL import Image, ImageDraw
 
@@ -116,4 +118,41 @@ for y in range(32):
     for x in range(16):
         edge.putpixel((x, y), (v, v, v, 255))
 edge.save(f"{OUT}\\bar-edge.png")
+# Foundry: chamfered steel. The panel, a two-tone bevelled rim (a darker
+# outer line, a bright inner one; tinted in the border colour in game), a
+# rivet with its own shading, and a bevelled metal bar.
+def shade(s, cuts, inset, value):
+    img, d = canvas(s)
+    d.polygon(poly_pts(s, cuts, inset), fill=(value, value, value, 255))
+    return img
+
+
+save(shape(32, (6, 6, 6, 6)), "panel-chamfer6")
+rim = Image.new("RGBA", (32 * K, 32 * K), CLEAR)
+d = ImageDraw.Draw(rim)
+d.polygon(poly_pts(32, (6, 6, 6, 6), 0), fill=(150, 150, 150, 255))
+d.polygon(poly_pts(32, (6, 6, 6, 6), 1), fill=(255, 255, 255, 255))
+d.polygon(poly_pts(32, (6, 6, 6, 6), 2.5), fill=CLEAR)
+save(rim, "ring-steel")
+
+img, d = canvas(16)
+d.ellipse([3 * K, 3 * K, 13 * K, 13 * K], fill=(110, 110, 110, 255))
+d.ellipse([3.6 * K, 3.4 * K, 12 * K, 11.8 * K], fill=(235, 235, 235, 255))
+d.ellipse([5 * K, 5 * K, 11 * K, 11 * K], fill=(175, 175, 175, 255))
+save(img, "rivet")
+
+steel = Image.new("RGBA", (16, 32), CLEAR)
+for y in range(32):
+    if y == 0:
+        v = 255
+    elif y >= 30:
+        v = 95
+    elif y < 13:
+        v = int(235 - 25 * (y / 13))
+    else:
+        v = int(205 - 75 * ((y - 13) / 17))
+    for x in range(16):
+        steel.putpixel((x, y), (v, v, v, 255))
+steel.save(f"{OUT}\\bar-steel.png")
+
 print("ok")
