@@ -28,3 +28,5 @@ exports/
 *.png
 *.jpg
 !logo*.png
+
+__pycache__/
