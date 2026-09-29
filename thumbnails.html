@@ -227,6 +227,15 @@ const SHOTS = {
   beasts:   'images/beasts/screenshots/main.png',
   gear:     'images/gear/screenshots/main.png',
   poisons:  'images/poisons/screenshots/main.png',
+  // Wick's UI, one per look, each titled in the look's own heading font.
+  ui_WicksModern: 'images/ui/screenshots/looks/WicksModern.png',
+  ui_WicksOG:     'images/ui/screenshots/looks/WicksOG.png',
+  ui_Hologram:    'images/ui/screenshots/looks/Hologram.png',
+  ui_Rebel:       'images/ui/screenshots/looks/Rebel.png',
+  ui_Gilded:      'images/ui/screenshots/looks/Gilded.png',
+  ui_Arena:       'images/ui/screenshots/looks/Arena.png',
+  ui_Foundry:     'images/ui/screenshots/looks/Foundry.png',
+  ui_Frost:       'images/ui/screenshots/looks/Frost.png',
 };
 function Shot({ which, style={}, accent=G, size='auto', origin='left top', glowAt='20% 25%' }) {
   return (
@@ -1001,6 +1010,43 @@ function AddonSocial({ which }) {
   );
 }
 
+/* ── Wick's UI · the looks ──────────────────────
+   A gallery card for the CurseForge page: every look Wick's UI (and the
+   suite) can wear, each a real screenshot titled in the look's own font. */
+const UI_LOOKS = ['WicksModern', 'WicksOG', 'Hologram', 'Rebel', 'Gilded', 'Arena', 'Foundry', 'Frost'];
+function UILooks() {
+  return (
+    <div style={{width:1200,height:630,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
+      <DungeonBg width={1200} height={630} glowX="50%" glowY="30%" glowColor={G} accent="#6B21A8" opacity={0.18}/>
+      <Brackets size={20} thick={3}/>
+      <div style={{position:'absolute',left:56,right:56,top:44,height:170,
+        display:'flex',alignItems:'center',justifyContent:'space-between',gap:40}}>
+        <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
+          <WickWordmark size={70}/>
+          <div style={{fontFamily:FM,fontSize:18,letterSpacing:'0.4em',color:G,marginTop:4,textAlign:'right'}}>UI</div>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:10,maxWidth:660}}>
+          <div style={{fontFamily:FU,fontSize:30,color:TX,lineHeight:1.25,fontWeight:600,whiteSpace:'nowrap'}}>
+            Pick a look. The whole interface follows.
+          </div>
+          <div style={{height:1,width:'100%',background:BR}}/>
+          <div style={{fontFamily:FM,fontSize:12,color:MDIM,letterSpacing:'0.12em',textTransform:'uppercase'}}>
+            Frames, windows, bags and fonts change together, across every Wick addon
+          </div>
+        </div>
+      </div>
+      <div style={{position:'absolute',left:40,right:40,bottom:40,
+        display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:16}}>
+        {UI_LOOKS.map(n => (
+          <div key={n} style={{aspectRatio:'16 / 9'}}>
+            <Shot which={'ui_' + n} size="cover" origin="center" glowAt="50% 50%"/>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SuiteThumb({ flavour = 'forever' } = {}) {
   const F = FLAVOURS[flavour] || FLAVOURS.forever;
   // A 240px column divided by a long roster leaves rows shorter than
@@ -1317,6 +1363,7 @@ const ONLY_COMPONENTS = {
   social_trade: { Comp: () => <AddonSocial which="trade"/>, w: 1200, h: 630 },
   social_gear: { Comp: () => <AddonSocial which="gear"/>, w: 1200, h: 630 },
   social_poisons: { Comp: () => <AddonSocial which="poisons"/>, w: 1200, h: 630 },
+  ui_looks:    { Comp: UILooks,                                            w: 1200, h: 630 },
   milestone:   { Comp: Milestone,                                          w: 1200, h: 630 },
   cd:       { Comp: CDThumb,            w: 460, h: 260 },
   bis:      { Comp: BISThumb,           w: 460, h: 260 },
@@ -1384,6 +1431,9 @@ function App() {
 
       <div className="section-label">Social Cover · 1200×630 (FB / X / LinkedIn link cards)</div>
       <Artboard id="social-cover" label="Wick Suite — Social Cover" w={1200} h={630} Component={SocialCover}/>
+
+      <div className="section-label">Wick's UI · the looks (1200×630, CurseForge gallery)</div>
+      <Artboard id="ui-looks" label="Wick's UI — Looks" w={1200} h={630} Component={UILooks}/>
 
       <div className="section-label">Addon Thumbnails · Store cards</div>
       <Artboard id="suite-thumb" label="Wick's Suite" w={460} h={260} Component={SuiteThumb}/>
