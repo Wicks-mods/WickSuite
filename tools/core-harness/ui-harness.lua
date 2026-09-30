@@ -380,6 +380,8 @@ do
         check(ns:UnitOf(p) == "nameplate1", "a plate's unit is read from where oUF keeps it")
         NP:Refresh(p)
         check(p.wuiMarkL:IsShown() and p.wuiMarkR:IsShown(), "your target's plate has a pointer each side")
+        check(p.wuiThreatGlow.wuiUnder and p.wuiTargetGlow.wuiUnder and (p.wuiThreatGlow.wuiAlpha or 1) < 1,
+            "the plate glows sit under the border, softer than a unit frame's")
         local _, _, _, x0 = p.wuiMarkL:GetPoint()
         p.wuiCastbar:Show()
         local _, _, _, x1 = p.wuiMarkL:GetPoint()
