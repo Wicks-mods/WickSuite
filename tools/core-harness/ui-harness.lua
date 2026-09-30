@@ -475,6 +475,29 @@ io.write("== buffs ==\n")
 check(ns.Auras.initialized and ns.Auras.buffs and ns.Auras.debuffs, "buff and debuff containers built")
 check(ns.Movers.list.auras_buffs ~= nil, "buffs have a mover")
 
+io.write("== visuals ==\n")
+do
+    local VX = ns.Visuals
+    check(VX and VX.initialized, "the visuals module starts")
+    local d = VX:db()
+    S.CVARS.showFog = "1"
+    d.noFog = true; VX:Apply()
+    local on = S.CVARS.showFog == "0"
+    d.noFog = false; VX:Apply()
+    check(on and S.CVARS.showFog == "1", "no fog sets the game's own setting and puts back what was there")
+    S.CVARS.ffxGlow = "1"
+    d.noGlow = true; VX:Apply()
+    S.CVARS.ffxGlow = "0.5"   -- changed by hand at the console meanwhile
+    d.noGlow = false; VX:Apply()
+    check(S.CVARS.ffxGlow == "0.5", "a setting changed by hand since is left as it is")
+    S.CVARS.cameraIndirectVisibility, S.CVARS.cameraIndirectOffset = nil, nil
+    d.cameraStays = true
+    local ok = pcall(VX.Apply, VX)
+    check(ok and S.CVARS.cameraIndirectVisibility == nil and not VX:Available("cameraStays"),
+        "an option whose setting this client lacks does nothing and is greyed out")
+    d.cameraStays = false
+end
+
 io.write("== comforts ==\n")
 do
     local CF, CM = ns.Comforts, ns.ComfortsModule
