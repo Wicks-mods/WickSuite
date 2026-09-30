@@ -64,4 +64,29 @@ ax, ay = cx + math.cos(math.radians(40)) * r, cy + math.sin(math.radians(40)) * 
 head = 3.4 * K
 d.polygon([(ax - head, ay - head * 0.2), (ax + head * 0.9, ay - head * 0.9), (ax + head * 0.3, ay + head)], fill=(255, 255, 255, 255))
 save(img, "reset")
+
+
+def filled(name, pts):
+    img, d = canvas()
+    d.polygon([(x * K, y * K) for x, y in pts], fill=(255, 255, 255, 255))
+    save(img, name)
+
+
+# Nameplate marks: pointers at a target or focus, filling the canvas so the
+# texture's size is the mark's size; a diamond for elites and rares.
+filled("pointer-right", [(5, 3), (28, 16), (5, 29)])
+filled("pointer-left", [(27, 3), (4, 16), (27, 29)])
+filled("diamond", [(16, 3), (29, 16), (16, 29), (3, 16)])
+
+# Lock: a shackle over a body with a keyhole.
+img, d = canvas()
+sr = 6.2 * K
+d.arc([cx - sr, 13 * K - sr, cx + sr, 13 * K + sr], start=180, end=360, fill=(255, 255, 255, 255), width=int(2.8 * K))
+d.rectangle([cx - sr - 1.4 * K, 13 * K, cx - sr + 1.4 * K, 16 * K], fill=(255, 255, 255, 255))
+d.rectangle([cx + sr - 1.4 * K, 13 * K, cx + sr + 1.4 * K, 16 * K], fill=(255, 255, 255, 255))
+d.rounded_rectangle([7 * K, 15 * K, 25 * K, 29 * K], radius=2 * K, fill=(255, 255, 255, 255))
+kh = 2.1 * K
+d.ellipse([cx - kh, 20.5 * K - kh, cx + kh, 20.5 * K + kh], fill=(255, 255, 255, 0))
+d.rectangle([cx - 0.9 * K, 20.5 * K, cx + 0.9 * K, 25 * K], fill=(255, 255, 255, 0))
+save(img, "lock")
 print("ok")

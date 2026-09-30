@@ -360,6 +360,56 @@ check(NP.driver ~= nil, "oUF nameplate driver spawned")
 A.db.profile.nameplates.execute = 20
 local okN, errN = pcall(function() NP:Update() end)
 check(okN and NP.curve ~= nil, "execute curve built on a settings change: " .. tostring(errN or ""))
+do
+    -- A plate styled the way the driver styles one.
+    local oUF = ns.oUF
+    oUF:SetActiveStyle("WicksUI_Nameplate")
+    local okP, p = pcall(oUF.Spawn, oUF, "target", "WicksUI_TestPlate")
+    oUF:SetActiveStyle("WicksUI")
+    check(okP and p and p.wuiMarkL and p.wuiCastbar, "a nameplate styles, with its marks: " .. tostring(not okP and p or ""))
+    if okP and p then
+        local d = NP:db()
+        local sv = { UnitExists = UnitExists, UnitIsUnit = UnitIsUnit, UnitIsFriend = UnitIsFriend }
+        local focus = false
+        UnitExists = function() return true end
+        UnitIsFriend = function() return false end
+        UnitIsUnit = function(_, b) if b == "focus" then return focus end return not focus end
+        p.unit = "nameplate1"
+        NP:Refresh(p)
+        check(p.wuiMarkL:IsShown() and p.wuiMarkR:IsShown(), "your target's plate has a pointer each side")
+        local _, _, _, x0 = p.wuiMarkL:GetPoint()
+        p.wuiCastbar:Show()
+        local _, _, _, x1 = p.wuiMarkL:GetPoint()
+        p.wuiCastbar:Hide()
+        local _, _, _, x2 = p.wuiMarkL:GetPoint()
+        check(x0 == -3 and x1 < x0 and x2 == x0, "the left pointer steps out past the spell icon while a cast shows: "
+            .. tostring(x0) .. " / " .. tostring(x1) .. " / " .. tostring(x2))
+        focus = true
+        NP:Refresh(p)
+        check(p.wuiMarkL:IsShown() and p:GetAlpha() == 1, "your focus is marked too, and not dimmed")
+        d.targetMarker = "glow"
+        focus = false
+        NP:Refresh(p)
+        check(p.wuiTargetGlow:IsShown() and not p.wuiMarkL:IsShown(), "the glow instead of the pointers when chosen")
+        d.targetMarker = "arrows"
+        d.castbar = false
+        NP:Configure(p)
+        check(not p:IsElementEnabled("Castbar"), "the Cast bar toggle switches the plate's cast bar off")
+        d.castbar = true
+        NP:Configure(p)
+        check(p:IsElementEnabled("Castbar") and p.Castbar == p.wuiCastbar, "and back on")
+        check(p.wuiNameTag:find("wui:classmark", 1, true) ~= nil, "the name carries the elite diamond")
+        local oc = UnitClassification
+        UnitClassification = function() return "elite" end
+        local mark = oUF.Tags.Methods["wui:classmark"]("target")
+        UnitClassification = function() return "normal" end
+        local none = oUF.Tags.Methods["wui:classmark"]("target")
+        UnitClassification = oc
+        check(mark:find("glyph-diamond", 1, true) and none == "", "a diamond for an elite, nothing for a normal mob")
+        UnitExists, UnitIsUnit, UnitIsFriend = sv.UnitExists, sv.UnitIsUnit, sv.UnitIsFriend
+        NP.plates[p] = nil
+    end
+end
 check(not ns.errors or #ns.errors == 0, "no module errors: " .. table.concat(ns.errors or {}, " | "))
 
 io.write("== buffs ==\n")
