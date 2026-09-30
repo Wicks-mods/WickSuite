@@ -405,6 +405,24 @@ do
     UnitName = function(u) return u end
     UnitClass = function() return "Mage", "MAGE" end
     UnitDetailedThreatSituation = function(u) local t = T[u]; if t then return unpack(t) end end
+    local pf
+    for f in pairs(ns.UnitFrames.all or {}) do if f.wuiKey == "player" then pf = f end end
+    check(pf and pf.wuiThreatGlow and pf.ThreatIndicator == pf.wuiThreatGlow, "the player frame has its threat glow: "
+        .. tostring(pf and pf.wuiThreatGlow) .. " / " .. tostring(pf and pf.ThreatIndicator))
+    check(pf and pf.IsElementEnabled and pf:IsElementEnabled("ThreatIndicator"), "and oUF's threat element is on for it")
+    do
+        local uts, isv, ue = UnitThreatSituation, issecretvalue, UnitExists
+        local SECRET = {}
+        UnitExists = function() return true end
+        issecretvalue = function(v) return v == SECRET end
+        UnitThreatSituation = function() return 3 end
+        local ok1 = pcall(ns.ThreatGlowUpdate, pf, "ForceUpdate", pf.unit)
+        check(ok1 and pf.wuiThreatGlow:IsShown(), "the glow shows when a mob is on you")
+        UnitThreatSituation = function() return SECRET end
+        local ok2 = pcall(ns.ThreatGlowUpdate, pf, "ForceUpdate", pf.unit)
+        check(ok2 and not pf.wuiThreatGlow:IsShown(), "a secret threat state hides the glow instead of erroring")
+        UnitThreatSituation, issecretvalue, UnitExists = uts, isv, ue
+    end
     local list = TH.Read()
     check(#list == 3 and list[1].unit == "party1" and list[1].tanking and list[2].unit == "player" and list[3].unit == "party2",
         "the meter ranks by threat, the tank first here")
