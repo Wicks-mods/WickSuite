@@ -425,6 +425,19 @@ do
             NP:Configure(p)
             check(off and on, "threat colours only while you tank; otherwise class and reaction")
         end
+        do
+            local wasN = d.friendlyNameOnly
+            d.friendlyNameOnly = true
+            UnitIsFriend = function() return true end
+            NP:Refresh(p)
+            local bare = not p.Health:IsShown() and not p.wuiPercent:IsShown() and not p.wuiDebuffs:IsShown()
+                and not p.wuiMarkL:IsShown()
+            UnitIsFriend = function() return false end
+            NP:Refresh(p)
+            local back = p.Health:IsShown() and p.wuiPercent:IsShown() == (d.percent and true or false)
+            d.friendlyNameOnly = wasN
+            check(bare and back, "a friendly name-only plate is just the name: no bar, percent, auras or marks; and back")
+        end
         UnitExists, UnitIsUnit, UnitIsFriend = sv.UnitExists, sv.UnitIsUnit, sv.UnitIsFriend
         NP.plates[p] = nil
     end
