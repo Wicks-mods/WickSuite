@@ -511,8 +511,19 @@ end
 
 io.write("== world names ==\n")
 do
-    ns.Media:UnitNameFont()
-    check(UNIT_NAME_FONT == ns.Core.Chrome:Font(), "names over units in the world take the look's font: " .. tostring(UNIT_NAME_FONT))
+    local zone = CreateFont and CreateFont("WicksUITest_ZoneFont")
+    local was = rawget(_G, "ZoneTextFont")
+    if zone and zone.SetFont then zone:SetFont("Fonts\\FRIZQT__.TTF", 40, "THICKOUTLINE"); ZoneTextFont = zone end
+    ns.Media:WorldFonts()
+    local Ch = ns.Core.Chrome
+    check(UNIT_NAME_FONT == Ch:Font() and DAMAGE_TEXT_FONT == Ch:Font(),
+        "names and damage numbers over the world take the look's font: " .. tostring(UNIT_NAME_FONT))
+    if zone and zone.GetFont then
+        local path, size, flags = zone:GetFont()
+        check(path == Ch:HeadingFont() and size == 40 and flags == "THICKOUTLINE",
+            "the zone name takes the look's heading face and keeps its size and outline")
+    end
+    ZoneTextFont = was
 end
 
 io.write("== party manager ==\n")
