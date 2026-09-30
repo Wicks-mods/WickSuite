@@ -431,7 +431,8 @@ do
     list = TH.Read()
     check(TH.Warning(list[2]) == false, "and not below it")
     local played = 0
-    local ps, gt = PlaySound, GetTime
+    local ps, gt, uts = PlaySound, GetTime, UnitThreatSituation
+    UnitThreatSituation = function(u) local t = T[u]; return t and t[2] or nil end
     PlaySound = function() played = played + 1 end
     local now = 1000
     GetTime = function() return now end
@@ -449,7 +450,14 @@ do
     T.player = { true, 3, 100, 100, 1200 }; T.party1 = { false, 1, 85, 85, 1000 }
     TH.SoundCheck(TH.Read())
     check(played == 3, "the sound plays as you pull a mob off the tank")
-    PlaySound, GetTime = ps, gt
+    -- An add turns to you while your target stays on the tank.
+    T.player = { false, 0, 60, 66, 600 }; T.party1 = { true, 3, 100, 100, 1000 }; TH.SoundCheck(TH.Read())
+    now = now + 5
+    local rd = TH.Read()
+    UnitThreatSituation = function(u) if u == "player" then return 3 end local t = T[u]; return t and t[2] end
+    TH.SoundCheck(rd)
+    check(played == 4, "and as an add that is not your target turns to you")
+    PlaySound, GetTime, UnitThreatSituation = ps, gt, uts
     for k, v in pairs(saved) do _G[k] = v end
 end
 
