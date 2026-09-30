@@ -480,22 +480,27 @@ do
     local VX = ns.Visuals
     check(VX and VX.initialized, "the visuals module starts")
     local d = VX:db()
-    S.CVARS.showFog = "1"
-    d.noFog = true; VX:Apply()
-    local on = S.CVARS.showFog == "0"
-    d.noFog = false; VX:Apply()
-    check(on and S.CVARS.showFog == "1", "no fog sets the game's own setting and puts back what was there")
+    S.CVARS.volumeFog, S.CVARS.volumeFogLevel = "1", "3"
+    d.noVolumeFog = true; VX:Apply()
+    local on = S.CVARS.volumeFog == "0" and S.CVARS.volumeFogLevel == "0"
+    d.noVolumeFog = false; VX:Apply()
+    check(on and S.CVARS.volumeFog == "1" and S.CVARS.volumeFogLevel == "3",
+        "no volumetric fog sets the game's own settings and puts back what was there")
     S.CVARS.ffxGlow = "1"
     d.noGlow = true; VX:Apply()
     S.CVARS.ffxGlow = "0.5"   -- changed by hand at the console meanwhile
     d.noGlow = false; VX:Apply()
     check(S.CVARS.ffxGlow == "0.5", "a setting changed by hand since is left as it is")
-    S.CVARS.cameraIndirectVisibility, S.CVARS.cameraIndirectOffset = nil, nil
-    d.cameraStays = true
+    S.CVARS.ffxNether = nil
+    d.noNether = true
     local ok = pcall(VX.Apply, VX)
-    check(ok and S.CVARS.cameraIndirectVisibility == nil and not VX:Available("cameraStays"),
+    check(ok and S.CVARS.ffxNether == nil and not VX:Available("noNether"),
         "an option whose setting this client lacks does nothing and is greyed out")
-    d.cameraStays = false
+    d.noNether = false
+    S.CVARS.disableHorizonStart = "0"
+    d.noFog = true; VX:Apply()
+    check(S.CVARS.disableHorizonStart == "1", "no distance fog switches off the full fog distance")
+    d.noFog = false; VX:Apply()
 end
 
 io.write("== comforts ==\n")
