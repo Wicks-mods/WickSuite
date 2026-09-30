@@ -1014,8 +1014,11 @@ function AddonSocial({ which }) {
    A gallery card for the CurseForge page: every look Wick's UI (and the
    suite) can wear, each a real screenshot titled in the look's own font. */
 const UI_LOOKS = ['WicksModern', 'WicksOG', 'Hologram', 'Rebel', 'Gilded', 'Arena', 'Foundry', 'Frost'];
-// The main parts, one line across the top of the screenshots.
-const UI_FEATURES = ['Unit frames', 'Nameplates', 'Action bars', 'Threat meter', 'Window skins', 'Chat', 'Minimap', 'Tooltips'];
+// The main parts, two lines across the top of the screenshots.
+const UI_FEATURES = [
+  ['Unit frames', 'Nameplates', 'Action bars', 'Threat meter', 'Window skins', 'Chat', 'Minimap', 'Tooltips'],
+  ['Buffs', 'Info panels', 'XP and rep bars', 'Profiles', 'Move anything', 'Full customization', 'Suite addons plug in'],
+];
 function UILooks() {
   return (
     <div style={{width:1200,height:630,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
@@ -1037,14 +1040,18 @@ function UILooks() {
           </div>
         </div>
       </div>
-      <div style={{position:'absolute',left:40,right:40,top:238,height:20,
-        display:'flex',alignItems:'center',justifyContent:'space-between',
+      <div style={{position:'absolute',left:40,right:40,top:214,
+        display:'flex',flexDirection:'column',gap:10,
         fontFamily:FM,fontSize:13,letterSpacing:'0.14em',textTransform:'uppercase',color:TX}}>
-        {UI_FEATURES.map((f, i) => (
-          <React.Fragment key={f}>
-            {i > 0 && <span style={{width:5,height:5,background:G,transform:'rotate(45deg)',flex:'none'}}/>}
-            <span style={{whiteSpace:'nowrap'}}>{f}</span>
-          </React.Fragment>
+        {UI_FEATURES.map((row, r) => (
+          <div key={r} style={{height:18,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            {row.map((f, i) => (
+              <React.Fragment key={f}>
+                {i > 0 && <span style={{width:5,height:5,background:G,transform:'rotate(45deg)',flex:'none'}}/>}
+                <span style={{whiteSpace:'nowrap'}}>{f}</span>
+              </React.Fragment>
+            ))}
+          </div>
         ))}
       </div>
       <div style={{position:'absolute',left:40,right:40,bottom:40,
