@@ -516,6 +516,11 @@ do
     check(ok, "the party manager skins without error: " .. tostring(err or ""))
     check(m.Background:GetAlpha() == 0 and mk.backgroundTexture:GetAlpha() == 0,
         "its panel art and the marker buttons' art are faded")
+    -- A live unit frame inside a window (the raid frame settings' preview)
+    -- is left out of the window scans: its alphas are secret.
+    local uf = CreateFrame("Button", nil, m)
+    uf.healthBar, uf.displayedUnit = CreateFrame("StatusBar", nil, uf), "player"
+    check(ns.PanelSkins.notOurs(uf) == true, "the window scans leave unit frames alone")
 end
 
 io.write("== visuals ==\n")
