@@ -526,6 +526,21 @@ do
     ZoneTextFont = was
 end
 
+io.write("== swing timers ==\n")
+do
+    local f = CreateFrame("Frame", "SwingTimerMainHandFrame", UIParent)
+    f.Background, f.Border = f:CreateTexture(), f:CreateTexture()
+    f.StatusBar = CreateFrame("StatusBar", nil, f)
+    local sb = f.StatusBar
+    sb.TypeLabel, sb.TimeLabel = sb:CreateFontString(), sb:CreateFontString()
+    sb.TypeLabelShadow = sb:CreateTexture()
+    f.InitializeBarPresentation = function() end
+    f.ApplyRangePresentation = function() end
+    local ok, err = pcall(ns.Skins.SwingTimers, ns.Skins)
+    check(ok and sb.backdrop ~= nil, "the swing timers skin: a panel of ours behind the bar: " .. tostring(err or ""))
+    SwingTimerMainHandFrame = nil
+end
+
 io.write("== party manager ==\n")
 do
     -- A stand-in with the pieces the skin reaches for.
