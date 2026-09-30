@@ -552,6 +552,21 @@ do
     check(ok and dd.Middle:GetAlpha() == 0, "an old dropdown loses its art for a tile of ours: " .. tostring(err or ""))
 end
 
+io.write("== group finder ==\n")
+do
+    local f = CreateFrame("Frame", "WicksUITest_LFG", UIParent)
+    f.SoloRoleButtons = CreateFrame("Frame", nil, f)
+    local tank = CreateFrame("Button", nil, f.SoloRoleButtons)
+    tank:SetSize(64, 64)
+    tank.roleID = "TANK"
+    tank.Background = tank:CreateTexture()
+    tank.CheckButton = CreateFrame("CheckButton", nil, tank)
+    f.SoloRoleButtons.RoleButtons = { tank }
+    f.CategoryView = CreateFrame("Frame", nil, f)
+    local ok, err = pcall(ns.PanelSkins.styleRoleButton, tank, "groupfinder-icon-role-large-tank")
+    check(ok and tank.Background:GetAlpha() == 0, "the group finder's roles lose their glow rings for tiles: " .. tostring(err or ""))
+end
+
 io.write("== party manager ==\n")
 do
     -- A stand-in with the pieces the skin reaches for.
