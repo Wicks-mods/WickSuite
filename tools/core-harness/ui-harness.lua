@@ -494,6 +494,16 @@ io.write("== buffs ==\n")
 check(ns.Auras.initialized and ns.Auras.buffs and ns.Auras.debuffs, "buff and debuff containers built")
 check(ns.Movers.list.auras_buffs ~= nil, "buffs have a mover")
 
+io.write("== info panels ==\n")
+do
+    local Ch = ns.Core.Chrome
+    local c = Ch.Colors.fel
+    local want = ("|cff%02x%02x%02x"):format(math.floor(c[1] * 255 + 0.5), math.floor(c[2] * 255 + 0.5), math.floor(c[3] * 255 + 0.5))
+    local s = ns.DataTexts.registry.time.text()
+    check(Ch:Esc("fel") == want and s:find(want, 1, true) ~= nil,
+        "info panel values are in the look's accent: " .. tostring(s):gsub("|", "||"))
+end
+
 io.write("== party manager ==\n")
 do
     -- A stand-in with the pieces the skin reaches for.
