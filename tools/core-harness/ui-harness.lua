@@ -443,6 +443,12 @@ do
     now = now + 5
     T.player = { false, 1, 95, 104, 950 }; TH.SoundCheck(TH.Read())
     check(played == 2, "and again once it has cleared and come back")
+    -- The tank has it, then it turns to you: you pulled it.
+    T.player = { false, 0, 60, 66, 600 }; TH.SoundCheck(TH.Read())
+    now = now + 5
+    T.player = { true, 3, 100, 100, 1200 }; T.party1 = { false, 1, 85, 85, 1000 }
+    TH.SoundCheck(TH.Read())
+    check(played == 3, "the sound plays as you pull a mob off the tank")
     PlaySound, GetTime = ps, gt
     for k, v in pairs(saved) do _G[k] = v end
 end
