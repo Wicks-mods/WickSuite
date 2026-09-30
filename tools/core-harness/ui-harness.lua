@@ -541,6 +541,17 @@ do
     SwingTimerMainHandFrame = nil
 end
 
+io.write("== old dropdowns ==\n")
+do
+    local dd = CreateFrame("Frame", nil, UIParent)
+    dd.Left, dd.Middle, dd.Right = dd:CreateTexture(), dd:CreateTexture(), dd:CreateTexture()
+    dd.Middle:SetSize(150, 64)
+    dd.Button = CreateFrame("Button", nil, dd)
+    dd.Text = dd:CreateFontString()
+    local ok, err = pcall(ns.PanelSkins.styleOldDropdown, dd)
+    check(ok and dd.Middle:GetAlpha() == 0, "an old dropdown loses its art for a tile of ours: " .. tostring(err or ""))
+end
+
 io.write("== party manager ==\n")
 do
     -- A stand-in with the pieces the skin reaches for.
