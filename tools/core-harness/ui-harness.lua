@@ -381,6 +381,40 @@ do
     A.db.profile.comforts.tipIDs = false
 end
 
+io.write("== threat ==\n")
+do
+    local TH = ns.Threat
+    check(TH and TH.initialized and _G.WicksUI_ThreatMeter and ns.Movers.list.threatmeter and ns.Movers.list.threatbar,
+        "threat meter and bar built, each with a mover")
+    -- A party of three on a mob: the tank, you, a mage; plain values, as
+    -- this client hands them over.
+    local saved = { UnitExists = UnitExists, UnitCanAttack = UnitCanAttack, IsInGroup = IsInGroup,
+        UnitDetailedThreatSituation = UnitDetailedThreatSituation, UnitAffectingCombat = UnitAffectingCombat,
+        UnitName = UnitName, UnitClass = UnitClass, UnitIsUnit = UnitIsUnit, IsInRaid = IsInRaid }
+    local T = {
+        player = { false, 1, 92, 101, 900 },
+        party1 = { true, 3, 100, 100, 1000 },
+        party2 = { false, 0, 40, 44, 400 },
+    }
+    UnitExists = function(u) return u == "target" or T[u] ~= nil end
+    UnitCanAttack = function() return true end
+    IsInGroup = function() return true end
+    IsInRaid = function() return false end
+    UnitIsUnit = function(a, b) return a == b end
+    UnitAffectingCombat = function() return true end
+    UnitName = function(u) return u end
+    UnitClass = function() return "Mage", "MAGE" end
+    UnitDetailedThreatSituation = function(u) local t = T[u]; if t then return unpack(t) end end
+    local list = TH.Read()
+    check(#list == 3 and list[1].unit == "party1" and list[1].tanking and list[2].unit == "player" and list[3].unit == "party2",
+        "the meter ranks by threat, the tank first here")
+    check(TH.Warning(list[2]) == true, "you are warned past 90% of the pull")
+    T.player = { false, 0, 60, 66, 600 }
+    list = TH.Read()
+    check(TH.Warning(list[2]) == false, "and not below it")
+    for k, v in pairs(saved) do _G[k] = v end
+end
+
 io.write("== extras and installer ==\n")
 check(ns.Extras.initialized and _G.WicksUI_MarkerBar ~= nil, "raid marker bar built")
 check(_G.WicksUI_Marker1:GetAttribute("macrotext1") == "/tm 1", "marker 1 marks the target")
