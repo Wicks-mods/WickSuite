@@ -351,6 +351,14 @@ A.db.profile.unitframes.units.player.portrait = "left"
 A.db.profile.unitframes.healthColor = "gradient"
 local okU2, errU2 = pcall(function() UF:Update() end)
 check(okU2, "update after settings change: " .. tostring(errU2 or ""))
+do
+    local got = {}
+    local fs = { SetFont = function(_, p, sz) got.p, got.s = p, sz end, SetShadowOffset = function() end, SetShadowColor = function() end }
+    ns.Media:SetFont(fs, 12, "OUTLINE", "Wick", true)
+    local st = ns.Core.Chrome:StyleDef()
+    check(st.unitFont == nil or (got.p == st.unitFont and got.s == 12 + (st.unitBump or 0)),
+        "unit frame text takes the look's own face and size where it has one: " .. tostring(got.p) .. " " .. tostring(got.s))
+end
 check(not ns.errors or #ns.errors == 0, "no module errors: " .. table.concat(ns.errors or {}, " | "))
 
 io.write("== nameplates ==\n")
