@@ -482,6 +482,28 @@ db:SetProfile("Default")
 check(db:DeleteProfile("Alt") == true and #db:GetProfiles() == 1, "DeleteProfile")
 check(db:DeleteProfile("Default") == false, "cannot delete Default")
 
+-- A start where the client has no name yet: nothing is saved under
+-- "Unknown", and at login the character gets its own profile back.
+do
+    local sv = { profiles = { Default = {}, Mine = { locked = true }, Stray = {} },
+        profileKeys = { ["Wick - Classic Beta PvP"] = "Mine", ["Unknown - Classic Beta PvP"] = "Stray" },
+        char = { ["Unknown - Classic Beta PvP"] = { junk = true } }, global = {}, keyMode = "char" }
+    _G.WickNamelessDB = sv
+    local un = UnitName
+    UnitName = function(u) if u == "player" then return "Unknown" end return un(u) end
+    local ndb = Core.Profiles:Init({ name = "Nameless" }, "WickNamelessDB", { profile = { locked = false } })
+    check(ndb.provisional and ndb.profileName ~= "Stray", "no name at load: the stray Unknown profile is not picked")
+    check(sv.profileKeys["Unknown - Classic Beta PvP"] == "Stray" and not sv.profileKeys["Unknown - Classic Beta PvP - x"],
+        "and nothing new is saved under Unknown")
+    UnitName = un
+    ndb:Rebind()
+    check(not ndb.provisional and ndb.charKey == "Wick - Classic Beta PvP" and ndb.profileName == "Mine" and ndb.profile.locked == true,
+        "at login the name is in, and the character is on its own profile: " .. tostring(ndb.profileName))
+    check(sv.profileKeys["Unknown - Classic Beta PvP"] == nil and sv.char["Unknown - Classic Beta PvP"] == nil,
+        "the Unknown entries are cleared")
+    _G.WickNamelessDB = nil
+end
+
 -- ---------- options -------------------------------------------------------
 io.write("== options ==\n")
 local built = false
