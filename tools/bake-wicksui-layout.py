@@ -55,6 +55,10 @@ for k in ["installed", "flatRestored", "ptSans", "shadedDefault", "presetFor", "
 # keep their snapshots.
 if snaps:
     gen["styleSizes"] = snaps
+# Choices the shipped layout makes whatever the source profile had.
+p.setdefault("nameplates", {})["enable"] = True
+p["nameplates"]["healthColor"] = "look"
+p.setdefault("skins", {})["trackerFontSize"] = 14
 print("baking", NAME, "from", current, "| other styles kept:", sorted(snaps))
 
 blob = repr(p)

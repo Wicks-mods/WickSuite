@@ -380,6 +380,15 @@ do
         check(ns:UnitOf(p) == "nameplate1", "a plate's unit is read from where oUF keeps it")
         NP:Refresh(p)
         check(p.wuiMarkL:IsShown() and p.wuiMarkR:IsShown(), "your target's plate has a pointer each side")
+        do
+            local st = ns.Core.Chrome:StyleDef()
+            local want = ns.mult * ((st.family == "og" and st.borderPx) or 1)
+            local _, _, _, bx = p.Health.backdrop:GetPoint()
+            check(math.abs((bx or 0) - want) < 1e-6, "the plate's border sits wholly outside the bar at the look's thickness: "
+                .. tostring(bx) .. " / " .. tostring(want))
+            local okC, errC = pcall(p.Health.PostUpdateColor, p.Health, "nameplate1")
+            check(okC and (not st.health or NP.LookColor("nameplate1") ~= nil), "plates take the look's health colours: " .. tostring(errC or ""))
+        end
         check(p.wuiThreatGlow.wuiUnder and p.wuiTargetGlow.wuiUnder and (p.wuiThreatGlow.wuiAlpha or 1) < 1,
             "the plate glows sit under the border, softer than a unit frame's")
         local _, _, _, x0 = p.wuiMarkL:GetPoint()
