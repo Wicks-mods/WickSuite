@@ -480,12 +480,17 @@ do
     local VX = ns.Visuals
     check(VX and VX.initialized, "the visuals module starts")
     local d = VX:db()
-    S.CVARS.volumeFog, S.CVARS.volumeFogLevel = "1", "3"
-    d.noVolumeFog = true; VX:Apply()
-    local on = S.CVARS.volumeFog == "0" and S.CVARS.volumeFogLevel == "0"
-    d.noVolumeFog = false; VX:Apply()
-    check(on and S.CVARS.volumeFog == "1" and S.CVARS.volumeFogLevel == "3",
-        "no volumetric fog sets the game's own settings and puts back what was there")
+    S.CVARS.weatherDensity = "2"
+    d.noWeather = true; VX:Apply()
+    local on = S.CVARS.weatherDensity == "0"
+    d.noWeather = false; VX:Apply()
+    check(on and S.CVARS.weatherDensity == "2", "no weather sets the game's own setting and puts back what was there")
+    -- An option taken out puts back what it had changed.
+    local g = ns.A.db.global
+    g.visualsWas = g.visualsWas or {}
+    g.visualsWas.volumeFog, S.CVARS.volumeFog = "1", "0"
+    VX:Apply()
+    check(S.CVARS.volumeFog == "1" and g.visualsWas.volumeFog == nil, "the retired fog option puts the fog setting back")
     S.CVARS.ffxGlow = "1"
     d.noGlow = true; VX:Apply()
     S.CVARS.ffxGlow = "0.5"   -- changed by hand at the console meanwhile
