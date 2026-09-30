@@ -671,6 +671,50 @@ function GearThumb() {
   );
 }
 
+// Wick's UI: the looks are the selling point, so the right side is four of
+// them, the collage's titled screenshots, in a grid.
+const UI_THUMB_LOOKS = ['WicksModern', 'Rebel', 'Hologram', 'Gilded'];
+function UIThumb() {
+  return (
+    <div style={{width:460,height:260,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
+      <DungeonBg width={460} height={260} glowX="25%" glowY="45%" glowColor={G} accent="#6B21A8" opacity={0.2}/>
+      <div style={{position:'absolute',left:-20,top:'50%',transform:'translateY(-50%)',
+        width:200,height:200,borderRadius:'50%',
+        background:`radial-gradient(circle, ${G}22 0%, transparent 70%)`,pointerEvents:'none'}}/>
+      <div style={{position:'absolute',left:20,top:18,bottom:18,width:128,
+        display:'flex',flexDirection:'column',justifyContent:'flex-start',gap:10}}>
+        <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
+          <WickWordmark size={22}/>
+          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>UI</div>
+        </div>
+        <div style={{height:1,width:'100%',background:BR}}/>
+        <div style={{fontFamily:FU,fontSize:10,color:TX,lineHeight:1.35,fontWeight:500}}>The whole interface,<br/>in one look.</div>
+        <div style={{display:'flex',flexDirection:'column',gap:3,marginTop:'auto'}}>
+          {['Bars, frames, plates, chat','Fully customizable','Every part optional'].map(f=>(
+            <div key={f} style={{display:'flex',alignItems:'center',gap:4}}>
+              <div style={{width:3,height:3,borderRadius:'50%',background:G}}/>
+              <span style={{fontFamily:FM,fontSize:6.5,color:MDIM}}>{f}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{position:'absolute',right:14,top:14,bottom:14,left:160,
+        display:'flex',flexDirection:'column',justifyContent:'center',gap:8}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6}}>
+          {UI_THUMB_LOOKS.map(n => (
+            <div key={n} style={{aspectRatio:'16 / 9'}}>
+              <Shot which={'ui_' + n} size="cover" origin="center" glowAt="50% 50%"/>
+            </div>
+          ))}
+        </div>
+        <div style={{fontFamily:FM,fontSize:6.5,letterSpacing:'0.28em',color:MDIM,textAlign:'center',textTransform:'uppercase'}}>
+          Eight looks <span style={{color:G}}>&middot;</span> or your own
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BagsThumb() {
   return (
     <div style={{width:460,height:260,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
@@ -1398,6 +1442,7 @@ const ONLY_COMPONENTS = {
   beasts:   { Comp: BeastsThumb,        w: 460, h: 260 },
   poisons:  { Comp: PoisonsThumb,       w: 460, h: 260 },
   gear:     { Comp: GearThumb,          w: 460, h: 260 },
+  ui:       { Comp: UIThumb,            w: 460, h: 260 },
   travel:   { Comp: TravelThumb,        w: 460, h: 260 },
   wardrobe: { Comp: WardrobeThumb,      w: 460, h: 260 },
   ledger:   { Comp: LedgerThumb,        w: 460, h: 260 },
@@ -1469,6 +1514,7 @@ function App() {
       <Artboard id="comforts-thumb" label="Wick's Comforts" w={460} h={260} Component={ComfortsThumb}/>
       <Artboard id="beasts-thumb" label="Wick's Beasts and Things" w={460} h={260} Component={BeastsThumb}/>
       <Artboard id="gear-thumb" label="Wick's Gear" w={460} h={260} Component={GearThumb}/>
+      <Artboard id="ui-thumb" label="Wick's UI" w={460} h={260} Component={UIThumb}/>
       <Artboard id="travel-thumb" label="Wick's Travel Form" w={460} h={260} Component={TravelThumb}/>
       <Artboard id="wardrobe-thumb" label="Wick's Wardrobe" w={460} h={260} Component={WardrobeThumb}/>
       <Artboard id="ledger-thumb" label="Wick's Ledger" w={460} h={260} Component={LedgerThumb}/>
