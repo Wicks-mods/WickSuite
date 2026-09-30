@@ -229,7 +229,7 @@ end
 io.write("== themes ==\n")
 check(#Chrome.Themes == 16 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, six looks' palettes and custom, warlock is fel")
 check(Chrome.ThemeByID.rebel and Chrome.ThemeByID.rebel.look, "a look's palette is a theme")
-check(Chrome:ThemeSetting() == "auto" and WickCoreDB.global.theme == "auto"
+check(Chrome:ThemeSetting() == "auto" and (Chrome:CharStore().theme == nil or Chrome:CharStore().theme == "auto")
     and Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "a new install follows the class")
 -- The rest of this section starts from Fel.
 Chrome:SetTheme("fel")
@@ -237,7 +237,7 @@ local felBefore = Chrome.Colors.fel[3]
 local bracket = panel.brackets.TOPLEFT[1]
 local titleFS = Chrome:Text(panel.content, 11, Chrome.Colors.text)
 Chrome:SetTheme("shaman")
-check(Chrome.activeTheme == "shaman" and WickCoreDB.global.theme == "shaman", "SetTheme persists")
+check(Chrome.activeTheme == "shaman" and Chrome:CharStore().theme == "shaman", "SetTheme persists")
 check(Chrome:SavedThemeSetting() == "shaman", "saved setting readable back")
 
 -- A hover wash is the accent at a low alpha. Registering it against the
@@ -324,12 +324,12 @@ do
     db.handedOver, Store.enabled = wasHanded, wasEnabled
     Store.announced, Store.reason = wasAnnounced, wasReason
 end
-WickCoreDB.global.theme = "wiped by something else"
+Chrome:CharStore().theme = "wiped by something else"
 Core.self.db = nil                                  -- profile unbound, as if init never ran
 Chrome:SetTheme("druid")
-check(WickCoreDB.global.theme == "druid", "SetTheme still writes with no profile bound")
+check(Chrome:CharStore().theme == "druid", "SetTheme still writes with no profile bound")
 S.fire("PLAYER_LOGOUT")
-check(WickCoreDB.global.theme == "druid", "logout flush rewrites the live choice")
+check(Chrome:CharStore().theme == "druid", "logout flush rewrites the live choice")
 
 -- A read that comes too early must not become a choice lost for good.
 --
@@ -337,20 +337,20 @@ check(WickCoreDB.global.theme == "druid", "logout flush rewrites the live choice
 -- after login. ApplySavedTheme used to save unconditionally, so a login
 -- that read nothing fell back to Fel and then wrote Fel over the real
 -- setting. The user lost their theme to this twice.
-WickCoreDB.global.theme = "shaman"
+Chrome:CharStore().theme = "shaman"
 Chrome:ApplySavedTheme("login")
 check(Chrome.activeTheme == "shaman", "a stored theme is applied at login")
-check(WickCoreDB.global.theme == "shaman", "and left where it was")
+check(Chrome:CharStore().theme == "shaman", "and left where it was")
 
-WickCoreDB.global.theme = nil                       -- the store has not landed yet
+Chrome:CharStore().theme = nil                       -- the store has not landed yet
 Chrome:ApplySavedTheme("login")
 check(Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "with nothing to read it follows the class")
-check(WickCoreDB.global.theme == nil,
+check(Chrome:CharStore().theme == nil,
     "and writes nothing, so a late store still has something to restore: " ..
-    tostring(WickCoreDB.global.theme))
+    tostring(Chrome:CharStore().theme))
 
 -- Which is what the store does when it lands.
-WickCoreDB.global.theme = "druid"
+Chrome:CharStore().theme = "druid"
 Chrome:ApplySavedTheme("store")
 check(Chrome.activeTheme == "druid", "the store landing applies the real choice")
 check(Chrome.applyLog:find("store=druid", 1, true) ~= nil,
@@ -366,7 +366,7 @@ check(Chrome:TitleMarkup("Wick's Test"):find("0070DD") ~= nil, "title markup fol
 check(Core.COLOR_ACCENT == "|cff0070DD", "chat accent follows theme")
 check(Chrome.ThemeByID.priest.colors.void[1] < 0.12, "bright accents keep the darks dark")
 Chrome:SetTheme("auto")
-check(WickCoreDB.global.theme == "auto" and Chrome.activeTheme == "shaman", "auto resolves to the class theme")
+check(Chrome:CharStore().theme == "auto" and Chrome.activeTheme == "shaman", "auto resolves to the class theme")
 check(Chrome:ResolveTheme("nonsense") == "fel", "unknown theme falls back to fel")
 Chrome:SetClassColorSet("classic")
 check(Chrome.ThemeByID.mage.hex.fel == "69CCF0" and WickCoreDB.global.classColors == "classic", "classic class color set swaps the mage accent")

@@ -281,7 +281,7 @@ S.fire("ADDON_LOADED", "WickCore")
 -- run.py --styles: the whole pass in one WickCore style.
 local STYLE = os.getenv("WICK_STYLE")
 if STYLE and STYLE ~= "" then
-    WickCoreDB.global.style = STYLE
+    WickCore.Chrome:CharStore().style = STYLE
     check(WickCore.Chrome:StyleID() == STYLE, "running in the " .. STYLE .. " style")
 end
 autoStub()
