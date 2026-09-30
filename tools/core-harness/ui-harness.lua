@@ -797,9 +797,20 @@ local okI, errI = pcall(function()
     check(p.nameplates.enable == false, "keeping Platynator leaves ours off")
     click("Nameplates", 1)
     check(p.nameplates.enable == true, "keeping Wick's UI switches ours on")
+    local order = {}
+    for i, pg in ipairs(I.pages) do order[i] = pg.title end
+    check(at.Bags < at.Look and at.Nameplates < at.Look, "the addon questions come first: " .. table.concat(order, ", "))
     I:Show(at.Done)
-    check(I.frame.reloadAction:IsShown(), "the last page reloads")
-    I:Finish(false)
+    local go = _G.WicksUI_InstallReload
+    check(I.frame.reloadAction:IsShown() and go and go:IsShown() and go:GetAttribute("macrotext") == "/reload",
+        "the last page's Reload now is the game's own /reload, one click even with an addon switched off")
+    I:Show(at.Look)
+    check(not go:IsShown(), "and only on the last page")
+    I:Show(at.Done)
+    -- Pressed: everything saved first (on the key's press and release, once).
+    go:GetScript("PreClick")(go)
+    go:GetScript("PreClick")(go)
+    check(not I.frame:IsShown() and g.installed, "the setup saves and closes as the reload goes")
     check(disabled.Platynator and g.conflicts["nameplates:Platynator"] == "ours", "Platynator is switched off and the answer kept")
     check(Ch.activeTheme == Ch:ResolveTheme(Ch:ThemeSetting()), "the look's colours come back after the setup")
     -- Kept theirs: not asked again. Skipped: theirs.
