@@ -492,6 +492,7 @@ do
     check(pf and pf.wuiThreatGlow and pf.ThreatIndicator == pf.wuiThreatGlow, "the player frame has its threat glow: "
         .. tostring(pf and pf.wuiThreatGlow) .. " / " .. tostring(pf and pf.ThreatIndicator))
     check(pf and pf.IsElementEnabled and pf:IsElementEnabled("ThreatIndicator"), "and oUF's threat element is on for it")
+    check(pf and pf.wuiThreatGlow.wuiUnder and (pf.wuiThreatGlow.wuiAlpha or 1) < 1, "and it sits under the frame's border, softened")
     do
         local uts, isv, ue = UnitThreatSituation, issecretvalue, UnitExists
         local SECRET = {}
