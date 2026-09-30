@@ -401,14 +401,15 @@ do
         d.castbar = true
         NP:Configure(p)
         check(p:IsElementEnabled("Castbar") and p.Castbar == p.wuiCastbar, "and back on")
-        check(p.wuiNameTag:find("wui:classmark", 1, true) ~= nil, "the name carries the elite diamond")
         local oc = UnitClassification
         UnitClassification = function() return "elite" end
-        local mark = oUF.Tags.Methods["wui:classmark"]("target")
+        NP:Refresh(p)
+        local mark = p.wuiClassMark:IsShown() and p.wuiClassBack:IsShown()
         UnitClassification = function() return "normal" end
-        local none = oUF.Tags.Methods["wui:classmark"]("target")
+        NP:Refresh(p)
+        local none = not p.wuiClassMark:IsShown()
         UnitClassification = oc
-        check(mark:find("glyph-diamond", 1, true) and none == "", "a diamond for an elite, nothing for a normal mob")
+        check(mark and none, "a diamond on the bar for an elite, nothing for a normal mob")
         do
             local was, isTank = d.threat, ns.Threat.IsTank
             d.threat = true
