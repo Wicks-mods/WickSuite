@@ -509,6 +509,12 @@ do
         "info panel values are in the look's accent: " .. tostring(s):gsub("|", "||"))
 end
 
+io.write("== world names ==\n")
+do
+    ns.Media:UnitNameFont()
+    check(UNIT_NAME_FONT == ns.Core.Chrome:Font(), "names over units in the world take the look's font: " .. tostring(UNIT_NAME_FONT))
+end
+
 io.write("== party manager ==\n")
 do
     -- A stand-in with the pieces the skin reaches for.
