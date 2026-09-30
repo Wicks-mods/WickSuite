@@ -374,7 +374,10 @@ do
         UnitExists = function() return true end
         UnitIsFriend = function() return false end
         UnitIsUnit = function(_, b) if b == "focus" then return focus end return not focus end
-        p.unit = "nameplate1"
+        -- As the driver leaves it: the unit in __unit, nothing in .unit.
+        p.unit = nil
+        p.__unit = "nameplate1"
+        check(ns:UnitOf(p) == "nameplate1", "a plate's unit is read from where oUF keeps it")
         NP:Refresh(p)
         check(p.wuiMarkL:IsShown() and p.wuiMarkR:IsShown(), "your target's plate has a pointer each side")
         local _, _, _, x0 = p.wuiMarkL:GetPoint()
@@ -406,6 +409,19 @@ do
         local none = oUF.Tags.Methods["wui:classmark"]("target")
         UnitClassification = oc
         check(mark:find("glyph-diamond", 1, true) and none == "", "a diamond for an elite, nothing for a normal mob")
+        do
+            local was, isTank = d.threat, ns.Threat.IsTank
+            d.threat = true
+            ns.Threat.IsTank = function() return false end
+            NP:Configure(p)
+            local off = not p.Health.colorThreat
+            ns.Threat.IsTank = function() return true end
+            NP:Configure(p)
+            local on = p.Health.colorThreat == true
+            ns.Threat.IsTank, d.threat = isTank, was
+            NP:Configure(p)
+            check(off and on, "threat colours only while you tank; otherwise class and reaction")
+        end
         UnitExists, UnitIsUnit, UnitIsFriend = sv.UnitExists, sv.UnitIsUnit, sv.UnitIsFriend
         NP.plates[p] = nil
     end
