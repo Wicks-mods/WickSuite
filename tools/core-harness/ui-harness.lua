@@ -352,6 +352,25 @@ A.db.profile.unitframes.healthColor = "gradient"
 local okU2, errU2 = pcall(function() UF:Update() end)
 check(okU2, "update after settings change: " .. tostring(errU2 or ""))
 do
+    -- Text sizes are a look's own: leaving one keeps them with it, and a
+    -- look's saved sizes put them back.
+    local g, prof = ns:G(), A.db.profile
+    local u = prof.unitframes.units.player
+    local id = ns.Core.Chrome:StyleID()
+    local key = id == "og" and "wick" or id
+    local wasSize, wasFor = u.texts.left.size, g.presetFor
+    g.styleSizes = g.styleSizes or {}
+    local wasSnap = g.styleSizes[key]
+    g.styleSizes[key] = { units = { player = { texts = { left = 12 } } } }
+    g.presetFor = "otherlook"
+    u.texts.left.size = 21
+    ns:ApplyStylePreset(false)
+    local left = g.styleSizes.otherlook and g.styleSizes.otherlook.units.player.texts
+    check(u.texts.left.size == 12 and left and left.left == 21,
+        "unit text sizes are kept per look: " .. tostring(u.texts.left.size) .. " / " .. tostring(left and left.left))
+    g.styleSizes.otherlook, g.styleSizes[key], g.presetFor, u.texts.left.size = nil, wasSnap, wasFor, wasSize
+end
+do
     local got = {}
     local fs = { SetFont = function(_, p, sz) got.p, got.s = p, sz end, SetShadowOffset = function() end, SetShadowColor = function() end }
     ns.Media:SetFont(fs, 12, "OUTLINE", "Wick", true)

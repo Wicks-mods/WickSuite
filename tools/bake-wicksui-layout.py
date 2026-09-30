@@ -59,6 +59,9 @@ if snaps:
 p.setdefault("nameplates", {})["enable"] = True
 p["nameplates"]["healthColor"] = "look"
 p.setdefault("skins", {})["trackerFontSize"] = 14
+# Hologram's face runs large: its player name a size of its own.
+holo = gen.setdefault("styleSizes", {}).setdefault("hologram", {})
+holo.setdefault("units", {}).setdefault("player", {}).setdefault("texts", {})["left"] = 12
 print("baking", NAME, "from", current, "| other styles kept:", sorted(snaps))
 
 blob = repr(p)
