@@ -761,10 +761,18 @@ local okI, errI = pcall(function()
     local sb, gba, da = SetBinding, GetBindingAction, C_AddOns.DisableAddOn
     SetBinding = function(k, a) binds[k] = a; return true end
     GetBindingAction = function(k) return binds[k] or "" end
-    C_AddOns.DisableAddOn = function(name) disabled[name] = true end
+    C_AddOns.DisableAddOn = function(name, who) disabled[name] = who or "everyone" end
     local styleWas, themeWas = Ch:StyleID(), Ch:ThemeSetting()
     binds.B = "OPENALLBAGS"
     S.LOADED.Platynator, S.LOADED.WicksBags = true, true
+    -- A kit for this class and one for another.
+    local _, myClass = UnitClass("player")
+    local mine, other
+    for _, k in ipairs(I.KITS) do
+        if k[3] == myClass then mine = k[1] elseif not other then other = k[1] end
+    end
+    S.LOADED[other] = true
+    if mine then S.LOADED[mine] = true end
     p.nameplates.enable = true
     g.conflicts = nil
     ns.A.db.char.bagKeys, ns.A.db.char.bagKeysWas = nil, nil
@@ -799,7 +807,8 @@ local okI, errI = pcall(function()
     check(p.nameplates.enable == true, "keeping Wick's UI switches ours on")
     local order = {}
     for i, pg in ipairs(I.pages) do order[i] = pg.title end
-    check(at.Bags < at.Look and at.Nameplates < at.Look, "the addon questions come first: " .. table.concat(order, ", "))
+    check(at.Scale < at.Bags and at.Scale < at.Nameplates and at.Nameplates < at["Class kits"] and at["Class kits"] < at.Done,
+        "the look first, the addons at the end: " .. table.concat(order, ", "))
     I:Show(at.Done)
     local go = _G.WicksUI_InstallReload
     check(I.frame.reloadAction:IsShown() and go and go:IsShown() and go:GetAttribute("macrotext") == "/reload",
@@ -812,6 +821,11 @@ local okI, errI = pcall(function()
     go:GetScript("PreClick")(go)
     check(not I.frame:IsShown() and g.installed, "the setup saves and closes as the reload goes")
     check(disabled.Platynator and g.conflicts["nameplates:Platynator"] == "ours", "Platynator is switched off and the answer kept")
+    check(disabled.Platynator == UnitGUID("player"), "for this character only, never every character")
+    check(disabled[other] and not (mine and disabled[mine]), "another class's kit is switched off here, this class's stays")
+    check(ns.A.db.char.setupDone == true, "the setup is kept as done for this character")
+    S.LOADED[other] = nil
+    if mine then S.LOADED[mine] = nil end
     check(Ch.activeTheme == Ch:ResolveTheme(Ch:ThemeSetting()), "the look's colours come back after the setup")
     -- Kept theirs: not asked again. Skipped: theirs.
     g.conflicts["nameplates:Platynator"] = "theirs"
