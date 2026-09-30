@@ -225,6 +225,14 @@ do
     check(#Core.Restrict:Refusals() == 2, "nor recorded")
 end
 
+-- ---------- the reload prompt --------------------------------------------
+io.write("== reload prompt ==\n")
+Chrome:ReloadPrompt("test")
+local rp = _G.WickCoreReloadPrompt
+check(rp and rp:IsShown() and rp.go and rp.go:GetAttribute("macrotext") == "/reload",
+    "the reload prompt opens, its button a /reload the game counts as the player's")
+rp:Hide()
+
 -- ---------- themes --------------------------------------------------------
 io.write("== themes ==\n")
 check(#Chrome.Themes == 16 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, six looks' palettes and custom, warlock is fel")
