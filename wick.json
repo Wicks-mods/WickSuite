@@ -565,7 +565,7 @@
       "accent": "#4FC778",
       "accent_name": "Fel Green",
       "cf_slug": "wicks-ui",
-      "cf_project_id": null,
+      "cf_project_id": 1719340,
       "features": [
         "Bars, unit frames, group frames and nameplates",
         "Chat, minimap, tooltips and info panels",
