@@ -646,6 +646,18 @@ do
     check(#list == 3 and list[1].unit == "party1" and list[1].tanking and list[2].unit == "player" and list[3].unit == "party2",
         "the meter ranks by threat, the tank first here")
     check(TH.Warning(list[2]) == true, "you are warned past 90% of the pull")
+    do
+        local Ch = ns.Core.Chrome
+        local was = Ch.themeSetting
+        Ch.themeSetting = "auto"
+        local classy = ns:MeterBarColor(true) == nil
+        Ch.themeSetting = "frost"
+        local mineC, otherC = ns:MeterBarColor(true), ns:MeterBarColor(false)
+        Ch.themeSetting = was
+        local f, v = Ch.Colors.fel, Ch.Colors.void
+        check(classy and mineC and otherC and mineC[1] == f[1] and math.abs(otherC[1] - (f[1] * 0.55 + v[1] * 0.45)) < 1e-6,
+            "meter bars keep class colours on a class theme, else the accent for you and a darker shade for others")
+    end
     T.player = { false, 0, 60, 66, 600 }
     list = TH.Read()
     check(TH.Warning(list[2]) == false, "and not below it")
