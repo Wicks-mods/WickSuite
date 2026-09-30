@@ -494,6 +494,30 @@ io.write("== buffs ==\n")
 check(ns.Auras.initialized and ns.Auras.buffs and ns.Auras.debuffs, "buff and debuff containers built")
 check(ns.Movers.list.auras_buffs ~= nil, "buffs have a mover")
 
+io.write("== party manager ==\n")
+do
+    -- A stand-in with the pieces the skin reaches for.
+    local m = CreateFrame("Frame", "WicksUITest_CRFM", UIParent)
+    m.Background = m:CreateTexture()
+    m.toggleButtonBack = CreateFrame("Button", nil, m)
+    m.toggleButtonForward = CreateFrame("Button", nil, m)
+    m.displayFrame = CreateFrame("Frame", nil, m)
+    local d = m.displayFrame
+    d.label, d.memberCountLabel = d:CreateFontString(), d:CreateFontString()
+    d.raidMarkers = CreateFrame("Frame", nil, d)
+    local rm = d.raidMarkers
+    rm.BG = rm:CreateTexture()
+    rm.Tabs = { CreateFrame("Button", nil, rm), CreateFrame("Button", nil, rm) }
+    local mk = CreateFrame("Button", nil, rm)
+    mk.backgroundTexture, mk.markerTexture = mk:CreateTexture(), mk:CreateTexture()
+    rawset(rm, "GetChildren", function() return mk, rm.Tabs[1], rm.Tabs[2] end)
+    m.BottomButtons = CreateFrame("Frame", nil, m)
+    local ok, err = pcall(ns.PanelSkins.SPECIAL.CompactRaidFrameManager, m)
+    check(ok, "the party manager skins without error: " .. tostring(err or ""))
+    check(m.Background:GetAlpha() == 0 and mk.backgroundTexture:GetAlpha() == 0,
+        "its panel art and the marker buttons' art are faded")
+end
+
 io.write("== visuals ==\n")
 do
     local VX = ns.Visuals
