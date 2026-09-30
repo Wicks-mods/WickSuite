@@ -155,4 +155,24 @@ for y in range(32):
         steel.putpixel((x, y), (v, v, v, 255))
 steel.save(f"{OUT}\\bar-steel.png")
 
+# A glow for threat and other alerts: a soft halo around an edge 16 px in
+# from the texture's own, strongest at the edge, fading 16 px out and a
+# little way in, the middle clear. 9-sliced at 20 and set 16 px outside
+# the frame it rings, so the edge lands on the frame's.
+G = 64
+glow = Image.new("RGBA", (G, G), CLEAR)
+E = 16
+for y in range(G):
+    for x in range(G):
+        dx = max(E - x, 0, x - (G - 1 - E))
+        dy = max(E - y, 0, y - (G - 1 - E))
+        if dx > 0 or dy > 0:
+            d = (dx * dx + dy * dy) ** 0.5
+            a = max(0.0, 1 - d / E) ** 2
+        else:
+            inside = min(x - E, y - E, (G - 1 - E) - x, (G - 1 - E) - y)
+            a = max(0.0, 1 - inside / 4.0) * 0.7
+        glow.putpixel((x, y), (255, 255, 255, int(255 * a)))
+glow.save(f"{OUT}\\glow.png")
+
 print("ok")
