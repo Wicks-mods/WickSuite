@@ -377,6 +377,11 @@ do
     local st = ns.Core.Chrome:StyleDef()
     check(st.unitFont == nil or (got.p == st.unitFont and got.s == 12 + (st.unitBump or 0)),
         "unit frame text takes the look's own face and size where it has one: " .. tostring(got.p) .. " " .. tostring(got.s))
+    local flags
+    local fs2 = { SetFont = function(_, _, _, f) flags = f end, SetShadowOffset = function() end, SetShadowColor = function() end }
+    ns.Media:SetFont(fs2, 12, "look", "Wick", true)
+    check(flags == (st.textOutline or ""), "the look's own outline: an outline in Rebel, none elsewhere: " .. tostring(flags))
+    check(A.db.profile.unitframes.fontOutline ~= "OUTLINE", "the old hard-outline default has moved to the look's own")
     -- Rebel's name tag: the player's name on a plate, the level uncoloured.
     local pfr
     for f in pairs(UF.all or {}) do if f.wuiKey == "player" then pfr = f end end

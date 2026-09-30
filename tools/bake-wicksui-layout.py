@@ -59,6 +59,7 @@ if snaps:
 p.setdefault("nameplates", {})["enable"] = True
 p["nameplates"]["healthColor"] = "look"
 p.setdefault("skins", {})["trackerFontSize"] = 14
+p.setdefault("unitframes", {})["fontOutline"] = "look"
 # Hologram's face runs large: its player name a size of its own.
 holo = gen.setdefault("styleSizes", {}).setdefault("hologram", {})
 holo.setdefault("units", {}).setdefault("player", {}).setdefault("texts", {})["left"] = 12
