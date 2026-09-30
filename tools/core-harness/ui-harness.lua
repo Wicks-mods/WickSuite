@@ -423,6 +423,19 @@ do
         check(ok2 and not pf.wuiThreatGlow:IsShown(), "a secret threat state hides the glow instead of erroring")
         UnitThreatSituation, issecretvalue, UnitExists = uts, isv, ue
     end
+    do
+        local d = TH:db()
+        local was = d.meterShow
+        d.meterShow = "always"
+        local m = TH.Meter()
+        TH.Draw({})
+        local h0 = m:GetHeight()
+        TH.Draw(TH.Read())
+        local h3 = m:GetHeight()
+        check(h0 == 24 and h3 == 24 + 3 * (d.rowHeight + 2) + 2,
+            "the threat meter is just its heading when empty, and as tall as its rows otherwise: " .. h0 .. " / " .. h3)
+        d.meterShow = was
+    end
     local list = TH.Read()
     check(#list == 3 and list[1].unit == "party1" and list[1].tanking and list[2].unit == "player" and list[3].unit == "party2",
         "the meter ranks by threat, the tank first here")
