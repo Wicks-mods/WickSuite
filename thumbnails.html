@@ -957,6 +957,7 @@ const SUITE_ADDONS = [
 // strip was built for six to eight.
 const FOREVER_ADDONS = [
   { key:'core',      name:'WickCore',   short:'WickCore',   mono:'WC',  accent:G, slash:'/wickcore',  tag:'the shared platform', bare:true },
+  { key:'ui',        name:'UI',         short:'UI',         mono:'UI',  accent:G, slash:'/wui',       tag:'the whole interface' },
   { key:'bags',      name:'Bags',       short:'Bags',       mono:'BG',  accent:G, slash:'/wbags',     tag:'bags and bank in one' },
   { key:'comforts',  name:'Comforts',   short:'Comforts',   mono:'CO',  accent:G, slash:'/wcomfort',  tag:'the small client fixes' },
   { key:'gear',      name:'Gear',       short:'Gear',       mono:'GR',  accent:G, slash:'/wgear',     tag:'what to chase while levelling' },
@@ -1221,7 +1222,7 @@ function SuiteBanner({ w = 860, h = 320, flavour = 'forever' } = {}) {
             {/* Name — use the `short` variant so multi-word names like
                 "BIS Tracker" / "CD Tracker" don't word-break a single
                 letter onto its own line at this card width. */}
-            <div style={{fontFamily:FD,fontWeight:700,fontSize:8.5,color:TX,
+            <div style={{fontFamily:FD,fontWeight:700,fontSize:F.addons.length > 8 ? 7.8 : 8.5,color:TX,
               textAlign:'center',lineHeight:1.25,minHeight:22,
               wordBreak:'normal',hyphens:'none'}}>
               <AddonName a={a} short/>
