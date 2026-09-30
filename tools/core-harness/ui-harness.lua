@@ -753,22 +753,75 @@ end
 io.write("== extras and installer ==\n")
 check(ns.Extras.initialized and _G.WicksUI_MarkerBar ~= nil, "raid marker bar built")
 check(_G.WicksUI_Marker1:GetAttribute("macrotext1") == "/tm 1", "marker 1 marks the target")
--- Every page, and every answer on it clicked.
+-- The setup: another nameplate addon and Wick's Bags on.
 local okI, errI = pcall(function()
-    for p = 1, 6 do
-        ns.Install:Show(p)
-        for _, btn in ipairs(ns.Install.frame.choices) do
-            if btn:IsShown() then btn:GetScript("OnClick")(btn) end
-        end
+    local I, Ch = ns.Install, ns.Core.Chrome
+    local p, g = ns.A.db.profile, ns:G()
+    local binds, disabled = {}, {}
+    local sb, gba, da = SetBinding, GetBindingAction, C_AddOns.DisableAddOn
+    SetBinding = function(k, a) binds[k] = a; return true end
+    GetBindingAction = function(k) return binds[k] or "" end
+    C_AddOns.DisableAddOn = function(name) disabled[name] = true end
+    local styleWas, themeWas = Ch:StyleID(), Ch:ThemeSetting()
+    binds.B = "OPENALLBAGS"
+    S.LOADED.Platynator, S.LOADED.WicksBags = true, true
+    p.nameplates.enable = true
+    g.conflicts = nil
+    ns.A.db.char.bagKeys, ns.A.db.char.bagKeysWas = nil, nil
+    I:Detect()
+    check(p.nameplates.enable == false, "another nameplate addon stands ours down until the setup asks")
+    check(I:HasQuestions(), "and brings its question back at login")
+    I:Start(true)
+    check(Ch.activeTheme == "fel", "the setup is drawn in Fel")
+    check(not I.frame.wuiModern and Ch:StyleID() == styleWas, "and in Wick OG, without changing the character's look")
+    local at = {}
+    for i, pg in ipairs(I.pages) do at[pg.title] = i end
+    check(at.Colours == nil and at.Look and at.Bags and at.Nameplates and at.Done, "no colours page; a bags page and a nameplates page")
+    local function click(title, n)
+        I:Show(at[title])
+        local b = I.frame.choices[n]
+        check(b:IsShown(), title .. " has answer " .. n)
+        b:GetScript("OnClick")(b)
     end
-    -- The colours page, Custom picked on its own.
-    ns.Install:Show(3)
-    local custom = ns.Install.frame.choices[3]
-    custom:GetScript("OnClick")(custom)
-    ns.Install:Finish()
+    -- Every look and every other answer clicked, then the ones kept.
+    for n = 1, #Ch.Styles do click("Look", n) end
+    for _, t in ipairs({ "Class colours", "Scale" }) do click(t, 1); click(t, 2) end
+    click("Class colours", 1)
+    click("Look", 1)
+    click("Bags", 1)
+    check(binds.B == "WICKSBAGS_TOGGLE" and binds["SHIFT-B"] == "OPENALLBAGS", "Wick's Bags on B, the game's bags on Shift+B")
+    click("Bags", 2)
+    check(binds.B == "OPENALLBAGS" and binds["SHIFT-B"] == nil, "the game's bags put the keys back as they were")
+    click("Bags", 1)
+    click("Nameplates", 2)
+    check(p.nameplates.enable == false, "keeping Platynator leaves ours off")
+    click("Nameplates", 1)
+    check(p.nameplates.enable == true, "keeping Wick's UI switches ours on")
+    I:Show(at.Done)
+    check(I.frame.reloadAction:IsShown(), "the last page reloads")
+    I:Finish(false)
+    check(disabled.Platynator and g.conflicts["nameplates:Platynator"] == "ours", "Platynator is switched off and the answer kept")
+    check(Ch.activeTheme == Ch:ResolveTheme(Ch:ThemeSetting()), "the look's colours come back after the setup")
+    -- Kept theirs: not asked again. Skipped: theirs.
+    g.conflicts["nameplates:Platynator"] = "theirs"
+    p.nameplates.enable = true
+    I:Detect()
+    check(not (I.open and #I.open > 0), "a job left to another addon is not asked about again")
+    g.conflicts = nil
+    I:Detect()
+    I:Start(false)
+    check(I.pages[1].title == "Nameplates" and #I.pages == 2, "at a later login only the open question is asked")
+    I:Finish(false)
+    check(p.nameplates.enable == false and g.conflicts["nameplates:Platynator"] == "theirs", "a skipped question keeps the other addon")
+    -- Put everything back for the checks after this.
+    S.LOADED.Platynator, S.LOADED.WicksBags = nil, nil
+    p.nameplates.enable = true
+    g.conflicts = nil
+    SetBinding, GetBindingAction, C_AddOns.DisableAddOn = sb, gba, da
+    if Ch:StyleID() ~= styleWas then Ch:SetStyle(styleWas) end
+    Ch:SetTheme(themeWas)
 end)
 check(okI, "installer pages and their answers: " .. tostring(errI or ""))
-check(ns.Core.Chrome:ThemeSetting() == "custom", "the colours page sets the theme")
 check(ns:G().installed == true, "installer marks itself done")
 -- The shipped layout is where a fresh profile starts.
 check(ns.defaults.profile.movers.uf_player ~= nil and ns.Movers.list.uf_player.default == ns.defaults.profile.movers.uf_player,
