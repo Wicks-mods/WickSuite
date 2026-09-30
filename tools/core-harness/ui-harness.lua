@@ -358,15 +358,15 @@ do
     local st = ns.Core.Chrome:StyleDef()
     check(st.unitFont == nil or (got.p == st.unitFont and got.s == 12 + (st.unitBump or 0)),
         "unit frame text takes the look's own face and size where it has one: " .. tostring(got.p) .. " " .. tostring(got.s))
-    -- Rebel's slab: the player's bars set in past the border and the gap.
+    -- Rebel's name tag: the player's name on a plate, the level uncoloured.
     local pfr
     for f in pairs(UF.all or {}) do if f.wuiKey == "player" then pfr = f end end
-    if pfr then
-        local px = ns.mult or 1
-        local want = (st.unitInset and st.family == "og") and (px * (st.borderPx or 1) + st.unitInset) or nil
-        local _, _, _, hx = pfr.Health:GetPoint()
-        check(want == nil or math.abs((hx or 0) + want) < 1e-6,
-            "a look with slab frames sets the bars in from the border: " .. tostring(hx) .. " / " .. tostring(want))
+    if pfr and pfr.wuiTexts and pfr.wuiTexts.left then
+        local lt = pfr.wuiTexts.left
+        local tagged = st.unitNameTag and st.family == "og"
+        local plate = lt.wuiNamePlate
+        check((tagged and plate and plate:IsShown()) or (not tagged and not (plate and plate:IsShown())),
+            "a look with name tags puts the name on one, and only that look: " .. tostring(tagged) .. " / " .. tostring(plate and plate:IsShown()))
     end
 end
 check(not ns.errors or #ns.errors == 0, "no module errors: " .. table.concat(ns.errors or {}, " | "))
