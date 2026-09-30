@@ -1006,6 +1006,7 @@ const SOCIAL = {
   trade: { label: 'TRADE', title: true, tagline: 'What a run earned, and what trade chat is offering.', features: ['Session earnings with gold per hour', 'Loot valued at vendor price, marked when unknown', 'The trade channel as a board', 'Badges, item icons, filters and search'] },
   gear: { label: 'GEAR', title: true, tagline: 'What to chase while levelling, and where it drops.', features: ['Upgrades scored against what you wear', 'Dungeons, crafted, quest rewards and sets', 'Live set bonuses read from the client', 'Try on, dressing room, link in chat'] },
   poisons: { label: 'POISONS', title: true, tagline: 'The rogue kit: coatings, combo points and weapon swaps.', features: ['What coats each blade, and how long is left', 'One key per hand to recoat', 'Combo points over your target, energy under them', 'Weapon swap keys for a dagger opener'] },
+  ui: { label: 'UI', title: true, tagline: 'The whole interface, in one look.', features: ['Bars, frames, nameplates and chat', "The game's own windows, dressed to match", 'Eight looks, full customization', 'Take the tour at wicksmods.com/ui'] },
 };
 
 // 1200x630, which is what Facebook asks for and what a boosted post
@@ -1049,7 +1050,22 @@ function AddonSocial({ which }) {
         </div>
       </div>
       <div style={{position:'absolute',right:48,top:48,bottom:48,left:470}}>
-        <Shot which={which} size="contain" origin="center" glowAt="50% 50%"/>
+        {which === 'ui' ? (
+          <div style={{height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',gap:16}}>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+              {UI_THUMB_LOOKS.map(n => (
+                <div key={n} style={{aspectRatio:'16 / 9'}}>
+                  <Shot which={'ui_' + n} size="cover" origin="center" glowAt="50% 50%"/>
+                </div>
+              ))}
+            </div>
+            <div style={{fontFamily:FM,fontSize:14,letterSpacing:'0.3em',color:MDIM,textAlign:'center',textTransform:'uppercase'}}>
+              Eight looks <span style={{color:G}}>&middot;</span> or your own
+            </div>
+          </div>
+        ) : (
+          <Shot which={which} size="contain" origin="center" glowAt="50% 50%"/>
+        )}
       </div>
     </div>
   );
@@ -1427,6 +1443,7 @@ const ONLY_COMPONENTS = {
   social_trade: { Comp: () => <AddonSocial which="trade"/>, w: 1200, h: 630 },
   social_gear: { Comp: () => <AddonSocial which="gear"/>, w: 1200, h: 630 },
   social_poisons: { Comp: () => <AddonSocial which="poisons"/>, w: 1200, h: 630 },
+  social_ui: { Comp: () => <AddonSocial which="ui"/>, w: 1200, h: 630 },
   ui_looks:    { Comp: UILooks,                                            w: 1200, h: 630 },
   milestone:   { Comp: Milestone,                                          w: 1200, h: 630 },
   cd:       { Comp: CDThumb,            w: 460, h: 260 },
