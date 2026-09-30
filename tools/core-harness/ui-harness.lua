@@ -430,6 +430,20 @@ do
     T.player = { false, 0, 60, 66, 600 }
     list = TH.Read()
     check(TH.Warning(list[2]) == false, "and not below it")
+    local played = 0
+    local ps, gt = PlaySound, GetTime
+    PlaySound = function() played = played + 1 end
+    local now = 1000
+    GetTime = function() return now end
+    T.player = { false, 1, 95, 104, 950 }
+    TH.SoundCheck(TH.Read())
+    TH.SoundCheck(TH.Read())
+    check(played == 1, "the warning sound plays once as the warning starts, not every read")
+    T.player = { false, 0, 60, 66, 600 }; TH.SoundCheck(TH.Read())
+    now = now + 5
+    T.player = { false, 1, 95, 104, 950 }; TH.SoundCheck(TH.Read())
+    check(played == 2, "and again once it has cleared and come back")
+    PlaySound, GetTime = ps, gt
     for k, v in pairs(saved) do _G[k] = v end
 end
 
