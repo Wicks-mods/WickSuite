@@ -1,0 +1,13 @@
+== facebook ==
+Your combat text, where you put it.
+
+New in Wick's UI 0.9.2: the text that scrolls round your character, every hit, heal and proc, can sit anywhere on screen. Pick its font, size and scale, keep the game's colours or give each kind of line its own, and send it up, down or in an arc. A sample plays while you move it, so you can see where it lands before the next pull.
+
+For the WoW Forever beta: https://wicksmods.com/ui
+
+== x ==
+Your combat text, where you put it. New in Wick's UI 0.9.2: drag it anywhere on screen, pick its font, size and colours, and watch a sample play while you move it.
+
+https://wicksmods.com/ui
+
+#WoWForever #Warcraft

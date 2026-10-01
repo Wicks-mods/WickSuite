@@ -1348,6 +1348,62 @@ function Milestone({ n = MILESTONE.n, eyebrow = MILESTONE.eyebrow,
   );
 }
 
+/* Breadcrumb card: a screenshot of something new, posted between
+   releases. Edit BREADCRUMB, render with `wick render breadcrumb`, and
+   post with `wick breadcrumb <name>` (copy in social/breadcrumbs). The
+   screenshot is drawn as large as the right side takes it, never cropped,
+   so the settings in it stay readable. */
+const BREADCRUMB = {
+  label: 'UI',
+  eyebrow: 'NEW IN 0.9.2',
+  title: 'Put your combat text anywhere',
+  points: ['Font, outline, size and scale', 'A colour for each kind of line', 'Up, down or in an arc', 'A sample plays while you move it'],
+  foot: 'wicksmods.com/ui',
+  shot: 'images/ui/screenshots/combat-text.png',
+  aspect: 926 / 626,
+};
+
+function Breadcrumb({ b = BREADCRUMB } = {}) {
+  // The room on the right, and the shot fitted inside it.
+  const BOX_W = 802, BOX_H = 542, RIGHT = 44, TOP = 44;
+  let w = BOX_W, h = Math.round(BOX_W / b.aspect);
+  if (h > BOX_H) { h = BOX_H; w = Math.round(BOX_H * b.aspect); }
+  return (
+    <div style={{width:1200,height:630,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
+      <DungeonBg width={1200} height={630} glowX="18%" glowY="40%" glowColor={G} accent="#6B21A8" opacity={0.18}/>
+      <Brackets size={20} thick={3}/>
+      <div style={{position:'absolute',left:56,top:56,bottom:56,width:1200 - RIGHT - w - 56 - 30,
+        display:'flex',flexDirection:'column',gap:20}}>
+        <div style={{display:'inline-flex',flexDirection:'column',alignItems:'flex-start'}}>
+          <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
+            <WickWordmark size={54}/>
+            <div style={{fontFamily:FM,fontSize:15,letterSpacing:'0.34em',color:G,marginTop:4,textAlign:'right'}}>
+              {b.label}
+            </div>
+          </div>
+        </div>
+        <div style={{fontFamily:FM,fontSize:12,letterSpacing:'0.3em',color:G,marginTop:6}}>{b.eyebrow}</div>
+        <div style={{height:1,width:'100%',background:BR,marginTop:-8}}/>
+        <div style={{fontFamily:FU,fontSize:30,color:TX,lineHeight:1.2,fontWeight:600}}>{b.title}</div>
+        <div style={{display:'flex',flexDirection:'column',gap:11,marginTop:'auto'}}>
+          {b.points.map(p => (
+            <div key={p} style={{display:'flex',alignItems:'center',gap:9}}>
+              <div style={{width:5,height:5,borderRadius:'50%',background:G,flexShrink:0}}/>
+              <span style={{fontFamily:FM,fontSize:12,color:MDIM,letterSpacing:'0.04em'}}>{p}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{fontFamily:FM,fontSize:13,letterSpacing:'0.12em',color:TX}}>{b.foot}</div>
+      </div>
+      <div style={{position:'absolute',right:RIGHT,top:TOP + Math.round((BOX_H - h) / 2),width:w,height:h,
+        border:`1px solid ${BR}`,boxShadow:'0 14px 44px rgba(0,0,0,0.55)'}}>
+        <img src={b.shot} width={w} height={h} style={{display:'block',width:w,height:h,objectFit:'cover'}}/>
+        <Brackets size={12} thick={2} inset={-2}/>
+      </div>
+    </div>
+  );
+}
+
 function SocialCover({ flavour = 'forever' } = {}) {
   const F = FLAVOURS[flavour] || FLAVOURS.forever;
   return (
@@ -1446,6 +1502,7 @@ const ONLY_COMPONENTS = {
   social_ui: { Comp: () => <AddonSocial which="ui"/>, w: 1200, h: 630 },
   ui_looks:    { Comp: UILooks,                                            w: 1200, h: 630 },
   milestone:   { Comp: Milestone,                                          w: 1200, h: 630 },
+  breadcrumb:  { Comp: Breadcrumb,                                         w: 1200, h: 630 },
   cd:       { Comp: CDThumb,            w: 460, h: 260 },
   bis:      { Comp: BISThumb,           w: 460, h: 260 },
   trade:    { Comp: TradeThumb,         w: 460, h: 260 },
@@ -1516,6 +1573,9 @@ function App() {
 
       <div className="section-label">Wick's UI · the looks (1200×630, CurseForge gallery)</div>
       <Artboard id="ui-looks" label="Wick's UI — Looks" w={1200} h={630} Component={UILooks}/>
+
+      <div className="section-label">Breadcrumb · a post between releases (1200×630)</div>
+      <Artboard id="breadcrumb" label="Breadcrumb" w={1200} h={630} Component={Breadcrumb}/>
 
       <div className="section-label">Addon Thumbnails · Store cards</div>
       <Artboard id="suite-thumb" label="Wick's Suite" w={460} h={260} Component={SuiteThumb}/>

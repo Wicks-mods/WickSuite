@@ -5,8 +5,9 @@
 //   wick list                      — print the addon roster from wick.json
 //   wick scaffold <Display Name>   — create a new addon (folder, files, git, github)
 //   wick sync                      — regenerate cross-links in all README.md from wick.json
-//   wick render                    — run grab-artboards.mjs (thumbnails + banner)
+//   wick render [target ...]       — run grab-artboards.mjs (thumbnails + banner)
 //   wick release <folder> <ver>    — version bump + CHANGELOG + commit + push + zip + CF upload
+//   wick breadcrumb <name>         — a screenshot post between releases (FB + X)
 //
 // Usage (bash / PowerShell):
 //   node "C:/Users/jspli/Projects/Wick/WickSuite/tools/wick.mjs" <subcommand> [args]
@@ -19,12 +20,16 @@
 //     Falls back to deriving from the user token in C:\Users\jspli\OneDrive\Documents\Wicksmodsinfo.txt.
 //   - DISCORD_BOT_TOKEN env var (optional; for the post-release Discord announce).
 //     Falls back to reading from the Discord section of Wicksmodsinfo.txt.
-//     Pass --no-announce to wick release to skip both social posts.
+//   - X (optional): x_consumer_key/secret + x_access_token/secret in Wicksmodsinfo.txt.
+//     Posting needs API credits on the developer account; without them the
+//     compose link is printed instead.
+//     Pass --no-announce to wick release to skip every social post.
 
 import { execSync, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 // ── paths ─────────────────────────────────────────────────────────────────
@@ -262,8 +267,16 @@ function composeFBCaption(addon, version, changelogBody) {
 
 // Post a release announcement to the Wick's Mods FB page. Best-effort:
 // any failure is logged and swallowed — the release itself already succeeded.
-function announceFB(addon, version, addonDir, config) {
+function announceFB(addon, version, addonDir, config, { dry = false } = {}) {
   const marker = path.join(addonDir, `.wick-fb-announced-v${version}`);
+  if (dry) {
+    const caption = composeFBCaption(addon, version, extractChangelogEntry(path.join(addonDir, "CHANGELOG.md"), version));
+    log(`
+── Facebook${fs.existsSync(marker) ? " (already announced, would skip)" : ""} ──
+${caption}`);
+    log(`picture: ${findAddonThumb(addonDir) || "(none, would post a link instead)"}`);
+    return;
+  }
   if (fs.existsSync(marker)) {
     log(`  (FB: already announced v${version}, skipping — delete ${path.basename(marker)} to re-post)`);
     return;
@@ -441,8 +454,16 @@ function composeDiscordEmbed(addon, version, changelogBody) {
 
 // Post a release announcement to the Wick's Mods Discord #announcements channel.
 // Best-effort: any failure is logged and swallowed.
-function announceDiscord(addon, version, addonDir, config) {
+function announceDiscord(addon, version, addonDir, config, { dry = false } = {}) {
   const marker = path.join(addonDir, `.wick-discord-announced-v${version}`);
+  if (dry) {
+    const embed = composeDiscordEmbed(addon, version, extractChangelogEntry(path.join(addonDir, "CHANGELOG.md"), version));
+    log(`
+── Discord${fs.existsSync(marker) ? " (already announced, would skip)" : ""} ──
+${embed.title}
+${embed.description || ""}`);
+    return;
+  }
   if (fs.existsSync(marker)) {
     log(`  (Discord: already announced v${version}, skipping — delete ${path.basename(marker)} to re-post)`);
     return;
@@ -496,6 +517,176 @@ function announceDiscord(addon, version, addonDir, config) {
     return;
   }
   log(`  (Discord: unexpected response, raw: ${resp.slice(0, 400)})`);
+}
+
+// ── X (Twitter) announce helpers ──────────────────────────────────────────
+//
+// OAuth 1.0a user context: the consumer pair plus the access pair from
+// Wicksmodsinfo.txt. The access pair has to be regenerated after the app's
+// permissions change, or it keeps the old scope. Posting costs API credits
+// on the developer account, which is billed apart from the X subscription:
+// a 402 means credits, not tokens, and every caller falls back to the
+// compose link when the API says no.
+
+const X_API = "https://api.x.com";
+
+function resolveXCreds() {
+  const p = "C:/Users/jspli/OneDrive/Documents/Wicksmodsinfo.txt";
+  if (!fs.existsSync(p)) return null;
+  // Line by line, comments skipped, last one wins: the file also holds
+  // commented and template copies of the same key names.
+  const lines = fs.readFileSync(p, "utf8").replace(/^\uFEFF/, "").split(/\r?\n/)
+    .filter(l => !l.trim().startsWith("#"));
+  const get = (k) => {
+    let v = null;
+    for (const l of lines) {
+      const m = l.match(new RegExp(`^\\s*${k}\\s*=\\s*(\\S+)`));
+      if (m) v = m[1];
+    }
+    return v;
+  };
+  const c = {
+    ck: get("x_consumer_key"), cs: get("x_consumer_secret"),
+    at: get("x_access_token"), as: get("x_access_token_secret"),
+  };
+  return (c.ck && c.cs && c.at && c.as) ? c : null;
+}
+
+// RFC 3986 encoding, which OAuth 1.0a insists on.
+const xEnc = (s) => encodeURIComponent(s).replace(/[!'()*]/g, ch => "%" + ch.charCodeAt(0).toString(16).toUpperCase());
+
+// Only query parameters are signed. JSON and multipart bodies are not part
+// of the signature base string.
+function xAuthHeader(creds, method, url) {
+  const u = new URL(url);
+  const o = {
+    oauth_consumer_key: creds.ck,
+    oauth_nonce: crypto.randomBytes(16).toString("hex"),
+    oauth_signature_method: "HMAC-SHA1",
+    oauth_timestamp: String(Math.floor(Date.now() / 1000)),
+    oauth_token: creds.at,
+    oauth_version: "1.0",
+  };
+  const all = { ...o };
+  for (const [k, v] of u.searchParams) all[k] = v;
+  const params = Object.keys(all).sort().map(k => `${xEnc(k)}=${xEnc(all[k])}`).join("&");
+  const base = [method.toUpperCase(), xEnc(u.origin + u.pathname), xEnc(params)].join("&");
+  o.oauth_signature = crypto.createHmac("sha1", `${xEnc(creds.cs)}&${xEnc(creds.as)}`).update(base).digest("base64");
+  return "OAuth " + Object.keys(o).sort().map(k => `${xEnc(k)}="${xEnc(o[k])}"`).join(", ");
+}
+
+async function xFetch(creds, method, url, init = {}) {
+  const r = await fetch(url, {
+    ...init, method,
+    headers: { ...(init.headers || {}), Authorization: xAuthHeader(creds, method, url) },
+  });
+  const text = await r.text();
+  let json = null;
+  try { json = JSON.parse(text); } catch (_) {}
+  return { status: r.status, json, text };
+}
+
+// What X counts: every link is 23 characters whatever its real length.
+function xLength(text) {
+  return [...text.replace(/https?:\/\/\S+/g, "x".repeat(23))].length;
+}
+
+// Upload a picture and return its media id. v2 first; v1.1 is the older
+// endpoint X has been retiring, kept as a second try.
+async function xUploadMedia(creds, file) {
+  const bytes = fs.readFileSync(file);
+  const type = /\.jpe?g$/i.test(file) ? "image/jpeg" : "image/png";
+  const form2 = new FormData();
+  form2.append("media", new Blob([bytes], { type }), path.basename(file));
+  form2.append("media_category", "tweet_image");
+  const v2 = await xFetch(creds, "POST", `${X_API}/2/media/upload`, { body: form2 });
+  const id2 = v2.json?.data?.id || v2.json?.id || v2.json?.media_id_string;
+  if (v2.status < 300 && id2) return { id: String(id2) };
+
+  const form1 = new FormData();
+  form1.append("media", new Blob([bytes], { type }), path.basename(file));
+  const v1 = await xFetch(creds, "POST", "https://upload.twitter.com/1.1/media/upload.json", { body: form1 });
+  if (v1.status < 300 && v1.json?.media_id_string) return { id: v1.json.media_id_string };
+  return { error: `v2 ${v2.status} ${v2.text.slice(0, 200)} | v1.1 ${v1.status} ${v1.text.slice(0, 200)}` };
+}
+
+// Post to X. Returns { id } on success, { error, status } on failure, and
+// never throws, so a caller can fall back to the compose link.
+//   dry: check the login with a read-only call and post nothing.
+async function xPost(text, image, { dry = false } = {}) {
+  const len = xLength(text);
+  if (len > 280) return { error: `post is ${len} characters, over 280` };
+  const creds = resolveXCreds();
+  if (!creds) return { error: "no X access pair in Wicksmodsinfo.txt" };
+  try {
+    if (dry) {
+      const me = await xFetch(creds, "GET", `${X_API}/2/users/me`);
+      if (me.status !== 200) return { error: `login check failed: ${me.status} ${me.text.slice(0, 200)}`, status: me.status };
+      return { dry: true, user: me.json?.data?.username, len };
+    }
+    const body = { text };
+    if (image) {
+      const m = await xUploadMedia(creds, image);
+      if (m.error) log(`  (X: picture upload failed, posting text only: ${m.error})`);
+      else body.media = { media_ids: [m.id] };
+    }
+    const r = await xFetch(creds, "POST", `${X_API}/2/tweets`, {
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (r.status < 300 && r.json?.data?.id) return { id: r.json.data.id };
+    const why = r.status === 402
+      ? "402: no API credits on the developer account (the X subscription does not cover them)"
+      : `${r.status} ${r.text.slice(0, 300)}`;
+    return { error: why, status: r.status };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+const xIntentUrl = (text) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+
+function composeXRelease(addon, version) {
+  const cfUrl = `https://www.curseforge.com/wow/addons/${addon.cf_slug}`;
+  const tagline = addon.short_tagline || addon.tagline || "";
+  // The tags follow the client this release is for. Every post said TBC
+  // Classic, the Forever ones included, which is the wrong audience.
+  const tags = (addon.client || "tbc") === "forever"
+    ? "#WoWForever #Warcraft"
+    : "#WoWClassic #TBCClassic";
+  const parts = [`${addon.title} v${version} is live on CurseForge.`, "", tagline, "", cfUrl, "", tags];
+  let text = parts.join("\n").replace(/\n{3,}/g, "\n\n");
+  // A long tagline is the part that gives.
+  if (xLength(text) > 280) text = [parts[0], "", cfUrl, "", tags].join("\n");
+  return text;
+}
+
+// Post a release announcement to X with the addon's social card. Best
+// effort, same as FB and Discord: on any failure the compose link is
+// printed so the post can still go out by hand.
+async function announceX(addon, version, addonDir, config, { dry = false } = {}) {
+  const marker = path.join(addonDir, `.wick-x-announced-v${version}`);
+  if (!dry && fs.existsSync(marker)) {
+    log(`  (X: already announced v${version}, skipping — delete ${path.basename(marker)} to re-post)`);
+    return;
+  }
+  const text = composeXRelease(addon, version);
+  const image = findAddonThumb(addonDir);
+  if (dry) {
+    log(`\n── X (${xLength(text)} characters as X counts them) ──\n${text}`);
+    log(`picture: ${image || "(none)"}`);
+  } else {
+    log(`\nPosting to X${image ? " with the social card" : ""} ...`);
+  }
+  const r = await xPost(text, image, { dry });
+  if (r.dry) { ok(`X: login works as @${r.user}; nothing posted`); return; }
+  if (r.id) {
+    fs.writeFileSync(marker, `${new Date().toISOString()}\n${JSON.stringify(r)}\n`);
+    ok(`X: posted (https://x.com/${config.social?.x_handle || "wicksmods"}/status/${r.id})`);
+    return;
+  }
+  log(`  (X: ${r.error})`);
+  log(`  X compose link instead:\n  ${xIntentUrl(text)}`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -730,10 +921,12 @@ function cmdSync() {
 // ═══════════════════════════════════════════════════════════════════════════
 // render — shortcut to grab-artboards.mjs
 // ═══════════════════════════════════════════════════════════════════════════
-function cmdRender() {
-  setProgress("wick render", 1, 1, "rendering all artboards");
+// Every artboard, or only the targets named (`wick render breadcrumb`).
+function cmdRender(...targets) {
+  const only = targets.filter(t => /^[a-z0-9_]+$/i.test(t));
+  setProgress("wick render", 1, 1, only.length ? `rendering ${only.join(" ")}` : "rendering all artboards");
   try {
-    run(`node "${GRAB_TOOL}"`);
+    run(`node "${GRAB_TOOL}" ${only.join(" ")}`);
   } finally {
     clearProgress();
   }
@@ -808,8 +1001,8 @@ async function cmdRelease(folder, newVer, ...flags) {
   const toc = path.join(dir, `${folder}.toc`);
   if (!fs.existsSync(toc)) die(`.toc not found: ${toc}`);
 
-  // 7 visible phases: bump → changelog → git → zip → CF upload → FB announce → Discord announce.
-  const TOTAL = noAnnounce ? 5 : 7;
+  // 8 visible phases: bump → changelog → git → zip → CF upload → FB → Discord → X.
+  const TOTAL = noAnnounce ? 5 : 8;
   const cmd   = `wick release ${folder} v${newVer}`;
 
   // ── Bump version in .toc ──────────────────────────────────────────
@@ -969,27 +1162,13 @@ async function cmdRelease(folder, newVer, ...flags) {
     catch (e) { log(`  (Discord: announce threw, swallowed: ${e.message})`); }
   }
 
-  // ── X (Twitter) intent URL — auto API is paywalled, click-to-post ──
-  if (!noX) {
-    const cfUrl = `https://www.curseforge.com/wow/addons/${addon.cf_slug}`;
-    const tagline = addon.short_tagline || addon.tagline || "";
-    // The tags follow the client this release is for. Every post
-    // said TBC Classic, the Forever ones included, which is the
-    // wrong audience to put it in front of.
-    const tags = (addon.client || "tbc") === "forever"
-      ? "#WoWForever #Warcraft"
-      : "#WoWClassic #TBCClassic";
-    const xText = [
-      `${addon.title} v${newVer} is live on CurseForge.`,
-      "",
-      tagline,
-      "",
-      cfUrl,
-      "",
-      tags,
-    ].join("\n");
-    const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(xText)}`;
-    log(`\nX (click to compose):\n  ${xUrl}`);
+  // ── Announce on X (best effort; prints the compose link if the API says no) ──
+  if (noX) {
+    log(`  (X: skipping post, ${noAnnounce ? "--no-announce" : "--no-x"} passed)`);
+  } else {
+    setProgress(cmd, 8, TOTAL, "posting to X");
+    try { await announceX(addon, newVer, dir, config); }
+    catch (e) { log(`  (X: announce threw, swallowed: ${e.message})`); }
   }
 
   clearProgress();
@@ -1262,7 +1441,7 @@ function readMilestones(config) {
 
 async function cmdMilestone(nArg, ...flags) {
   const exact = parseInt(String(nArg || "").replace(/[^0-9]/g, ""), 10);
-  if (!exact) die("usage: wick milestone <count> [--no-fb] [--no-discord] [--force]");
+  if (!exact) die("usage: wick milestone <count> [--dry-run] [--no-fb] [--no-discord] [--no-x] [--force]");
   const config = readConfig();
   const { round, r, fb, x, discord } = milestoneCopy(exact);
   if (!round) die(`${exact} has not crossed a thousand yet`);
@@ -1296,8 +1475,12 @@ async function cmdMilestone(nArg, ...flags) {
   if (dry) {
     log(`\n── Facebook ──\n${fb}`);
     log(`\n── Discord ──\n${discord}`);
-    log(`\n── X ──\n${x}`);
+    log(`\n── X (${xLength(x)} characters as X counts them) ──\n${x}`);
     log(`\ncard: ${card}`);
+    if (!flags.includes("--no-x")) {
+      const r = await xPost(x, card, { dry: true });
+      if (r.dry) ok(`X: login works as @${r.user}`); else log(`  (X: ${r.error})`);
+    }
     log(`\n(dry run: nothing posted, nothing recorded)`);
     return;
   }
@@ -1381,8 +1564,142 @@ async function cmdMilestone(nArg, ...flags) {
     }
   }
 
-  log(`\nX (click to compose):\n  https://twitter.com/intent/tweet?text=${encodeURIComponent(x)}`);
+  if (!flags.includes("--no-x")) {
+    log(`\nPosting to X with the milestone card ...`);
+    const xr = await xPost(x, card);
+    if (xr.id) ok(`X: posted (id ${xr.id})`);
+    else log(`  (X: ${xr.error})\n  X compose link instead:\n  ${xIntentUrl(x)}`);
+  }
   log(`\n✓ Milestone posted.`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// breadcrumb <name> [--dry-run] [--no-fb] [--no-x] [--force]
+// ═══════════════════════════════════════════════════════════════════════════
+// A post between releases: a screenshot of something new on the Breadcrumb
+// card (BREADCRUMB in thumbnails.html, rendered by `wick render breadcrumb`),
+// posted to Facebook with a caption, and an X compose link opened in the
+// browser. An X link cannot carry a picture, so the card's path is printed
+// to attach there by hand.
+//
+// The copy is social/breadcrumbs/<name>.txt, a section for each place:
+//   == facebook ==
+//   ...
+//   == x ==
+//   ...
+// Each name goes out once. social/breadcrumbs/posted.json records it
+// before Facebook is called, so a run that dies after the post went up
+// still refuses a second one until the page has been looked at (--force).
+function readBreadcrumbCopy(file) {
+  const out = {};
+  let cur = null;
+  for (const line of fs.readFileSync(file, "utf8").replace(/\r\n/g, "\n").split("\n")) {
+    const m = line.match(/^==\s*(\w+)\s*==\s*$/);
+    if (m) { cur = m[1].toLowerCase(); out[cur] = []; continue; }
+    if (cur) out[cur].push(line);
+  }
+  for (const k of Object.keys(out)) out[k] = out[k].join("\n").trim();
+  return out;
+}
+
+async function cmdBreadcrumb(name, ...flags) {
+  if (!name || name.startsWith("--")) die("usage: wick breadcrumb <name> [--dry-run] [--no-fb] [--no-x] [--force]");
+  const config = readConfig();
+  const dir = path.join(SUITE_DIR, "social", "breadcrumbs");
+  const copyFile = path.join(dir, `${name}.txt`);
+  if (!fs.existsSync(copyFile)) die(`no copy at ${copyFile}`);
+  const copy = readBreadcrumbCopy(copyFile);
+  if (!copy.facebook || !copy.x) die(`${copyFile} needs a "== facebook ==" and an "== x ==" section`);
+
+  // The rules for anything posted, checked rather than remembered.
+  for (const [where, t] of Object.entries(copy)) {
+    if (/—/.test(t)) die(`the ${where} copy has an em dash`);
+  }
+  if (/(^|\s)\/[a-z]/i.test(copy.facebook.replace(/https?:\/\/\S+/g, ""))) {
+    die("the facebook copy has a slash command in it");
+  }
+  if (/#/.test(copy.facebook)) die("the facebook copy has a hashtag; those belong on X only");
+  if (xLength(copy.x) > 280) die(`the X copy is ${xLength(copy.x)} characters as X counts them, over 280`);
+
+  const card = path.join(SUITE_DIR, "images", "suite", "breadcrumb.png");
+  if (!fs.existsSync(card)) die(`no card at ${card}: set BREADCRUMB in thumbnails.html and run: wick render breadcrumb`);
+  const html = path.join(SUITE_DIR, "thumbnails.html");
+  if (fs.statSync(html).mtimeMs > fs.statSync(card).mtimeMs) {
+    die(`the card is older than thumbnails.html: run wick render breadcrumb`);
+  }
+
+  const postedFile = path.join(dir, "posted.json");
+  const posted = fs.existsSync(postedFile) ? JSON.parse(fs.readFileSync(postedFile, "utf8")) : {};
+  if (posted[name] && !flags.includes("--force")) {
+    die(`${name} has gone out already (${JSON.stringify(posted[name])}). Look at the page, then pass --force to post it again`);
+  }
+  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(copy.x)}`;
+
+  if (flags.includes("--dry-run")) {
+    log(`\n── Facebook ──\n${copy.facebook}`);
+    log(`\n── X (${xLength(copy.x)} characters as X counts them) ──\n${copy.x}`);
+    log(`\ncard: ${card}`);
+    if (!flags.includes("--no-x")) {
+      const r = await xPost(copy.x, card, { dry: true });
+      if (r.dry) ok(`X: login works as @${r.user}`); else log(`  (X: ${r.error})`);
+    }
+    log(`\n(dry run: nothing posted, nothing recorded)`);
+    return;
+  }
+
+  if (!flags.includes("--no-fb")) {
+    const token = resolveFBPageToken(config);
+    const pageId = config.social?.fb_page_id;
+    const v = config.social?.fb_graph_version || "v21.0";
+    if (!token || !pageId) die("FB: no page token or page id");
+    posted[name] = { date: new Date().toISOString().slice(0, 10), fb: "posting" };
+    fs.writeFileSync(postedFile, JSON.stringify(posted, null, 2) + "\n");
+    const captionPath = path.join(os.tmpdir(), "wick-breadcrumb-caption.txt");
+    fs.writeFileSync(captionPath, copy.facebook);
+    log(`\nPosting to Facebook (${config.social.fb_page_name}) with the breadcrumb card ...`);
+    let resp = "";
+    try {
+      resp = runCapture([
+        `curl -s -X POST`,
+        `-F "source=@${card}"`,
+        `-F "caption=<${captionPath}"`,
+        `-F "access_token=${token}"`,
+        `"https://graph.facebook.com/${v}/${pageId}/photos"`,
+      ].join(" "));
+    } catch (e) { log(`  (FB: curl failed: ${e.message})`); }
+    try { fs.rmSync(captionPath); } catch (_) {}
+    let parsed = null;
+    try { parsed = JSON.parse(resp); } catch (_) {}
+    const id = parsed && (parsed.post_id || parsed.id);
+    if (id) {
+      posted[name].fb = id;
+      ok(`FB: posted (post id ${id})`);
+    } else if (parsed && parsed.error && parsed.error.code === 1) {
+      // The photos endpoint says this even when the post went up.
+      posted[name].fb = "unconfirmed";
+      log(`  (FB: answered with its code 1 false alarm. The post has probably gone up: look at the page before running this again.)`);
+    } else {
+      posted[name].fb = "unknown";
+      log(`  (FB: unexpected response: ${String(resp).slice(0, 200)}. Look at the page before running this again.)`);
+    }
+    fs.writeFileSync(postedFile, JSON.stringify(posted, null, 2) + "\n");
+  }
+
+  if (!flags.includes("--no-x")) {
+    log(`\nPosting to X with the breadcrumb card ...`);
+    const xr = await xPost(copy.x, card);
+    if (xr.id) {
+      ok(`X: posted (id ${xr.id})`);
+      posted[name] = { ...(posted[name] || { date: new Date().toISOString().slice(0, 10) }), x: xr.id };
+      fs.writeFileSync(postedFile, JSON.stringify(posted, null, 2) + "\n");
+    } else {
+      // The API said no: open the compose page so it can still go out by hand.
+      log(`  (X: ${xr.error})\n  opening the compose page instead; attach the card there:\n  ${xUrl}\n  card: ${card}`);
+      // No shell: the copy is in the URL, and a shell would read its % and & marks.
+      try { spawnSync("rundll32.exe", ["url.dll,FileProtocolHandler", xUrl]); } catch (_) {}
+    }
+  }
+  log(`\n✓ Breadcrumb posted.`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1393,15 +1710,17 @@ switch (sub) {
   case "list":     cmdList(); break;
   case "scaffold": cmdScaffold(rest.join(" ")); break;
   case "sync":     cmdSync(); break;
-  case "render":   cmdRender(); break;
+  case "render":   cmdRender(...rest); break;
   case "release":       await cmdRelease(rest[0], rest[1], ...rest.slice(2)); break;
   case "audit-secrets": cmdAuditSecrets(); break;
   case "milestone":     await cmdMilestone(rest[0], ...rest.slice(1)); break;
+  case "breadcrumb":    await cmdBreadcrumb(rest[0], ...rest.slice(1)); break;
   case "announce": {
     // Manually re-post a release announcement (e.g., if --no-announce was used,
     // or a token wasn't set at release time, or you want to re-post).
     const folder = rest[0], ver = rest[1];
-    if (!folder || !ver) die("usage: wick announce <folder> <version>");
+    if (!folder || !ver) die("usage: wick announce <folder> <version> [--dry-run] [--no-fb] [--no-discord] [--no-x]");
+    const dry = rest.includes("--dry-run");
     const cfg = readConfig();
     // The same resolution release uses. This used to join the TBC root
     // for everything, so announcing a Forever addon looked in a folder
@@ -1410,8 +1729,10 @@ switch (sub) {
     const a = resolveAddon(cfg, folder, rest.slice(2));
     const dir = path.join(rootOf(cfg, a), a.folder);
     if (!fs.existsSync(dir)) die(`addon folder not found: ${dir}`);
-    announceFB(a, ver, dir, cfg);
-    announceDiscord(a, ver, dir, cfg);
+    if (!rest.includes("--no-fb"))      announceFB(a, ver, dir, cfg, { dry });
+    if (!rest.includes("--no-discord")) announceDiscord(a, ver, dir, cfg, { dry });
+    if (!rest.includes("--no-x"))       await announceX(a, ver, dir, cfg, { dry });
+    if (dry) log(`\n(dry run: nothing posted, nothing recorded)`);
     break;
   }
   case undefined:
@@ -1423,18 +1744,27 @@ usage:
   wick list                                list active addons
   wick scaffold "<Display Name>"           create a new addon (files, git, github, wick.json)
   wick sync                                regenerate suite cross-link tables in every README
-  wick render                              run grab-artboards.mjs (thumbnails + banner)
-  wick release <folder> <ver> [--no-announce]
+  wick render [target ...]                 run grab-artboards.mjs (thumbnails + banner),
+                                           every artboard or only the targets named
+  wick release <folder> <ver> [--no-announce] [--no-fb] [--no-x]
                                            bump, commit, tag, push, zip, upload to CurseForge,
-                                           and post a release announcement to FB + Discord
-  wick announce <folder> <ver>             re-post a release announcement to FB + Discord
-                                           (idempotent; writes marker files to dedupe)
-  wick milestone <count> [--dry-run] [--no-fb] [--no-discord] [--force]
+                                           and post a release announcement to FB + Discord + X
+  wick announce <folder> <ver> [--dry-run] [--no-fb] [--no-discord] [--no-x]
+                                           re-post a release announcement to FB + Discord + X
+                                           (idempotent; writes marker files to dedupe).
+                                           --dry-run prints every post, checks the X login,
+                                           and posts nothing
+  wick milestone <count> [--dry-run] [--no-fb] [--no-discord] [--no-x] [--force]
                                            post the download counter crossing a round
                                            number, with the milestone card; records it
                                            in the landing site's milestones-hit.json.
                                            --dry-run prints the copy and posts nothing
-  wick audit-secrets                       scan all suite repos (working tree + full history)
+  wick breadcrumb <name> [--dry-run] [--no-fb] [--no-x] [--force]
+                                           post a screenshot of something new between
+                                           releases: the Breadcrumb card on Facebook with
+                                           social/breadcrumbs/<name>.txt, and on X with the
+                                           card. Each name goes out once
+  wick audit-secrets                      scan all suite repos (working tree + full history)
                                            for accidentally committed secrets; exits 1 if found
 
 examples:
@@ -1443,6 +1773,7 @@ examples:
   node tools/wick.mjs release WicksCDTracker 0.3.0
   node tools/wick.mjs release WicksCDTracker 0.3.0 --no-announce
   node tools/wick.mjs announce WicksQuestKey 1.0.0
+  node tools/wick.mjs announce WicksQuestKey 1.0.0 --dry-run
   node tools/wick.mjs audit-secrets`);
     break;
   default:

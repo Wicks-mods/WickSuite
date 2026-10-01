@@ -89,4 +89,11 @@ kh = 2.1 * K
 d.ellipse([cx - kh, 20.5 * K - kh, cx + kh, 20.5 * K + kh], fill=(255, 255, 255, 0))
 d.rectangle([cx - 0.9 * K, 20.5 * K, cx + 0.9 * K, 25 * K], fill=(255, 255, 255, 0))
 save(img, "lock")
+
+# Rest: a crescent moon, the player frame's resting mark. A full disc with
+# a smaller one cut from its upper right.
+img, d = canvas()
+d.ellipse([5 * K, 5 * K, 27 * K, 27 * K], fill=(255, 255, 255, 255))
+d.ellipse([11.5 * K, 1.5 * K, 30.5 * K, 20.5 * K], fill=(255, 255, 255, 0))
+save(img, "rest")
 print("ok")

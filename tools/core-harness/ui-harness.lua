@@ -343,6 +343,21 @@ local UF = ns.UnitFrames
 check(UF.initialized, "unit frames initialized")
 check(UF.frames.player ~= nil and UF.frames.target ~= nil, "player and target spawned")
 check(UF.frames.boss and #UF.frames.boss == 5, "five boss frames")
+do
+    -- An incoming heal stops at full health rather than running past the
+    -- frame's edge (the client's calculator allows 5% over by default).
+    local over = {}
+    for f in pairs(UF.all or {}) do
+        local h = f.Health
+        if h and h.HealingAll and h.incomingHealOverflow ~= 1 then over[#over + 1] = tostring(f.wuiKey) end
+    end
+    check(next(UF.all or {}) and #over == 0, "incoming heals stop at the end of the health bar: " .. table.concat(over, ", "))
+    -- Resting: our crescent on a tile, made only where it shows.
+    local ri = UF.frames.player.RestingIndicator
+    check(ri and ri:GetObjectType() == "Frame" and ri.mark and ri.mark:GetTexture() == ns.Media:Glyph("rest"),
+        "the player frame's resting mark is our crescent, not the game's Zzz")
+    check(UF.frames.target.wuiIcons.resting == nil, "and a frame that never shows resting makes no mark")
+end
 check(ns.UnitGroups.headers and ns.UnitGroups.headers.party and ns.UnitGroups.headers.raid, "party and raid headers")
 check(ns.Movers.list.uf_player and ns.Movers.list.uf_raid and ns.Movers.list.castbar_player, "unit frame movers, including the detached player castbar")
 local okC, errC = pcall(function() UF:Configure(UF.frames.player) end)
