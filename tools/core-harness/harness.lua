@@ -235,7 +235,13 @@ rp:Hide()
 
 -- ---------- themes --------------------------------------------------------
 io.write("== themes ==\n")
-check(#Chrome.Themes == 16 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, six looks' palettes and custom, warlock is fel")
+check(#Chrome.Themes == 17 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, seven looks' palettes and custom, warlock is fel")
+-- Crisp takes the player's class colour as its accent over neutral greys.
+do
+    local t, cls = Chrome.ThemeByID.crisp, Chrome.ThemeByClass[select(2, UnitClass("player")) or ""]
+    check(t and cls and t.hex.fel == cls.hex.fel and t.hex.void == "121212" and t.hex.border == "000000",
+        "Crisp's accent is the class colour, its darks neutral grey with a black border")
+end
 check(Chrome.ThemeByID.rebel and Chrome.ThemeByID.rebel.look, "a look's palette is a theme")
 check(Chrome:ThemeSetting() == "auto" and (Chrome:CharStore().theme == nil or Chrome:CharStore().theme == "auto")
     and Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "a new install follows the class")
