@@ -60,6 +60,13 @@ p.setdefault("nameplates", {})["enable"] = True
 p["nameplates"]["healthColor"] = "look"
 p.setdefault("skins", {})["trackerFontSize"] = 14
 p.setdefault("unitframes", {})["fontOutline"] = "look"
+# The cast bar and keybind colours follow the look unless a player picks
+# one, so the shipped layout never pins them; the one-off migration flags
+# belong to the played profile, not to a new one.
+for mod, k in (("unitframes", "castColor"), ("actionbars", "hotkeyColor")):
+    p.get(mod, {}).pop(k, None)
+for mod in ("unitframes", "actionbars"):
+    p.get(mod, {}).pop("colorsMigrated", None)
 # Hologram's face runs large: its player name a size of its own.
 holo = gen.setdefault("styleSizes", {}).setdefault("hologram", {})
 holo.setdefault("units", {}).setdefault("player", {}).setdefault("texts", {})["left"] = 12

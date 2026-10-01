@@ -141,7 +141,35 @@ local function newMock(kind, name)
         elseif k == "IsMouseEnabled" then return function() return t.__mouseEnabled end
         elseif k == "IsShown" or k == "IsVisible" then return function() return t.__shown end
         elseif k == "Show" then return function() t.__shown = true; if t.__scripts.OnShow then t.__scripts.OnShow(t) end end
-        elseif k == "Hide" then return function() local was = t.__shown; t.__shown = false; if was and t.__scripts.OnHide then t.__scripts.OnHide(t) end end
+        elseif k == "Hide" then return function()
+                local was = t.__shown
+                t.__shown = false
+                -- A box that hides lets go of the keyboard, as the client's do.
+                if t.__focus then
+                    t.__focus = false
+                    if t.__scripts.OnEditFocusLost then t.__scripts.OnEditFocusLost(t) end
+                end
+                if was and t.__scripts.OnHide then t.__scripts.OnHide(t) end
+            end
+        -- Edit box focus. Each box keeps its own; that one box at a time
+        -- holds the keyboard is not modelled, a check asks about one box.
+        -- An unknown method answers with a mock, and a mock is true, so
+        -- without these every box read as focused.
+        elseif k == "SetFocus" then return function()
+                if t.__focus then return end
+                t.__focus = true
+                if t.__scripts.OnEditFocusGained then t.__scripts.OnEditFocusGained(t) end
+            end
+        elseif k == "ClearFocus" then return function()
+                if not t.__focus then return end
+                t.__focus = false
+                if t.__scripts.OnEditFocusLost then t.__scripts.OnEditFocusLost(t) end
+            end
+        elseif k == "HasFocus" then return function() return t.__focus and true or false end
+        -- A click from code runs the button's click script, as in the game.
+        elseif k == "Click" then return function(_, button)
+                if t.__scripts.OnClick then t.__scripts.OnClick(t, button or "LeftButton", false) end
+            end
         elseif k == "SetShown" then return function(_, v) if v then t:Show() else t:Hide() end end
         elseif k == "SetSize" then return function(_, w, h) t.__w, t.__h = w, h end
         elseif k == "SetWidth" then return function(_, w) t.__w = w end
@@ -538,10 +566,15 @@ function UnitFrameHealthBar_Update(bar, unit)
     bar:SetStatusBarColor(0, 1, 0)      -- the flat green Blizzard uses
 end
 function UnitFrameHealthBar_OnValueChanged(bar) end
-function hooksecurefunc(name, fn)
-    local orig = _G[name]
+-- Both forms the client takes: a global function's name, or a table and
+-- the name of a method on it. The second was missing, so every post-hook
+-- on a frame's method (a row's Init, a bar's layout) quietly did nothing.
+function hooksecurefunc(a, b, c)
+    local tbl, name, fn = _G, a, b
+    if type(a) == "table" then tbl, name, fn = a, b, c end
+    local orig = tbl[name]
     if type(orig) ~= "function" then return end
-    _G[name] = function(...) local r = { orig(...) } fn(...) return unpack(r) end
+    tbl[name] = function(...) local r = { orig(...) } fn(...) return unpack(r) end
 end
 PlayerFrame = PlayerFrame or nil
 

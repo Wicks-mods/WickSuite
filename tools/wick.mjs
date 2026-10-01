@@ -897,7 +897,9 @@ async function cmdRelease(folder, newVer, ...flags) {
     `try {`,
     `  foreach ($f in Get-ChildItem -Path $src -Recurse -File -Force) {`,
     `    $rel = $f.FullName.Substring($src.Length + 1).Replace('\\', '/')`,
-    `    if ($rel -like '.git/*' -or $rel -like '.claude/*' -or $rel -eq '.gitignore') { continue }`,
+    // .wick-* are this tool's own markers (an announcement made); they sit
+    // in the addon folder but are never part of the addon.
+    `    if ($rel -like '.git/*' -or $rel -like '.claude/*' -or $rel -eq '.gitignore' -or $rel -like '.wick-*') { continue }`,
     `    [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $f.FullName, $folder + '/' + $rel, [System.IO.Compression.CompressionLevel]::Optimal)`,
     `  }`,
     `} finally { $zip.Dispose(); $stream.Dispose() }`,

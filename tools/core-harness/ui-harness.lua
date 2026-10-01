@@ -424,10 +424,12 @@ do
         check(p.wuiMarkL:IsShown() and p.wuiMarkR:IsShown(), "your target's plate has a pointer each side")
         do
             local st = ns.Core.Chrome:StyleDef()
-            local want = ns.mult * ((st.family == "og" and st.borderPx) or 1)
+            -- OG family: a border wholly outside the bar at the look's
+            -- thickness. Modern: a card with room round the bar.
+            local want = ns:Modern() and NP.CardPad() or ns.mult * ((st.family == "og" and st.borderPx) or 1)
             local _, _, _, bx = p.Health.backdrop:GetPoint()
-            check(math.abs((bx or 0) - want) < 1e-6, "the plate's border sits wholly outside the bar at the look's thickness: "
-                .. tostring(bx) .. " / " .. tostring(want))
+            check(math.abs((bx or 0) - want) < 1e-6 and math.abs(NP.CardInset() - want) < 1e-6,
+                "the plate's border or card sits outside the bar at the look's spacing: " .. tostring(bx) .. " / " .. tostring(want))
             local okC, errC = pcall(p.Health.PostUpdateColor, p.Health, "nameplate1")
             check(okC and (not st.health or NP.LookColor("nameplate1") ~= nil), "plates take the look's health colours: " .. tostring(errC or ""))
         end
@@ -438,8 +440,19 @@ do
         local _, _, _, x1 = p.wuiMarkL:GetPoint()
         p.wuiCastbar:Hide()
         local _, _, _, x2 = p.wuiMarkL:GetPoint()
-        check(x0 == -3 and x1 < x0 and x2 == x0, "the left pointer steps out past the spell icon while a cast shows: "
-            .. tostring(x0) .. " / " .. tostring(x1) .. " / " .. tostring(x2))
+        if ns:Modern() then
+            -- The thin cast line has no icon to step past; the pointer
+            -- hugs the card.
+            check(x0 == -(3 + NP.CardPad()) and x1 == x0 and x2 == x0, "the left pointer hugs the card, a cast or not: "
+                .. tostring(x0) .. " / " .. tostring(x1) .. " / " .. tostring(x2))
+            check(p.wuiCastbar:GetHeight() == 5 and not p.wuiCastbar.wuiIconHolder:IsShown(),
+                "the plate's cast bar is a thin line with no icon, as on the unit frames")
+        else
+            check(x0 == -3 and x1 < x0 and x2 == x0, "the left pointer steps out past the spell icon while a cast shows: "
+                .. tostring(x0) .. " / " .. tostring(x1) .. " / " .. tostring(x2))
+            check(p.wuiCastbar:GetHeight() == NP:db().castHeight and p.wuiCastbar.wuiIconHolder:IsShown() == (NP:db().castIcon and true or false),
+                "the plate's cast bar takes its height and icon from the settings")
+        end
         focus = true
         NP:Refresh(p)
         check(p.wuiMarkL:IsShown() and p:GetAlpha() == 1, "your focus is marked too, and not dimmed")
@@ -537,7 +550,8 @@ do
     f.InitializeBarPresentation = function() end
     f.ApplyRangePresentation = function() end
     local ok, err = pcall(ns.Skins.SwingTimers, ns.Skins)
-    check(ok and sb.backdrop ~= nil, "the swing timers skin: a panel of ours behind the bar: " .. tostring(err or ""))
+    check(ok and ns:BackdropOf(sb) ~= nil, "the swing timers skin: a panel of ours behind the bar: " .. tostring(err or ""))
+    check(rawget(sb, "backdrop") == nil, "and kept beside Blizzard's bar, never written onto it")
     SwingTimerMainHandFrame = nil
 end
 
@@ -884,6 +898,137 @@ do
     check(kids == 0, "and gets no panel of ours")
 end
 
+io.write("== click bindings ==\n")
+do
+    local PS = ns.PanelSkins
+    local listed = false
+    for _, n in ipairs(PS.WINDOWS) do if n == "ClickBindingFrame" then listed = true end end
+    check(listed, "the click binding window is on the window skin's list")
+    -- The window as Blizzard_ClickBindingUI builds it.
+    local cf = CreateFrame("Frame", "ClickBindingFrame")
+    cf:SetSize(440, 620)
+    cf.NineSlice = realCreateFrame("Frame"); cf.Bg = S.newMock("Texture")
+    cf.CloseButton = realCreateFrame("Button"); cf.PortraitContainer = realCreateFrame("Frame")
+    cf.TitleContainer = { TitleText = S.newMock("FontString") }
+    local sbb = CreateFrame("Frame", nil, cf)
+    sbb.NineSlice = realCreateFrame("Frame")
+    cf.ScrollBoxBackground = sbb
+    local box = CreateFrame("Button", nil, cf)
+    cf.ScrollBox = box
+    local target = CreateFrame("Frame", nil, box)
+    box.ScrollTarget = target
+    -- A binding row: an icon, its name and binding, Blizzard's markers.
+    local function makeRow()
+        local row = CreateFrame("Button", nil, target)
+        row:SetSize(450, 46)
+        row:Show()
+        for _, k in ipairs({ "Background", "NewOutline", "IconHighlight", "FrameHighlight", "EmptySlotIconHighlight" }) do
+            row[k] = row:CreateTexture()
+        end
+        local icon = row:CreateTexture()
+        -- A real texture forgets its atlas when given a file.
+        rawset(icon, "GetAtlas", function() return icon.__atlas end)
+        rawset(icon, "SetAtlas", function(_, a) icon.__atlas = a end)
+        rawset(icon, "SetTexture", function(_, t) icon.__tex = t; icon.__atlas = nil end)
+        row.Icon = icon
+        row.Name, row.BindingText = row:CreateFontString(), row:CreateFontString()
+        row.DeleteButton = realCreateFrame("Button", nil, row)
+        -- Blizzard's Init draws the row's picture: a spell's file, or the
+        -- empty slot's atlas.
+        row.Init = function(self, d)
+            if d.atlas then self.Icon:SetAtlas(d.atlas) else self.Icon:SetTexture(d.icon) end
+        end
+        return row
+    end
+    local spell, empty = makeRow(), makeRow()
+    spell:Init({ icon = 132212 })
+    empty:Init({ atlas = "clickcast-icon-add" })
+    local header = CreateFrame("Frame", nil, target)
+    header.Name = header:CreateFontString()
+    -- A heading has no binding text or icon; the stub would invent them.
+    rawset(header, "__nokeys", setmetatable({ BindingText = true, Icon = true }, { __index = OUF_KEYS }))
+    header:Show()
+    rawset(target, "GetChildren", function() return header, spell, empty end)
+    -- The talents and macros buttons, talents chosen.
+    local function corner(chosen)
+        local p = CreateFrame("Button", nil, cf)
+        p:SetSize(31, 31)
+        p.Portrait, p.Frame, p.UnselectedFrame, p.Highlight = p:CreateTexture(), p:CreateTexture(), p:CreateTexture(), p:CreateTexture()
+        p.UnselectedFrame:SetShown(not chosen)
+        return p
+    end
+    local talents, macros = corner(true), corner(false)
+    cf.FramePortraits = { talents, macros }
+    -- The help button and the tutorial.
+    local hb = CreateFrame("Button", nil, cf)
+    hb:SetSize(64, 64)
+    hb.I, hb.Ring, hb.BigIPulse, hb.RingPulse = hb:CreateTexture(), hb:CreateTexture(), hb:CreateTexture(), hb:CreateTexture()
+    hb.BigIPulse:Show()
+    cf.TutorialButton = hb
+    local tf = CreateFrame("Frame", nil, cf)
+    tf:SetSize(496, 253)
+    tf.NineSlice, tf.CloseButton = realCreateFrame("Frame"), realCreateFrame("Button")
+    tf.TitleContainer = { TitleText = S.newMock("FontString") }
+    tf.Tutorial, tf.Bg = S.newMock("Texture"), S.newMock("Texture")
+    for _, k in ipairs({ "SummaryText", "InfoText", "AlternateText", "ThrallName" }) do tf[k] = tf:CreateFontString() end
+    rawset(tf, "GetRegions", function() return tf.Tutorial, tf.Bg, tf.SummaryText end)
+    cf.TutorialFrame = tf
+    cf:Show()
+
+    local ok, err = pcall(PS.Skin, PS, cf)
+    check(ok, "the click binding window skins: " .. tostring(err or ""))
+    local E = PS.extrasOf
+    check(E(sbb) and E(sbb).list ~= nil, "the list sits on a black card")
+    check(E(spell) and E(spell).binding and E(spell).tile and spell.Background:GetAlpha() == 0,
+        "a binding is a pill with its icon on a tile, Blizzard's row art gone")
+    check(spell.NewOutline:GetTexture() ~= nil and spell.IconHighlight:GetTexture() ~= nil,
+        "the new-binding outline and the held-spell glow are redrawn as rings")
+    local plus = ns.Media:Glyph("plus")
+    check(empty.Icon:GetTexture() == plus, "the empty slot shows our plus, not Blizzard's green one")
+    empty:Init({ icon = 134331 })
+    spell:Init({ atlas = "clickcast-icon-add" })
+    check(empty.Icon:GetTexture() == 134331 and spell.Icon:GetTexture() == plus,
+        "a row filled again is redrawn at once: a picture shows as itself, an empty slot as our plus")
+    check(E(talents).ring:IsShown() and not E(macros).ring:IsShown(), "the open one of the corner buttons wears the accent ring")
+    macros.UnselectedFrame:Hide(); talents.UnselectedFrame:Show()
+    PS.clickBindingPass(cf)
+    check(E(macros).ring:IsShown() and not E(talents).ring:IsShown(), "and the ring follows when the other opens")
+    check(hb.I:GetAlpha() == 0 and hb.Ring:GetAlpha() == 0 and not hb.BigIPulse:IsShown() and E(hb).help,
+        "the help button is a tile of ours, its ring, its big i and its pulse gone")
+    check(tf.Tutorial:GetAlpha() == 0 and tf.ThrallName:GetAlpha() == 0 and E(tf).example ~= nil,
+        "the tutorial's painting goes for a unit frame card of ours")
+    check(E(tf).backdrop ~= nil, "and the tutorial is a window of ours")
+    check(rawget(cf, "wuiBG") == nil and rawget(spell, "wuiBG") == nil and rawget(spell, "backdrop") == nil,
+        "nothing of ours written into Blizzard's frames")
+    ClickBindingFrame = nil
+end
+
+io.write("== legacy window ==\n")
+do
+    local PS = ns.PanelSkins
+    local listed = false
+    for _, n in ipairs(PS.WINDOWS) do if n == "LegacySystemFrame" then listed = true end end
+    check(listed, "the Legacy window is on the window skin's list by this client's name for it")
+    local lf = CreateFrame("Frame", "LegacySystemFrame")
+    lf:SetSize(920, 575)
+    lf.NineSlice = realCreateFrame("Frame"); lf.Bg = S.newMock("Texture")
+    lf.CloseButton = realCreateFrame("Button")
+    lf.TitleContainer = { TitleText = S.newMock("FontString") }
+    -- Its page tabs, built on the large side tab template.
+    local tab = CreateFrame("Frame", nil, lf)
+    tab:SetSize(55, 55)
+    tab:Show()
+    tab.Icon = tab:CreateTexture()
+    tab.Background, tab.TabGlow, tab.HighlightTexture, tab.SelectedTexture = tab:CreateTexture(), tab:CreateTexture(), tab:CreateTexture(), tab:CreateTexture()
+    tab.SelectedTexture:Show()
+    lf.Tabs = { tab }
+    local ok, err = pcall(PS.Skin, PS, lf)
+    check(ok, "the Legacy window skins: " .. tostring(err or ""))
+    local e = PS.extrasOf(tab)
+    check(e and e.tile and e.ring and e.ring:IsShown(), "its tabs are side tiles, the open one in the accent ring, not bottom tabs")
+    LegacySystemFrame = nil
+end
+
 io.write("== settings window ==\n")
 local okOpen, errOpen = pcall(function() ns.Config:Open("general") end)
 check(okOpen, "config opens: " .. tostring(errOpen or ""))
@@ -916,6 +1061,286 @@ check(not ns.Movers:IsUnlocked(), "lock")
 io.write("== keybinds ==\n")
 local okK, errK = pcall(function() ns.Keybind:Activate(); ns.Keybind:Deactivate(false) end)
 check(okK, "keybind mode opens and closes: " .. tostring(errK or ""))
+
+-- The design system audit's first batch (2026-09-30), one check or two per fix.
+io.write("== audit fixes ==\n")
+do
+    local Ch = ns.Core.Chrome
+    local C = Ch.Colors
+    local W = ns.Widgets
+    local function near(a, b) return a and b and math.abs(a[1] - b[1]) < 0.002 and math.abs(a[2] - b[2]) < 0.002 and math.abs(a[3] - b[3]) < 0.002 end
+    local function restoreTheme() Ch:ApplyTheme(Ch:ResolveTheme(Ch:ThemeSetting())) end
+
+    -- 1: a label follows a theme change; one given its own colour keeps it.
+    local fs = ns:CreateText(UIParent, 12)
+    local mine = ns:CreateText(UIParent, 12)
+    ns:TextColor(mine, { 1, 0, 0 })
+    local chosen = ns:CreateText(UIParent, 12)
+    ns:TextColor(chosen, "fel")
+    Ch:ApplyTheme("hologram")
+    check(near(fs.__textColor, C.text), "a label takes the new theme's text colour")
+    check(near(chosen.__textColor, C.fel), "a label recoloured to the accent takes the new accent, not the text colour")
+    check(near(mine.__textColor, { 1, 0, 0 }), "a label given a colour of its own keeps it")
+
+    -- 2: the cast bar and keybinds follow the look; the old copies go once.
+    local UF, AB = ns.UnitFrames, ns.ActionBars
+    local uf, ab = UF:db(), AB:db()
+    check(uf.castColor == nil and UF:CastColor() == C.fel, "the cast bar is in the look's accent by default")
+    check(ab.hotkeyColor == nil and AB:HotkeyColor() == C.text, "the keybinds are in the look's text colour by default")
+    local cb = UF.frames.player and rawget(UF.frames.player, "Castbar")
+    check(cb and near(cb.__color, C.fel), "the player's cast bar took the new accent at the theme change")
+    uf.castColor, uf.colorsMigrated = { 0.31, 0.78, 0.47, 1 }, false
+    ab.hotkeyColor, ab.colorsMigrated = { 0.83, 0.78, 0.63, 1 }, false
+    UF:MigrateColors(); AB:MigrateColors()
+    check(uf.castColor == nil and ab.hotkeyColor == nil, "a profile's old copies of fel and the text colour are let go")
+    uf.castColor, uf.colorsMigrated = { 1, 0, 0, 1 }, false
+    UF:MigrateColors()
+    check(near(uf.castColor, { 1, 0, 0 }) and UF:CastColor() == uf.castColor, "a cast colour the player picked stays")
+    uf.castColor = nil
+    local b1 = _G.WicksUI_Bar1.buttons[1]
+    check(b1.config and near(b1.config.text.hotkey.color, C.text), "the keybind text took the new text colour")
+    restoreTheme()
+
+    -- 3: the look's own outline reaches the action bars as a real flag.
+    local outWas = ab.fontOutline
+    ab.fontOutline = "look"
+    AB:Update()
+    local flags = b1.config and b1.config.text.hotkey.font.flags
+    check(flags ~= "look" and (flags == "" or flags == "OUTLINE"), "\"the look's own\" outline is a font flag on the bars: " .. tostring(flags))
+    ab.fontOutline = outWas
+    AB:Update()
+
+    -- 4: talent states told apart by weight, not hue.
+    local st = ns.PanelSkins.nodeState
+    check(st("talents-node-circle-green") == "spendable" and st("talents-node-circle-yellow") == "maxed"
+        and st("talents-node-circle-gray") == "open" and st("talents-node-circle-red") == nil, "talent node states read from Blizzard's art")
+
+    -- 5: a chosen setup answer keeps its ring after the pointer leaves.
+    local b = W:Button(UIParent, "x", 50)
+    b:SetSelected(true)
+    b:GetScript("OnEnter")(b)
+    b:GetScript("OnLeave")(b)
+    local lit = b.wuiModern and b.wuiRing:IsShown() or (not b.wuiModern and near(b.wuiBorder.top.__color, C.fel))
+    check(b.selected and lit, "a selected button keeps its accent ring after a hover")
+    b:SetSelected(false)
+    b:GetScript("OnLeave")(b)
+    check(not b.selected and near(b.text.__textColor, C.text), "and drops it when deselected")
+
+    -- 6: nothing of ours written onto a host the client made.
+    local host = CreateFrame("Button")
+    local bd = ns:CreateBackdrop(host, "Default", 1)
+    check(rawget(host, "backdrop") == nil and ns:BackdropOf(host) == bd, "a backdrop is kept beside its host, not on it")
+    check(ns:CreateBackdrop(host, "Default", 1) == bd, "and made once")
+    local icon = host:CreateTexture()
+    ns:CropIcon(icon)
+    check(rawget(icon, "wuiMask") == nil, "an icon's mask is kept beside it, not on it")
+
+    -- 7: Escape closes the setup (answers kept) and locks the frames.
+    local I = ns.Install
+    local da = C_AddOns.DisableAddOn
+    C_AddOns.DisableAddOn = function() end
+    I:Start(true)
+    check(I.frame:IsShown() and Ch.activeTheme == "fel", "the setup is open")
+    -- 5 again, in the setup itself: the look in use is the chosen answer.
+    local lookPage
+    for i, pg in ipairs(I.pages) do if pg.title == "Look" then lookPage = i end end
+    I:Show(lookPage)
+    local pick
+    for _, c in ipairs(I.frame.choices) do if c:IsShown() and c.selected then pick = c end end
+    if pick then pick:GetScript("OnLeave")(pick) end
+    check(pick and pick.selected and near(pick.wuiBorder.top.__color, C.fel), "the setup's chosen answer keeps its ring after a hover")
+    local closed = CloseSpecialWindows()
+    check(closed and not I.frame:IsShown() and I._run().finished, "Escape closes the setup the way its close button does")
+    check(Ch.activeTheme == Ch:ResolveTheme(Ch:ThemeSetting()), "and the look's colours come back")
+    C_AddOns.DisableAddOn = da
+    ns.Movers:Unlock()
+    check(ns.Movers:IsUnlocked() and _G.WicksUIMoverPanel:IsShown(), "frames unlocked, the mover panel open")
+    check(CloseSpecialWindows() and not ns.Movers:IsUnlocked() and not _G.WicksUIMoverPanel:IsShown(),
+        "Escape locks the frames and closes the panel, and the game menu stays shut")
+
+    -- 8: rings drawn in the look's own shape.
+    local ring = host:CreateTexture()
+    ns:SetRing(ring, host)
+    if ns:Modern() then
+        check(ring:GetTexture() == Ch:RingTex(host), "a ring in a modern look is that look's ring")
+    else
+        check(tostring(ring:GetTexture()):find("ring%-hair") ~= nil, "a ring in the OG family is square")
+    end
+
+    -- 9: a shadow made once can be put away again.
+    local card = CreateFrame("Frame")
+    ns:SetTemplate(card, "Default")
+    ns:SetTemplate(card, "Default", { shadow = false })
+    local off = not card.wuiShadow or not card.wuiShadow:IsShown()
+    ns:SetTemplate(card, "Default")
+    local on = not ns:Modern() or (card.wuiShadow and card.wuiShadow:IsShown())
+    check(off and on, "a lifted card turned flat loses its shadow, and gets it back")
+
+    -- 10: overlays in the bar texture follow the setting.
+    local g = ns:G()
+    local barWas = g.statusbar
+    local overlay = ns:BarTexture(UIParent:CreateTexture())
+    g.statusbar = "Wick Shaded"
+    ns:RefreshStatusbars()
+    check(overlay:GetTexture() == ns.Media:Statusbar(), "an overlay drawn in the bar texture takes a new one")
+    local xp = ns.DataBars and ns.DataBars.xp
+    check(not xp or (ns.statusbars[xp.rested] and xp.rested.__statusTex == ns.Media:Statusbar()), "the rested bar too")
+    g.statusbar = barWas
+    ns:RefreshStatusbars()
+
+    -- 11: a greyed control takes no input in any of its parts.
+    local val = 1
+    local sl = W:Slider(UIParent, "x", 0, 10, 1, function() return val end, function(v) val = v end, 200,
+        { disabled = function() return true end })
+    check(sl.disabled and sl.parts[1].__mouseEnabled == false, "a greyed slider's number box takes no typing")
+    local ta = W:TextArea(UIParent, "x", function() return "" end, function() end, 300, 40,
+        { disabled = function() return true end, default = function() return "" end })
+    local saveB, revertB = ta.parts[2], ta.parts[3]
+    check(ta.control.__mouseEnabled == false and saveB.disabled and revertB.disabled, "a greyed text area takes no focus, its buttons do nothing")
+
+    -- And on the unit frame pages: a switched-off frame greys its page.
+    local pd = UF:UnitDB("player")
+    pd.enable = false
+    ns.Config:Show("unitframes.player")
+    local page = ns.Config.pages["unitframes.player"]
+    local width, enable
+    for _, c in ipairs(page.layout.controls) do
+        if c.labelText == "Width" and not width then width = c end
+        if c.labelText == "Enable" and not enable then enable = c end
+    end
+    check(width and width.disabled and enable and not enable.disabled, "a switched-off frame greys its settings, Enable stays live")
+    pd.enable = true
+    ns.Config:Show("unitframes.player")
+    check(width and not width.disabled, "and they come back with it")
+end
+
+-- The audit's smaller items, folded into the same release.
+io.write("== audit fixes, the small ones ==\n")
+do
+    local Ch = ns.Core.Chrome
+    local C = Ch.Colors
+    local W = ns.Widgets
+    local function near(a, b) return a and b and math.abs(a[1] - b[1]) < 0.002 and math.abs(a[2] - b[2]) < 0.002 and math.abs(a[3] - b[3]) < 0.002 end
+
+    -- The health gradient runs up to the accent: its colours are built
+    -- again when the theme changes.
+    local UF = ns.UnitFrames
+    local built, was = 0, UF.ApplyColors
+    UF.ApplyColors = function(...) built = built + 1; return was(...) end
+    Ch:ApplyTheme("frost")
+    UF.ApplyColors = was
+    check(built == 1, "a theme change rebuilds the unit frames' health colours: " .. built)
+    Ch:ApplyTheme(Ch:ResolveTheme(Ch:ThemeSetting()))
+
+    -- Tooltip names in the class colour set the player chose.
+    local T = ns.Comforts and ns.Comforts.modules.tooltips
+    if T then
+        local cf = A.db.profile.comforts
+        local wasTip, wasSet = cf.tipClassColor, Ch.classColorSet
+        local sv = { UnitIsPlayer = UnitIsPlayer, UnitClass = UnitClass, UnitName = UnitName, UnitExists = UnitExists }
+        UnitIsPlayer = function() return true end
+        UnitClass = function() return "Shaman", "SHAMAN" end
+        UnitName = function() return "Thrall" end
+        UnitExists = function(u) return u == "party1" end
+        local line = S.newMock("FontString")
+        local wasLine = rawget(_G, "GameTooltipTextLeft1")
+        rawset(_G, "GameTooltipTextLeft1", line)
+        cf.tipClassColor = true
+        Ch:SetClassColorSet("classic")
+        T:DecorateUnit(GameTooltip, "party1")
+        check(near(line.__textColor, { Ch:ClassColor("SHAMAN") }), "a player's name on a tooltip takes the Classic era colour when that set is chosen")
+        Ch:SetClassColorSet(wasSet or "client")
+        cf.tipClassColor = wasTip
+        rawset(_G, "GameTooltipTextLeft1", wasLine)
+        UnitIsPlayer, UnitClass, UnitName, UnitExists = sv.UnitIsPlayer, sv.UnitClass, sv.UnitName, sv.UnitExists
+    end
+
+    -- Highlight fills follow the look's shape; a mover's is rounded in Modern.
+    local mv = ns.Movers.list.bar1
+    check(not ns:Modern() or mv.wuiBG:GetTexture() ~= nil, "a mover's fill is drawn in the look's panel shape")
+
+    -- Enter says yes; any other key leaves the dialog alone.
+    local said = 0
+    W:Confirm("Sure?", function() said = said + 1 end)
+    local cf = _G.WicksUIConfirm
+    cf:GetScript("OnKeyDown")(cf, "W")
+    check(said == 0 and cf:IsShown(), "a key other than Enter goes on to the game")
+    cf:GetScript("OnKeyDown")(cf, "ENTER")
+    check(said == 1 and not cf:IsShown(), "Enter confirms the dialog")
+
+    -- A typed number is kept however the box is left; Escape puts it back.
+    local val = 1
+    local host = CreateFrame("Frame", nil, UIParent)
+    local sl = W:Slider(host, "a", 0, 10, 1, function() return val end, function(v) val = v end, 200)
+    local box = sl.parts[1]
+    box:Show()
+    box:SetFocus()
+    box:SetText("7")
+    sl:Refresh()
+    check(box:GetText() == "7", "a refresh of the page leaves a number being typed alone")
+    box:ClearFocus()
+    check(val == 7, "a typed number is kept when the box is left, not only on Enter")
+    box:SetFocus()
+    box:SetText("3")
+    box:GetScript("OnEscapePressed")(box)
+    check(val == 7 and box:GetText() == "7" and not box:HasFocus(), "Escape puts back what was there")
+    -- Tab moves on to the next box in the same window.
+    local val2 = 2
+    local sl2 = W:Slider(host, "b", 0, 10, 1, function() return val2 end, function(v) val2 = v end, 200)
+    local box2 = sl2.parts[1]
+    box2:Show()
+    box:SetFocus()
+    box:SetText("4")
+    box:GetScript("OnTabPressed")(box)
+    check(val == 4 and not box:HasFocus() and box2:HasFocus(), "Tab keeps the number and moves on to the next box")
+    box2:ClearFocus()
+
+    -- The wheel scrolls the page; Shift and the wheel turn the slider.
+    local page = CreateFrame("ScrollFrame", nil, UIParent)
+    local scrolled = 0
+    page:SetScript("OnMouseWheel", function(_, delta) scrolled = scrolled + delta end)
+    local inner = CreateFrame("Frame", nil, page)
+    local v3 = 5
+    local sl3 = W:Slider(inner, "c", 0, 10, 1, function() return v3 end, function(v) v3 = v end, 200)
+    local s3 = sl3.control
+    local shift = IsShiftKeyDown
+    IsShiftKeyDown = function() return false end
+    s3:GetScript("OnMouseWheel")(s3, 1)
+    check(scrolled == 1 and s3:GetValue() == 5, "the wheel over a slider scrolls the page and leaves the slider")
+    IsShiftKeyDown = function() return true end
+    s3:GetScript("OnMouseWheel")(s3, 1)
+    check(scrolled == 1 and s3:GetValue() == 6, "Shift and the wheel turn the slider")
+    IsShiftKeyDown = shift
+    check(sl3.hint ~= nil, "and its tooltip says so")
+
+    -- A long list shows that there is more of it.
+    local owner = CreateFrame("Button", nil, UIParent)
+    local long = {}
+    for i = 1, 24 do long[i] = { i, "Item " .. i } end
+    W.OpenMenu(owner, long, nil, function() end)
+    local menu = _G.WicksUIMenu
+    local _, _, _, _, top = menu.thumb:GetPoint()
+    menu:GetScript("OnMouseWheel")(menu, -1)
+    local _, _, _, _, lower = menu.thumb:GetPoint()
+    check(menu.track:IsShown() and menu.thumb:IsShown() and lower < top, "a dropdown longer than it shows has a bar that follows the wheel")
+    W.OpenMenu(owner, { { 1, "One" }, { 2, "Two" } }, nil, function() end)
+    check(not menu.track:IsShown(), "and a short one has none")
+    W.CloseMenu()
+
+    -- The wording: the accent is not called fel, and the look is the look.
+    local found = {}
+    for key, pg in pairs(ns.Config.pages) do
+        if pg.layout then
+            for _, c in ipairs(pg.layout.controls) do
+                local t = c.labelText
+                if type(t) == "string" and (t:find("^Fel ") or t == "Style") then found[#found + 1] = key .. ": " .. t end
+            end
+        end
+    end
+    check(#found == 0, "no setting calls the accent fel or the look a style: " .. table.concat(found, ", "))
+    check(ns.Config.pages.unitframes.title == "Unit frames" and ns.Config.pages.actionbars.title == "Action bars",
+        "page names in sentence case")
+end
 
 io.write("== slash ==\n")
 check(type(SlashCmdList.WICK_WICKSUI) == "function", "/wui registered")
