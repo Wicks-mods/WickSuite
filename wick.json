@@ -4,9 +4,9 @@
   "author_email": "wicksmods@gmail.com",
   "github_user": "Wicksmods",
   "cf_api_base": "https://wow.curseforge.com",
-  "cf_game_version_id": 14300,
+  "cf_game_version_id": 16533,
   "cf_game_version_type_id": 73246,
-  "interface": "20505",
+  "interface": "20506",
   "addons_root_local": "C:\\Program Files (x86)\\World of Warcraft\\_anniversary_\\Interface\\AddOns",
   "project_home": "C:\\Users\\jspli\\Projects\\Wick",
   "suite_repo": "WickSuite",
@@ -343,7 +343,7 @@
       ],
       "repo": "WicksSurvivors",
       "cf_game_versions": [
-        14300,
+        16533,
         17053
       ],
       "client": "tbc"
@@ -586,9 +586,9 @@
     "tbc": {
       "label": "TBC Classic Anniversary",
       "addons_root": "C:\\Program Files (x86)\\World of Warcraft\\_anniversary_\\Interface\\AddOns",
-      "cf_game_version_id": 14300,
+      "cf_game_version_id": 16533,
       "cf_game_version_type_id": 73246,
-      "interface": "20505"
+      "interface": "20506"
     },
     "forever": {
       "label": "World of Warcraft: Forever",
