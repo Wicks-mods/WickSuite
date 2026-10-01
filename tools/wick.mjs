@@ -8,6 +8,7 @@
 //   wick render [target ...]       — run grab-artboards.mjs (thumbnails + banner)
 //   wick release <folder> <ver>    — version bump + CHANGELOG + commit + push + zip + CF upload
 //   wick breadcrumb <name>         — a screenshot post between releases (FB + X)
+//   wick obs <cmd>                 — drive OBS over obs-websocket (see tools/obs.mjs)
 //
 // Usage (bash / PowerShell):
 //   node "C:/Users/jspli/Projects/Wick/WickSuite/tools/wick.mjs" <subcommand> [args]
@@ -1715,6 +1716,7 @@ switch (sub) {
   case "audit-secrets": cmdAuditSecrets(); break;
   case "milestone":     await cmdMilestone(rest[0], ...rest.slice(1)); break;
   case "breadcrumb":    await cmdBreadcrumb(rest[0], ...rest.slice(1)); break;
+  case "obs":           await (await import("./obs.mjs")).run(rest); break;
   case "announce": {
     // Manually re-post a release announcement (e.g., if --no-announce was used,
     // or a token wasn't set at release time, or you want to re-post).
@@ -1764,6 +1766,9 @@ usage:
                                            releases: the Breadcrumb card on Facebook with
                                            social/breadcrumbs/<name>.txt, and on X with the
                                            card. Each name goes out once
+  wick obs <cmd> [args]                    drive OBS: status, scenes, scene <name>, shot,
+                                           capture <slug>, record, replay, stream
+                                           (wick obs --help for the full list)
   wick audit-secrets                      scan all suite repos (working tree + full history)
                                            for accidentally committed secrets; exits 1 if found
 

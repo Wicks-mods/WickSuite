@@ -15,6 +15,7 @@ node "C:/Users/jspli/Projects/Wick/WickSuite/tools/wick.mjs" <subcommand> [args]
 | `wick sync` | Regenerate the suite-table cross-link block in every `README.md` (delimited by `<!-- wick:suite-table:start -->` ... `end`) |
 | `wick render` | Shortcut to `grab-artboards.mjs` — render all thumbnails + banner (1× and 2× PNGs) |
 | `wick release <folder> <ver>` | Version bump → CHANGELOG append → commit + tag + push → zip → upload to CurseForge |
+| `wick obs <cmd>` | Drive OBS over obs-websocket (`obs.mjs`, no dependencies). `capture <slug>` saves straight to `design-handoff/images/screenshots/screenshot-<slug>.png`; also `status`, `scenes`, `scene`, `shot`, `record`, `replay save`, `stream`. Password is read from OBS's own config each run |
 
 ## Config
 
