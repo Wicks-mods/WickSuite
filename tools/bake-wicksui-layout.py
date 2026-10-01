@@ -67,6 +67,9 @@ for mod, k in (("unitframes", "castColor"), ("actionbars", "hotkeyColor")):
     p.get(mod, {}).pop(k, None)
 for mod in ("unitframes", "actionbars"):
     p.get(mod, {}).pop("colorsMigrated", None)
+# Your own combat text keeps the game's colours until a player picks one.
+if "combattext" in p:
+    p["combattext"]["colors"] = {}
 # Hologram's face runs large: its player name a size of its own.
 holo = gen.setdefault("styleSizes", {}).setdefault("hologram", {})
 holo.setdefault("units", {}).setdefault("player", {}).setdefault("texts", {})["left"] = 12

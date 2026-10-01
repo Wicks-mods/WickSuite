@@ -270,7 +270,12 @@ local function newMock(kind, name)
         elseif k == "GetNumLines" then return function() return 1 end
         elseif k == "NumLines" then return function() return 1 end
         elseif k == "GetCursorPosition" then return function() return 0 end
-        elseif k == "IsEnabled" then return function() return true end
+        -- A button's enabled state, kept, so a check can switch one off
+        -- and see what is drawn for it.
+        elseif k == "IsEnabled" then return function() return not t.__disabled end
+        elseif k == "Enable" then return function() t.__disabled = nil end
+        elseif k == "Disable" then return function() t.__disabled = true end
+        elseif k == "SetEnabled" then return function(_, v) t.__disabled = not v or nil end
         elseif k == "SetAttribute" then return function(_, a, v)
                 -- A protected frame's attributes are locked for the
                 -- duration of a fight. Anything that wants to change
@@ -287,6 +292,7 @@ local function newMock(kind, name)
         elseif k == "GetStatusBarTexture" then return function() return t.__statusTexObj or t end
         elseif k == "SetColorTexture" then return function(_, r, g, b, a) t.__color = { r, g, b, a } end
         elseif k == "SetTextColor" then return function(_, r, g, b, a) t.__textColor = { r, g, b, a } end
+        elseif k == "SetTextHeight" then return function(_, h) t.__textHeight = h end
         -- Slider
         elseif k == "SetMinMaxValues" then return function(_, lo, hi) t.__min, t.__max = lo, hi end
         elseif k == "GetMinMaxValues" then return function() return t.__min or 0, t.__max or 0 end

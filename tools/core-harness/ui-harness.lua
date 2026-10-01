@@ -1003,6 +1003,53 @@ do
     ClickBindingFrame = nil
 end
 
+io.write("== quest giver ==\n")
+do
+    local PS = ns.PanelSkins
+    -- The chosen reward: Blizzard's choice, drawn as the accent ring.
+    local rf = CreateFrame("Frame", "QuestInfoRewardsFrame")
+    rf:Show()
+    local function reward(id)
+        local b = CreateFrame("Button", nil, rf)
+        b:SetSize(147, 41)
+        b:Show()
+        b.Icon = b:CreateTexture()
+        b.type = "choice"
+        rawset(b, "GetID", function() return id end)
+        return b
+    end
+    local first, second = reward(1), reward(2)
+    rf.RewardButtons = { first, second }
+    QuestInfoFrame = { itemChoice = 0 }
+    local ok, err = pcall(PS.markRewardChoice)
+    local E = PS.extrasOf
+    check(ok and E(first) and not E(first).choiceRing:IsShown() and not E(second).choiceRing:IsShown(),
+        "no reward is marked before one is chosen: " .. tostring(err or ""))
+    QuestInfoFrame.itemChoice = 2
+    PS.markRewardChoice()
+    check(E(second).choiceRing:IsShown() and E(second).choiceWash:IsShown() and not E(first).choiceRing:IsShown(),
+        "the reward you choose wears the accent ring")
+    QuestInfoFrame.itemChoice = 1
+    PS.markRewardChoice()
+    check(E(first).choiceRing:IsShown() and not E(second).choiceRing:IsShown(), "and the ring moves when you choose another")
+    QuestInfoFrame, QuestInfoRewardsFrame = nil, nil
+
+    -- A button the game switches off reads as off.
+    local b = CreateFrame("Button", nil, UIParent)
+    b:SetSize(120, 22)
+    b.Left, b.Middle, b.Right = b:CreateTexture(), b:CreateTexture(), b:CreateTexture()
+    b.Text = b:CreateFontString()
+    PS.styleButton(b)
+    local pill = E(b) and E(b).backdrop
+    check(pill and pill:GetAlpha() == 1 and b.Text:GetAlpha() == 1, "a working button is drawn at full strength")
+    b:Disable()
+    check(pill:GetAlpha() < 1 and b.Text:GetAlpha() < 1, "a button the game switches off is dimmed, so it reads as off")
+    b:Enable()
+    check(pill:GetAlpha() == 1 and b.Text:GetAlpha() == 1, "and comes back when it is switched on")
+    b:SetEnabled(false)
+    check(pill:GetAlpha() < 1, "SetEnabled is followed too")
+end
+
 io.write("== legacy window ==\n")
 do
     local PS = ns.PanelSkins
@@ -1027,6 +1074,197 @@ do
     local e = PS.extrasOf(tab)
     check(e and e.tile and e.ring and e.ring:IsShown(), "its tabs are side tiles, the open one in the accent ring, not bottom tabs")
     LegacySystemFrame = nil
+end
+
+io.write("== combat text ==\n")
+do
+    local CT = ns.CombatText
+    ns:G().combatTextFont = true
+    check(CT and CT.initialized and CT.frame and ns.Movers.list.combattext, "your own combat text starts, with a mover")
+    local d = CT:db()
+    -- The game's combat text loads on demand: its frame and the AddMessage
+    -- the hook follows.
+    local bz = CreateFrame("Frame", "CombatText", UIParent)
+    bz:Show()
+    local got = {}
+    rawset(bz, "AddMessage", function(_, message) got[#got + 1] = message end)
+    CombatText = bz
+    S.fire("ADDON_LOADED", "Blizzard_CombatText")
+    check(bz:GetAlpha() == 0 and bz:IsShown(), "once it loads, the game's own lines are faded, not hidden: hidden, it drops them all")
+
+    local tick = CT.frame:GetScript("OnUpdate")
+    local function run(dt) tick(CT.frame, dt) end
+    CT:Clear()
+    bz:AddMessage("-1,234", nil, 1, 0.1, 0.1, nil, 1)
+    local line = CT.lines[1]
+    check(got[1] == "-1,234" and line and line.fs.__text == "-1,234", "a line the game makes is drawn again by Wick's UI, the game's own call untouched")
+    local c = line and line.fs.__textColor
+    check(c and c[1] == 1 and c[2] == 0.1 and c[3] == 0.1 and line.fs.__textHeight == d.size,
+        "in the colour the game gave it, at the size picked")
+    run(0.95)
+    local p, _, _, _, y = line.fs:GetPoint()
+    check(p == "BOTTOM" and math.abs(y - d.distance / 2) < 1, "it rises through its box over its time: " .. tostring(y))
+    run(0.65)
+    local a = line.fs.__alpha
+    check(a and a > 0.3 and a < 0.7, "it fades over its last part, as the game's do: " .. tostring(a))
+    run(0.4)
+    check(#CT.lines == 0 and not line.fs:IsShown(), "and goes when its time is up")
+
+    bz:AddMessage("-5,000", nil, 1, 0.1, 0.1, "crit")
+    local crit = CT.lines[1]
+    check(crit and crit.fs.__textHeight == d.critSize, "a crit is drawn at the crit size")
+    run(0.04)
+    local popped = crit.fs.__textHeight
+    run(0.2)
+    local _, _, _, _, cy = crit.fs:GetPoint()
+    check(popped > d.critSize and crit.fs.__textHeight == d.critSize and cy == crit.back,
+        "it pops larger for a moment and holds where it landed")
+    CT:Clear()
+
+    bz:AddMessage("-10", nil, 1, 0.1, 0.1)
+    bz:AddMessage("-20", nil, 1, 0.1, 0.1)
+    local l1, l2 = CT.lines[1], CT.lines[2]
+    check(l2.back <= l1.back - (l1.height + l2.height) / 2, "a line made in the same moment starts behind the last, clear of it")
+    for i = 1, 14 do bz:AddMessage("-" .. i, nil, 1, 0.1, 0.1) end
+    local aside, deepest = false, 0
+    for _, l in ipairs(CT.lines) do
+        if math.abs(l.x) >= 60 then aside = true end
+        deepest = math.min(deepest, l.back)
+    end
+    check(aside and deepest >= -130, "in a crowd, lines start aside rather than ever further back, as the game's do")
+    CT:Clear()
+
+    check(CT.KindOf(1, 0.1, 0.1) == "damage" and CT.KindOf(0.79, 0.3, 0.85) == "spell" and CT.KindOf(0.1, 1, 0.1) == "heal"
+        and CT.KindOf(0.1, 0.1, 1) == "rep" and CT.KindOf(1, 0.82, 0) == "alert" and CT.KindOf(1, 1, 1) == "other",
+        "each line's kind is told by the game's colour for it")
+    check(CT.KindOf(1, 0, 0) == "power" and CT.KindOf(0, 0, 1) == "power", "a gain in its power's own colour is a power gain")
+    check(CT.KindOf(S.SECRET, 0, 0) == "other", "a colour it cannot read is everything else, without an error")
+    d.colors.damage = { 0.2, 0.4, 0.6, 1 }
+    bz:AddMessage("-30", nil, 1, 0.1, 0.1)
+    bz:AddMessage("+40", nil, 0.1, 1, 0.1)
+    local pc, hc = CT.lines[1].fs.__textColor, CT.lines[2].fs.__textColor
+    check(pc[1] == 0.2 and pc[3] == 0.6 and hc[1] == 0.1 and hc[2] == 1, "a colour picked for a kind is used for it; the rest keep the game's")
+    d.colors.damage = nil
+    CT:Clear()
+
+    local okS, errS = pcall(bz.AddMessage, bz, S.SECRET, nil, 1, 0.1, 0.1, nil, 1)
+    check(okS and CT.lines[1] and CT.lines[1].fs.__text == S.SECRET, "a secret line is handed on as it is, never read: " .. tostring(errS or ""))
+    CT:Clear()
+
+    d.direction = "down"
+    bz:AddMessage("-50", nil, 1, 0.1, 0.1)
+    run(0.95)
+    local dp, _, _, _, dy = CT.lines[1].fs:GetPoint()
+    check(dp == "TOP" and dy < -100, "pointed down, it runs from the top of its box down")
+    CT:Clear()
+    d.direction = "arc"
+    bz:AddMessage("-60", nil, 1, 0.1, 0.1)
+    run(0.95)
+    local _, _, _, ax = CT.lines[1].fs:GetPoint()
+    check(math.abs(ax) > 20, "an arc swings out to the side")
+    d.direction = "up"
+    CT:Clear()
+
+    CT:Sample()
+    check(#CT.lines == 8, "the sample shows a line of each kind: " .. #CT.lines)
+    CT:Clear()
+
+    d.enable = false
+    CT:Refresh()
+    bz:AddMessage("-70", nil, 1, 0.1, 0.1)
+    check(bz:GetAlpha() == 1 and #CT.lines == 0, "switched off, the game's own lines show again and Wick's UI draws none")
+    d.enable = true
+    CT:Refresh()
+    check(bz:GetAlpha() == 0, "switched on again, the game's are faded")
+    ns:G().combatTextFont = false
+    CT:Refresh()
+    bz:AddMessage("-80", nil, 1, 0.1, 0.1)
+    check(bz:GetAlpha() == 1 and #CT.lines == 0, "with another combat text addon kept in the setup, the game's are left alone")
+    ns:G().combatTextFont = true
+    CT:Refresh()
+
+    ns.Movers:Unlock()
+    run(0.01)
+    check(ns.Movers.list.combattext:IsShown() and #CT.lines > 0, "unlocked, its box shows with a sample running in it")
+    ns.Movers:Lock()
+    CT:Clear()
+
+    -- The settings page: your own text's settings, its colours, and the
+    -- numbers' movement.
+    S.CVARS.enableFloatingCombatText = "1"
+    local okP, errP = pcall(function() ns.Config:Open("combattext") end)
+    local pg = ns.Config.pages.combattext
+    local labels = {}
+    for _, ctl in ipairs(pg and pg.layout and pg.layout.controls or {}) do
+        if ctl.labelText then labels[ctl.labelText] = ctl end
+    end
+    check(okP and labels["Drawn by Wick's UI"] and labels["Crit size"] and labels["Damage and warnings"] and labels["Gravity"],
+        "the Combat text page has your own text's settings, its colours and the numbers' movement: " .. tostring(errP or ""))
+    local sw = labels["Damage and warnings"]
+    check(sw and tostring(sw.text:GetText()):find("the game's", 1, true), "a colour not picked says it is the game's")
+    d.colors.heal = { 1, 1, 1, 1 }
+    local hs = labels["Heals and buffs"]
+    if hs then hs:GetScript("OnClick")(hs, "RightButton") end
+    check(d.colors.heal == nil, "right-click on a picked colour goes back to the game's")
+    ns.Config:Hide()
+
+    S.CVARS.WorldTextGravity_v2, S.CVARS.WorldTextScale_v2 = "1.5", "2"
+    ns.Visuals:ResetNumbers()
+    check(S.CVARS.WorldTextGravity_v2 == "0.5" and S.CVARS.WorldTextScale_v2 == "1", "the numbers' movement goes back to the game's own")
+    d.numbersFont = "Morpheus"
+    ns.Media:WorldFonts()
+    local picked = DAMAGE_TEXT_FONT
+    d.numbersFont = "Wick"
+    ns.Media:WorldFonts()
+    check(picked == ns.Media:Font("Morpheus") and DAMAGE_TEXT_FONT == ns.Core.Chrome:Font(),
+        "the numbers take the font picked for them, the look's by default")
+    local entry
+    for _, cf in ipairs(ns.Install.CONFLICTS or {}) do if cf.key == "combattext" then entry = cf end end
+    check(entry and entry.ours:find("draws your own combat text", 1, true), "the setup says what Wick's UI does with the combat text")
+    CombatText = nil
+end
+
+io.write("== stack split ==\n")
+do
+    local PS = ns.PanelSkins
+    local listed = false
+    for _, n in ipairs(PS.WINDOWS) do if n == "StackSplitFrame" then listed = true end end
+    check(listed, "the stack split is on the window skin's list")
+    local sf = CreateFrame("Frame", "StackSplitFrame", UIParent)
+    sf:SetSize(172, 96)
+    sf.SingleItemSplitBackground, sf.MultiItemSplitBackground = S.newMock("Texture"), S.newMock("Texture")
+    sf.StackSplitText, sf.StackItemCountText = S.newMock("FontString"), S.newMock("FontString")
+    rawset(sf, "GetRegions", function()
+        return sf.SingleItemSplitBackground, sf.MultiItemSplitBackground, sf.StackSplitText, sf.StackItemCountText
+    end)
+    sf.LeftButton, sf.RightButton = CreateFrame("Button", nil, sf), CreateFrame("Button", nil, sf)
+    for _, k in ipairs({ "OkayButton", "CancelButton" }) do
+        local b = CreateFrame("Button", nil, sf)
+        b:SetSize(64, 24)
+        b.Left, b.Middle, b.Right = b:CreateTexture(), b:CreateTexture(), b:CreateTexture()
+        b.Text = b:CreateFontString()
+        sf[k] = b
+    end
+    local chose = 0
+    rawset(sf, "ChooseFrameType", function(self, n) self.isMultiStack = n > 1; chose = chose + 1 end)
+    local ok, err = pcall(PS.Skin, PS, sf)
+    local e = PS.extrasOf(sf)
+    check(ok and e and e.backdrop and e.well, "the stack split skins, with a well for the number: " .. tostring(err or ""))
+    check(sf.SingleItemSplitBackground:GetAlpha() == 0 and sf.MultiItemSplitBackground:GetAlpha() == 0,
+        "its old money-frame art is faded, both sizes")
+    local ok1, ok2 = PS.extrasOf(sf.OkayButton), PS.extrasOf(sf.CancelButton)
+    check(ok1 and ok1.backdrop and ok2 and ok2.backdrop and ns.glyphs[sf.LeftButton] and ns.glyphs[sf.RightButton],
+        "Okay and Cancel are pills, the arrows our marks")
+    sf:ChooseFrameType(1)
+    local single = e.well.__points[1][5]
+    sf:ChooseFrameType(5)
+    local multi = e.well.__points[1][5]
+    check(chose == 2 and single == 3 and multi == 15, "the well follows the game's two layouts: one number, or the stacks over a total")
+    sf.LeftButton:Disable()
+    check(ns.glyphs[sf.LeftButton].mark:GetAlpha() < 1, "an arrow the game switches off is faded")
+    sf.LeftButton:Enable()
+    check(ns.glyphs[sf.LeftButton].mark:GetAlpha() == 1, "and comes back when the game switches it on")
+    StackSplitFrame = nil
 end
 
 io.write("== settings window ==\n")
