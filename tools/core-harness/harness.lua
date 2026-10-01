@@ -246,7 +246,6 @@ local bracket = panel.brackets.TOPLEFT[1]
 local titleFS = Chrome:Text(panel.content, 11, Chrome.Colors.text)
 Chrome:SetTheme("shaman")
 check(Chrome.activeTheme == "shaman" and Chrome:CharStore().theme == "shaman", "SetTheme persists")
-check(Chrome:SavedThemeSetting() == "shaman", "saved setting readable back")
 
 -- A hover wash is the accent at a low alpha. Registering it against the
 -- accent token would repaint it at the token's alpha, which turns a 6%
@@ -346,12 +345,12 @@ check(Chrome:CharStore().theme == "druid", "logout flush rewrites the live choic
 -- that read nothing fell back to Fel and then wrote Fel over the real
 -- setting. The user lost their theme to this twice.
 Chrome:CharStore().theme = "shaman"
-Chrome:ApplySavedTheme("login")
+Chrome:ApplySavedTheme()
 check(Chrome.activeTheme == "shaman", "a stored theme is applied at login")
 check(Chrome:CharStore().theme == "shaman", "and left where it was")
 
 Chrome:CharStore().theme = nil                       -- the store has not landed yet
-Chrome:ApplySavedTheme("login")
+Chrome:ApplySavedTheme()
 check(Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "with nothing to read it follows the class")
 check(Chrome:CharStore().theme == nil,
     "and writes nothing, so a late store still has something to restore: " ..
@@ -359,10 +358,9 @@ check(Chrome:CharStore().theme == nil,
 
 -- Which is what the store does when it lands.
 Chrome:CharStore().theme = "druid"
-Chrome:ApplySavedTheme("store")
+Chrome:ApplySavedTheme()
 check(Chrome.activeTheme == "druid", "the store landing applies the real choice")
-check(Chrome.applyLog:find("store=druid", 1, true) ~= nil,
-    "and says so in the trace: " .. Chrome.applyLog:sub(-40))
+check(Chrome:ThemeSetting() == "druid", "and takes it as the setting logout will save")
 
 Core.self.db = Core.Profiles:Init(Core.self, "WickCoreDB", Core.self.opts.defaults)
 Chrome:SetTheme("shaman")
