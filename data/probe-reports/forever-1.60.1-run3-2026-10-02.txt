@@ -1,0 +1,1705 @@
+==================================================================
+ Wick's Probe 0.5.0 - client and API surface report
+ generated 2026-10-02 12:44:59
+==================================================================
+
+[CLIENT]
+  version                1.60.1
+  build                  70170
+  build date             Oct  1 2026
+  interface (TOC)        16001
+  GetBuildInfo returns   6
+  locale                 enUS
+  realm                  Classic Beta PvP
+  WOW_PROJECT_ID         18
+  matches constant       WOW_PROJECT_CAMELOT
+    WOW_PROJECT_CAMELOT  18
+    WOW_PROJECT_CLASSIC  2
+    WOW_PROJECT_MAINLINE 1
+
+[FEATURE FLAGS]
+  PRESENT issecretvalue                                  Secret Values (retail 12.0)
+  PRESENT C_Secrets.HasSecretRestrictions                Secret Values control API
+  PRESENT C_RestrictedActions.IsAddOnRestrictionActive   AddOn restriction state (12.0)
+  PRESENT C_RestrictedActions.GetAddOnRestrictionState   AddOn restriction query (12.0)
+  absent  C_StringUtil.Format                            Secret-safe string utils (12.0)
+  PRESENT C_DurationUtil.CreateDuration                  Duration objects (12.0)
+  PRESENT UnitHealthPercent                              Secret-safe health percent (12.0)
+  PRESENT GetTotemInfo                                   Totem info
+  PRESENT C_GameRules.IsGameRuleActive                   Game rules / ruleset detection
+  PRESENT C_Container.GetContainerNumSlots               C_Container namespace
+  PRESENT C_UnitAuras.GetAuraDataByIndex                 C_UnitAuras namespace
+  PRESENT C_Item.GetItemInfo                             C_Item namespace
+  PRESENT C_Spell.GetSpellInfo                           C_Spell namespace
+  PRESENT C_AddOns.GetAddOnMetadata                      C_AddOns namespace
+  PRESENT C_ChatInfo.SendAddonMessage                    C_ChatInfo addon messaging
+  absent  C_Transmog.GetSlotInfo                         Transmog API
+  PRESENT C_TransmogCollection.GetAppearanceSources      Transmog collection
+  absent  C_Engraving.IsEngravingEnabled                 Engraving (SoD)
+  absent  C_Seasons.GetActiveSeason                      Seasons API
+  PRESENT C_TradeSkillUI.GetAllRecipeIDs                 Modern tradeskill API
+  absent  GetNumSockets                                  Item sockets
+  PRESENT GetCombatRating                                Combat rating system
+  PRESENT GetSpellHitModifier                            Separate spell hit
+  PRESENT IsFlyableArea                                  Flying
+  PRESENT IsActiveBattlefieldArena                       Arena
+  absent  CombatLogGetCurrentEventInfo                   Modern CLEU accessor
+
+[GLOBALS  317 present / 88 missing]
+  MISSING  ActionButton_HideOverlayGlow           WicksUI
+  MISSING  AddQuestWatch                          WicksUI
+  MISSING  AutoCastShine_AutoCastStart            WicksUI
+  MISSING  AutoCastShine_AutoCastStop             WicksUI
+  MISSING  BankButtonIDToInvSlotID                WicksBags
+  MISSING  CloseBankFrame                         WicksBags
+  MISSING  CombatLogGetCurrentEventInfo           WicksCDTracker,WicksCombatLog,WicksDungeonMaps,WicksLayers,WicksTotemsAndThings
+  MISSING  EquipItemByName                        WickidsTBCBISTracker
+  MISSING  GetAbandonQuestName                    WicksUI
+  MISSING  GetAddOnMetadata                       (probe question)
+  MISSING  GetArenaCurrency                       WicksBags
+  MISSING  GetArenaTeam                           (probe question)
+  MISSING  GetAuraInfo                            WicksUI
+  MISSING  GetBankSlotCost                        WicksBags
+  MISSING  GetCoinTextureString                   (probe question)
+  MISSING  GetContainerItemInfo                   WicksBags
+  MISSING  GetContainerItemLink                   (probe question)
+  MISSING  GetContainerNumFreeSlots               (probe question)
+  MISSING  GetContainerNumSlots                   (probe question)
+  MISSING  GetCraftDisplaySkillLine               (probe question)
+  MISSING  GetDetailedItemLevelInfo               (probe question)
+  MISSING  GetExistingSocketInfo                  (probe question)
+  MISSING  GetHonorCurrency                       WicksBags
+  MISSING  GetItemCount                           WickidsTBCBISTracker,WicksBags,WicksDemonsAndThings,WicksQuestKey,WicksTotemsAndThings
+  MISSING  GetItemIcon                            WickidsTBCBISTracker
+  MISSING  GetItemInfo                            WickidsTBCBISTracker,WicksBags,WicksConcessionStand,WicksLedger,WicksQuestKey,WicksTotemsAndThings,WicksTradeHall,WicksUI,WicksWardrobe
+  MISSING  GetItemInfoInstant                     WickidsTBCBISTracker,WicksBags,WicksTradeHall
+  MISSING  GetItemQualityColor                    WickidsTBCBISTracker
+  MISSING  GetItemSpell                           WicksConcessionStand
+  MISSING  GetItemStats                           (probe question)
+  MISSING  GetMaxQuestWatches                     WicksUI
+  MISSING  GetMouseFocus                          WicksUI
+  MISSING  GetNumArenaTeamMembers                 (probe question)
+  MISSING  GetNumBankSlots                        WicksBags
+  MISSING  GetNumCrafts                           (probe question)
+  MISSING  GetNumPartyMembers                     (probe question)
+  MISSING  GetNumQuestLogEntries                  WickidsTBCBISTracker,WicksQuestKey,WicksUI
+  MISSING  GetNumRaidMembers                      WicksTotemsAndThings
+  MISSING  GetNumSockets                          (probe question)
+  MISSING  GetNumTalentTabs                       WicksDemonsAndThings,WicksStats,WicksTotemsAndThings
+  MISSING  GetNumTalents                          WicksTotemsAndThings
+  MISSING  GetNumTradeSkills                      (probe question)
+  MISSING  GetPower                               WicksUI
+  MISSING  GetPowerColor                          WicksUI
+  MISSING  GetPowerInfo                           WicksUI
+  MISSING  GetPowerMax                            WicksUI
+  MISSING  GetPowerUpdaters                       WicksUI
+  MISSING  GetQuestLogTitle                       WickidsTBCBISTracker,WicksQuestKey,WicksUI
+  MISSING  GetSocketItemInfo                      (probe question)
+  MISSING  GetSocketTypes                         (probe question)
+  MISSING  GetSpellCooldown                       WicksDemonsAndThings,WicksTotemsAndThings
+  MISSING  GetSpellInfo                           (probe question)
+  MISSING  GetSpellLink                           (probe question)
+  MISSING  GetSpellTexture                        (probe question)
+  MISSING  GetTalentInfo                          WicksTotemsAndThings
+  MISSING  GetTalentTabInfo                       WicksDemonsAndThings,WicksStats,WicksTotemsAndThings
+  MISSING  GetTradeSkillInfo                      (probe question)
+  MISSING  GetTradeSkillLine                      (probe question)
+  MISSING  GetTradeSkillNumReagents               (probe question)
+  MISSING  GetTransmogrifyItemInfo                (probe question)
+  MISSING  GetZonePVPInfo                         WicksUI
+  MISSING  InterfaceOptionsFrame_OpenToCategory   WickCore
+  MISSING  InterfaceOptions_AddCategory           WickCore
+  MISSING  IsAddOnLoaded                          (probe question)
+  MISSING  IsPlayerAtEffectiveMaxLevel            WicksUI
+  MISSING  IsQuestWatched                         WicksUI
+  MISSING  MouseIsOver                            WickidsTBCBISTracker,WicksTotemsAndThings
+  MISSING  PickupBankItem                         WicksBags
+  MISSING  PickupSpell                            WicksUI
+  MISSING  PopulateHistory                        WicksLedger
+  MISSING  PopulatePanel                          WicksLedger
+  MISSING  PurchaseSlot                           WicksBags
+  MISSING  RegisterAddonMessagePrefix             (probe question)
+  MISSING  ReleaseAllConsumableRows               WickidsTBCBISTracker
+  MISSING  ReleaseAllEnchantRows                  WickidsTBCBISTracker
+  MISSING  ReleaseAllGemRows                      WickidsTBCBISTracker
+  MISSING  RemoveQuestWatch                       WicksUI
+  MISSING  RunMacroText                           WicksUI
+  MISSING  SelectQuestLogEntry                    WicksUI
+  MISSING  SendAddonMessage                       (probe question)
+  MISSING  SetAbandonQuest                        WicksUI
+  MISSING  UnitAttackBothHands                    WicksStats
+  MISSING  UnitAura                               (probe question)
+  MISSING  UnitBuff                               WicksDemonsAndThings,WicksStats,WicksTotemsAndThings
+  MISSING  UnitDebuff                             (probe question)
+  MISSING  UnitDefense                            WicksStats
+  MISSING  UnitStandState                         WicksSurvivors
+  MISSING  UseContainerItem                       WicksBags
+
+[NAMESPACED  133 present / 8 missing]
+  MISSING  C_CombatLog.GetCurrentEventInfo        (probe question)
+  MISSING  C_DamageMeter.GetCombatSessionType     (probe question)
+  MISSING  C_Engraving.IsEngravingEnabled         (probe question)
+  MISSING  C_QuestLog.PushQuest                   WicksUI
+  MISSING  C_RestrictedActions.IsInRestrictedEnvironment (probe question)
+  MISSING  C_Seasons.GetActiveSeason              (probe question)
+  MISSING  C_TradeSkillUI.GetTradeSkillLine       (probe question)
+  MISSING  C_Transmog.GetSlotInfo                 (probe question)
+
+[EVENTS  152 valid / 2 invalid]
+  INVALID  LEARNED_SPELL_IN_TAB                   WicksBones,WicksTotemsAndThings
+  INVALID  TRADE_SKILL_UPDATE                     (probe question)
+
+[UNCONFIRMED EVENT CANDIDATES  78 valid / 82 invalid]
+  (scanned from bare string literals; invalid here is usually
+   just an internal message name, not a real regression)
+  VALID    ACTIONBAR_PAGE_CHANGED                 WicksUI
+  VALID    ADDON_ACTION_BLOCKED                   WickCore
+  VALID    ADDON_ACTION_FORBIDDEN                 WickCore
+  VALID    AUCTION_HOUSE_CLOSED                   WicksBags
+  VALID    AUCTION_HOUSE_SHOW                     WicksBags
+  VALID    BAG_UPDATE_COOLDOWN                    WicksBags
+  VALID    BANKFRAME_CLOSED                       WicksBags
+  VALID    BANKFRAME_OPENED                       WicksBags
+  VALID    BANK_TABS_CHANGED                      WicksBags
+  VALID    BN_FRIEND_ACCOUNT_OFFLINE              WicksUI
+  VALID    BN_FRIEND_ACCOUNT_ONLINE               WicksUI
+  VALID    CHAT_MSG_LOOT                          WicksLedger,WicksTradeHall
+  VALID    COMBAT_TEXT_UPDATE                     WicksLedger
+  VALID    CONFIRM_LOOT_ROLL                      WicksComforts,WicksUI
+  VALID    CURRENCY_DISPLAY_UPDATE                WicksBags
+  VALID    DISPLAY_SIZE_CHANGED                   WicksUI
+  VALID    FRIENDLIST_UPDATE                      WicksUI
+  VALID    GLOBAL_MOUSE_DOWN                      WicksTotemsAndThings
+  VALID    GUILDBANKBAGSLOTS_CHANGED              WicksBags
+  VALID    GUILDBANKFRAME_CLOSED                  WicksBags
+  VALID    GUILDBANKFRAME_OPENED                  WicksBags
+  VALID    GUILDBANK_ITEM_LOCK_CHANGED            WicksBags
+  VALID    GUILDBANK_UPDATE_MONEY                 WicksBags
+  VALID    GUILDBANK_UPDATE_TABS                  WicksBags
+  VALID    GUILDBANK_UPDATE_WITHDRAWMONEY         WicksBags
+  VALID    GUILD_ROSTER_UPDATE                    WickCore,WicksUI
+  VALID    ITEM_DATA_LOAD_RESULT                  WicksGear
+  VALID    ITEM_LOCK_CHANGED                      WicksBags
+  VALID    LOOT_BIND_CONFIRM                      WicksComforts,WicksUI
+  VALID    MAIL_CLOSED                            WicksBags
+  VALID    MAIL_SHOW                              WicksBags
+  VALID    MERCHANT_CLOSED                        WicksBags
+  VALID    MINIMAP_UPDATE_ZOOM                    WicksComforts,WicksUI
+  VALID    NEUTRAL_FACTION_SELECT_RESULT          WicksUI
+  VALID    PET_BAR_UPDATE                         WicksBeastsAndThings,WicksUI
+  VALID    PET_BAR_UPDATE_COOLDOWN                WicksUI
+  VALID    PET_SPECIALIZATION_CHANGED             WicksUI
+  VALID    PET_UI_UPDATE                          WicksBeastsAndThings,WicksUI
+  VALID    PLAYERBANKSLOTS_CHANGED                WicksBags
+  VALID    PLAYER_DAMAGE_DONE_MODS                WicksStats
+  VALID    PLAYER_FARSIGHT_FOCUS_CHANGED          WicksUI
+  VALID    PLAYER_FLAGS_CHANGED                   WicksUI
+  VALID    PLAYER_GUILD_UPDATE                    WicksUI
+  VALID    PLAYER_INTERACTION_MANAGER_FRAME_HIDE  WicksBags
+  VALID    PLAYER_INTERACTION_MANAGER_FRAME_SHOW  WicksBags
+  VALID    PLAYER_XP_UPDATE                       WicksLedger,WicksTradeHall,WicksUI
+  VALID    QUEST_FINISHED                         WicksUI
+  VALID    QUEST_WATCH_LIST_CHANGED               WicksUI
+  VALID    SCENARIO_UPDATE                        WicksUI
+  VALID    SETTINGS_LOADED                        WicksUI
+  VALID    SPELL_POWER_CHANGED                    WicksStats
+  VALID    TRACKED_ACHIEVEMENT_UPDATE             WicksUI
+  VALID    UI_SCALE_CHANGED                       WicksUI
+  VALID    UNIT_ATTACK_POWER                      WicksStats
+  VALID    UNIT_DAMAGE                            WicksStats
+  VALID    UNIT_DEFENSE                           WicksStats
+  VALID    UNIT_DIED                              WicksDungeonMaps
+  VALID    UNIT_LEVEL                             WicksBeastsAndThings
+  VALID    UNIT_NAME_UPDATE                       WicksUI
+  VALID    UNIT_RANGED_ATTACK_POWER               WicksStats
+  VALID    UNIT_RESISTANCES                       WicksStats
+  VALID    UNIT_SPELLCAST_DELAYED                 WicksUI
+  VALID    UNIT_SPELLCAST_EMPOWER_UPDATE          WicksUI
+  VALID    UNIT_SPELLCAST_NOT_INTERRUPTIBLE       WicksUI
+  VALID    UNIT_STATS                             WicksGear,WicksStats
+  VALID    UPDATE_BONUS_ACTIONBAR                 WicksUI
+  VALID    UPDATE_CHAT_WINDOWS                    WicksComforts,WicksUI
+  VALID    UPDATE_EXHAUSTION                      WicksUI
+  VALID    UPDATE_EXTRA_ACTIONBAR                 WicksUI
+  VALID    UPDATE_FACTION                         WicksUI
+  VALID    UPDATE_FLOATING_CHAT_WINDOWS           WicksComforts,WicksUI
+  VALID    UPDATE_INVENTORY_DURABILITY            WicksUI
+  VALID    UPDATE_SHAPESHIFT_COOLDOWN             WicksUI
+  VALID    UPDATE_SHAPESHIFT_FORMS                WicksStancesAndThings,WicksUI
+  VALID    UPDATE_SHAPESHIFT_USABLE               WicksUI
+  VALID    WEAPON_ENCHANT_CHANGED                 WicksPoisonsAndThings
+  VALID    WEAPON_SLOT_CHANGED                    WicksPoisonsAndThings
+  VALID    ZONE_CHANGED_INDOORS                   WicksFormsAndThings,WicksTravelForm,WicksUI
+
+[COMBAT RATING CONSTANTS (CR_*)]
+  CR_ARMOR_PENETRATION   25
+  CR_AVOIDANCE           21
+  CR_AVOIDANCE_TOOLTIP   Reduces damage taken from area of effect attacks.
+
+Avoidance: %s [+%....
+  CR_BLOCK               5
+  CR_BLOCK_TOOLTIP       Blocking reduces damage of an attack by %0.2f%%.
+|cff888888(Against a...
+  CR_CORRUPTION          12
+  CR_CORRUPTION_RESISTANCE 13
+  CR_CRIT_MELEE          9
+  CR_CRIT_MELEE_TOOLTIP  Chance of attacks doing extra damage.
+Crit %s (+%.2f%% crit chance)
+  CR_CRIT_PARRY_RATING_TOOLTIP Chance for extra effectiveness on attacks and heals.
+
+Critical Strike...
+  CR_CRIT_RANGED         10
+  CR_CRIT_RANGED_TOOLTIP Chance of attacks doing extra damage.
+Crit %s (+%.2f%% crit chance)
+  CR_CRIT_SPELL          11
+  CR_CRIT_SPELL_TOOLTIP  Chance of spells doing extra damage.
+Crit %s (+%.2f%% crit chance)
+  CR_CRIT_TOOLTIP        Increases chance for extra effectiveness on |cFFFFFFFFAttacks|r, |cFF...
+  CR_DEFAULT_HIT_CAP_TOOLTIP 
+|cffBCBCBCTo never miss|r |cFFFF5A5ARaid Bosses|r|cffBCBCBC:
+  8.00%...
+  CR_DEFENSE_SKILL       2
+  CR_DODGE               3
+  CR_DODGE_BASE_STAT_TOOLTIP Increases chance to |cFFFFFFFFDodge|r by %.2f%%
+
+Increased by |cFFFFF...
+  CR_DODGE_TOOLTIP       Dodge of %d adds %.2f%% Dodge
+|cff888888(Before diminishing returns)|r
+  CR_EXPERTISE           24
+  CR_EXPERTISE_TOOLTIP   Increase the chance |cFFFFFFFFMelee|r attacks are not |cFFFFFFFFDodge...
+  CR_HASTE_MELEE         18
+  CR_HASTE_MELEE_TOOLTIP Increases |cFFFFFFFFMelee|r attack speed by %.2f%%
+  CR_HASTE_RANGED        19
+  CR_HASTE_RANGED_TOOLTIP Increases |cFFFFFFFFRanged|r attack speed by %.2f%%
+  CR_HASTE_RATING_RANGED_TOOLTIP Increases the speed of |cFFFFFFFFMelee|r attacks, |cFFFFFFFFRanged|r ...
+  CR_HASTE_RATING_TOOLTIP Increases the speed of |cFFFFFFFFMelee|r attacks and |cFFFFFFFFSpell|...
+  CR_HASTE_SPELL         20
+  CR_HASTE_SPELL_TOOLTIP Increases |cFFFFFFFFSpell|r casting speed by %.2f%%
+  CR_HIT_MELEE           6
+  CR_HIT_MELEE_TOOLTIP   Increases |cFFFFFFFFMelee|r hit chance by %.2f%%
+  CR_HIT_OFFHAND_MELEE_TOOLTIP Increases |cFFFFFFFFOff-hand Melee|r hit chance by %.2f%%
+  CR_HIT_RANGED          7
+  CR_HIT_RANGED_TOOLTIP  Increases |cFFFFFFFFRanged|r hit chance by %.2f%%
+  CR_HIT_SPELL           8
+  CR_HIT_SPELL_TOOLTIP   Increases |cFFFFFFFFSpell|r hit chance by %.2f%%
+  CR_HUNTER_HIT_CAP_TOOLTIP 
+|cffBCBCBCTo never miss|r |cFFFF5A5ARaid Bosses|r|cffBCBCBC:
+  8.00%...
+  CR_LIFESTEAL           17
+  CR_LIFESTEAL_TOOLTIP   Returns a portion of your damage and healing as healing to you.
+
+Leec...
+  CR_MASTERY             26
+  CR_MULTISTRIKE_TOOLTIP Grants two %.2f%% chances to deliver extra attacks or heals for %.0f%...
+  CR_PARRY               4
+  CR_PARRY_BASE_STAT_TOOLTIP Increases chance to |cFFFFFFFFParry|r by %.2f%%
+
+Increased by |cFFFFF...
+  CR_PARRY_TOOLTIP       Parry of %d adds %.2f%% Parry
+|cff888888(Before diminishing returns)|r
+  CR_RANGED_EXPERTISE_TOOLTIP Increases the chance |cFFFFFFFFMelee|r attacks are not |cFFFFFFFFDodg...
+  CR_ROGUE_CRIT_TOOLTIP  Increases chance for extra effectiveness on |cFFFFFFFFAttacks|r, |cFF...
+  CR_ROGUE_HIT_CAP_TOOLTIP 
+|cffBCBCBCTo never miss|r |cFFFF5A5ARaid Bosses|r|cffBCBCBC:
+  8.00%...
+  CR_SPEED               14
+  CR_SPEED_TOOLTIP       |cFFBCBCBCBase Speeds (In Yards Per Second):
+7.0 yd/s Running
+4.7 yd/...
+  CR_STURDINESS_TOOLTIP  Prevents durability loss on items.
+  CR_UNUSED_1            1
+  CR_UNUSED_2            22
+  CR_UNUSED_3            27
+  CR_UNUSED_4            28
+  CR_VERSATILITY_DAMAGE_DONE 29
+  CR_VERSATILITY_DAMAGE_TAKEN 31
+  CR_VERSATILITY_TOOLTIP Increases damage and healing done by %.2f%% and decreases damage take...
+  CR_WARRIOR_CRIT_TOOLTIP Increases chance for extra effectiveness on |cFFFFFFFFAttacks|r, |cFF...
+  CR_WARRIOR_HIT_CAP_TOOLTIP 
+|cffBCBCBCTo never miss|r |cFFFF5A5ARaid Bosses|r|cffBCBCBC:
+  8.00%...
+  CR_WEAPON_SKILL_RANGED 23
+
+[STAT VOCABULARY (ITEM_MOD_*)]
+  ITEM_MOD_AGILITY       %c%s Agility
+  ITEM_MOD_AGILITY_OR_INTELLECT_SHORT Agility or Intellect
+  ITEM_MOD_AGILITY_OR_STRENGTH_OR_INTELLECT_SHORT Agility or Strength or Intellect
+  ITEM_MOD_AGILITY_OR_STRENGTH_SHORT Agility or Strength
+  ITEM_MOD_AGILITY_SHORT Agility
+  ITEM_MOD_ALCHEMY       Increases alchemy skill by %s.
+  ITEM_MOD_ALCHEMY_SHORT Alchemy Skill
+  ITEM_MOD_ARCANE_DAMAGE_DONE Increases arcane damage done by up to %s.
+  ITEM_MOD_ARCANE_DAMAGE_DONE_SHORT Arcane Damage
+  ITEM_MOD_ARCANE_PENETRATION Increases arcane piercing by %s.
+  ITEM_MOD_ARCANE_PENETRATION_SHORT Arcane Piercing
+  ITEM_MOD_ARMOR_PENETRATION_RATING Increases your armor piercing by %s.
+  ITEM_MOD_ARMOR_PENETRATION_RATING_SHORT Armor Piercing
+  ITEM_MOD_ATTACK_POWER  Increases attack power by %s.
+  ITEM_MOD_ATTACK_POWER_SHORT Attack Power
+  ITEM_MOD_ATTACK_POWER_VS_BEAST_SHORT Attack Power Vs Beasts
+  ITEM_MOD_ATTACK_POWER_VS_DEMON_SHORT Attack Power Vs Demons
+  ITEM_MOD_ATTACK_POWER_VS_DRAGONKIN_SHORT Attack Power Vs Dragonkin
+  ITEM_MOD_ATTACK_POWER_VS_ELEMENTAL_SHORT Attack Power Vs Elementals
+  ITEM_MOD_ATTACK_POWER_VS_GIANT_SHORT Attack Power Vs Giants
+  ITEM_MOD_ATTACK_POWER_VS_HUMANOID_SHORT Attack Power Vs Humanoids
+  ITEM_MOD_ATTACK_POWER_VS_MECHANICAL_SHORT Attack Power Vs Mechanical
+  ITEM_MOD_ATTACK_POWER_VS_UNDEAD_SHORT Attack Power Vs Undead
+  ITEM_MOD_AXES          Increases axes skill by %s.
+  ITEM_MOD_AXES_SHORT    Axes Skill
+  ITEM_MOD_BLACKSMITHING Increases blacksmithing skill by %s.
+  ITEM_MOD_BLACKSMITHING_SHORT Blacksmithing Skill
+  ITEM_MOD_BLOCK_RATING  Increases your shield block by %s.
+  ITEM_MOD_BLOCK_RATING_SHORT Block
+  ITEM_MOD_BLOCK_VALUE   Increases the block value of your shield by %s.
+  ITEM_MOD_BLOCK_VALUE_SHORT Block Value
+  ITEM_MOD_BOWS          Increases bows skill by %s.
+  ITEM_MOD_BOWS_SHORT    Bows Skill
+  ITEM_MOD_COOKING       Increases cooking skill by %s.
+  ITEM_MOD_COOKING_SHORT Cooking Skill
+  ITEM_MOD_CORRUPTION    Corruption
+  ITEM_MOD_CORRUPTION_RESISTANCE Corruption Resistance
+  ITEM_MOD_CRAFTING_SPEED_SHORT Crafting Speed
+  ITEM_MOD_CRIT_MELEE_RATING Improves melee critical strike by %s.
+  ITEM_MOD_CRIT_MELEE_RATING_SHORT Critical Strike (Melee)
+  ITEM_MOD_CRIT_RANGED_RATING Improves ranged critical strike by %s.
+  ITEM_MOD_CRIT_RANGED_RATING_SHORT Critical Strike (Ranged)
+  ITEM_MOD_CRIT_RATING   Increases your critical strike by %s.
+  ITEM_MOD_CRIT_RATING_SHORT Critical Strike
+  ITEM_MOD_CRIT_SPELL_RATING Improves spell critical strike by %s.
+  ITEM_MOD_CRIT_SPELL_RATING_SHORT Critical Strike (Spell)
+  ITEM_MOD_CRIT_TAKEN_MELEE_RATING Improves melee critical avoidance by %s.
+  ITEM_MOD_CRIT_TAKEN_MELEE_RATING_SHORT Critical Strike Avoidance (Melee)
+  ITEM_MOD_CRIT_TAKEN_RANGED_RATING Improves ranged critical avoidance by %s.
+  ITEM_MOD_CRIT_TAKEN_RANGED_RATING_SHORT Critical Strike Avoidance (Ranged)
+  ITEM_MOD_CRIT_TAKEN_RATING Improves critical avoidance by %s.
+  ITEM_MOD_CRIT_TAKEN_RATING_SHORT Critical Strike Avoidance
+  ITEM_MOD_CRIT_TAKEN_SPELL_RATING Improves spell critical avoidance by %s.
+  ITEM_MOD_CRIT_TAKEN_SPELL_RATING_SHORT Critical Strike Avoidance (Spell)
+  ITEM_MOD_CROSSBOWS     Increases crossbows skill by %s.
+  ITEM_MOD_CROSSBOWS_SHORT Crossbows Skill
+  ITEM_MOD_CR_AVOIDANCE_SHORT Avoidance
+  ITEM_MOD_CR_LIFESTEAL_SHORT Leech
+  ITEM_MOD_CR_MULTISTRIKE_SHORT Multistrike
+  ITEM_MOD_CR_SPEED_SHORT Speed
+  ITEM_MOD_CR_STURDINESS_SHORT Indestructible
+  ITEM_MOD_CR_UNUSED_10_SHORT Unused 10
+  ITEM_MOD_CR_UNUSED_11_SHORT Unused 11
+  ITEM_MOD_CR_UNUSED_12_SHORT Unused 12
+  ITEM_MOD_CR_UNUSED_1_SHORT Multi-Strike
+  ITEM_MOD_CR_UNUSED_3_SHORT Speed
+  ITEM_MOD_CR_UNUSED_4_SHORT Leech
+  ITEM_MOD_CR_UNUSED_5_SHORT Avoidance
+  ITEM_MOD_CR_UNUSED_6_SHORT Indestructible
+  ITEM_MOD_CR_UNUSED_7_SHORT Unused 7
+  ITEM_MOD_CR_UNUSED_9_SHORT Versatility
+  ITEM_MOD_DAGGERS       Increases daggers skill by %s.
+  ITEM_MOD_DAGGERS_SHORT Daggers Skill
+  ITEM_MOD_DAMAGE_PER_SECOND_SHORT damage per second
+  ITEM_MOD_DEFENSE_SKILL_RATING Increases defense skill by %s.
+  ITEM_MOD_DEFENSE_SKILL_RATING_SHORT Defense
+  ITEM_MOD_DEFTNESS_SHORT Deftness
+  ITEM_MOD_DODGE_RATING  Increases your dodge by %s.
+  ITEM_MOD_DODGE_RATING_SHORT Dodge
+  ITEM_MOD_DUAL_WIELD    Increases dual wield skill by %s.
+  ITEM_MOD_DUAL_WIELD_SHORT Dual Wield Skill
+  ITEM_MOD_ENCHANTING    Increases enchanting skill by %s.
+  ITEM_MOD_ENCHANTING_SHORT Enchanting Skill
+  ITEM_MOD_ENGINEERING   Increases engineering skill by %s.
+  ITEM_MOD_ENGINEERING_SHORT Engineering Skill
+  ITEM_MOD_EXPERTISE_RATING Increases your expertise by %s.
+  ITEM_MOD_EXPERTISE_RATING_SHORT Expertise
+  ITEM_MOD_EXTRA_ARMOR   Increases your armor by %s.
+  ITEM_MOD_EXTRA_ARMOR_SHORT Bonus Armor
+  ITEM_MOD_FERAL_ATTACK_POWER Increases attack power by %s in Cat, Bear, Dire Bear, and Moonkin for...
+  ITEM_MOD_FERAL_ATTACK_POWER_SHORT Attack Power In Forms
+  ITEM_MOD_FINESSE_SHORT Finesse
+  ITEM_MOD_FIRE_DAMAGE_DONE Increases fire damage done by up to %s.
+  ITEM_MOD_FIRE_DAMAGE_DONE_SHORT Fire Damage
+  ITEM_MOD_FIRE_PENETRATION Increases fire piercing by %s.
+  ITEM_MOD_FIRE_PENETRATION_SHORT Fire Piercing
+  ITEM_MOD_FIRST_AID     Increases first aid skill by %s.
+  ITEM_MOD_FIRST_AID_SHORT First Aid Skill
+  ITEM_MOD_FISHING       Increases fishing skill by %s.
+  ITEM_MOD_FISHING_SHORT Fishing Skill
+  ITEM_MOD_FIST_WEAPONS  Increases fist weapons skill by %s.
+  ITEM_MOD_FIST_WEAPONS_SHORT Fist Weapons Skill
+  ITEM_MOD_FROST_DAMAGE_DONE Increases frost damage done by up to %s.
+  ITEM_MOD_FROST_DAMAGE_DONE_SHORT Frost Damage
+  ITEM_MOD_FROST_PENETRATION Increases frost piercing by %s.
+  ITEM_MOD_FROST_PENETRATION_SHORT Frost Piercing
+  ITEM_MOD_GUNS          Increases guns skill by %s.
+  ITEM_MOD_GUNS_SHORT    Guns Skill
+  ITEM_MOD_HASTE_RATING  Increases your haste by %s.
+  ITEM_MOD_HASTE_RATING_SHORT Haste
+  ITEM_MOD_HEALTH        %c%s Health
+  ITEM_MOD_HEALTH_REGEN  Restores %s health per 5 sec.
+  ITEM_MOD_HEALTH_REGENERATION Restores %s health per 5 sec.
+  ITEM_MOD_HEALTH_REGENERATION_SHORT Health Regeneration
+  ITEM_MOD_HEALTH_REGEN_SHORT Health Per 5 Sec.
+  ITEM_MOD_HEALTH_SHORT  Health
+  ITEM_MOD_HERBALISM     Increases herbalism skill by %s.
+  ITEM_MOD_HERBALISM_SHORT Herbalism Skill
+  ITEM_MOD_HIT_MELEE_RATING Improves melee hit by %s.
+  ITEM_MOD_HIT_MELEE_RATING_SHORT Hit (Melee)
+  ITEM_MOD_HIT_RANGED_RATING Improves ranged hit by %s.
+  ITEM_MOD_HIT_RANGED_RATING_SHORT Hit (Ranged)
+  ITEM_MOD_HIT_RATING    Increases your hit by %s.
+  ITEM_MOD_HIT_RATING_SHORT Hit
+  ITEM_MOD_HIT_SPELL_RATING Improves spell hit by %s.
+  ITEM_MOD_HIT_SPELL_RATING_SHORT Hit (Spell)
+  ITEM_MOD_HIT_TAKEN_MELEE_RATING Improves melee hit avoidance by %s.
+  ITEM_MOD_HIT_TAKEN_MELEE_RATING_SHORT Hit Avoidance (Melee)
+  ITEM_MOD_HIT_TAKEN_RANGED_RATING Improves ranged hit avoidance by %s.
+  ITEM_MOD_HIT_TAKEN_RANGED_RATING_SHORT Hit Avoidance (Ranged)
+  ITEM_MOD_HIT_TAKEN_RATING Improves hit avoidance by %s.
+  ITEM_MOD_HIT_TAKEN_RATING_SHORT Hit Avoidance
+  ITEM_MOD_HIT_TAKEN_SPELL_RATING Improves spell hit avoidance by %s.
+  ITEM_MOD_HIT_TAKEN_SPELL_RATING_SHORT Hit Avoidance (Spell)
+  ITEM_MOD_HOLY_DAMAGE_DONE Increases holy damage done by up to %s.
+  ITEM_MOD_HOLY_DAMAGE_DONE_SHORT Holy Damage
+  ITEM_MOD_INGENUITY_SHORT Ingenuity
+  ITEM_MOD_INSPIRATION_SHORT Inspiration
+  ITEM_MOD_INTELLECT     %c%s Intellect
+  ITEM_MOD_INTELLECT_SHORT Intellect
+  ITEM_MOD_JEWELCRAFTING Increases jewelcrafting skill by %s.
+  ITEM_MOD_JEWELCRAFTING_SHORT Jewelcrafting Skill
+  ITEM_MOD_LEATHERWORKING Increases leatherworking skill by %s.
+  ITEM_MOD_LEATHERWORKING_SHORT Leatherworking Skill
+  ITEM_MOD_MACES         Increases maces skill by %s.
+  ITEM_MOD_MACES_SHORT   Maces Skill
+  ITEM_MOD_MANA          %c%s Mana
+  ITEM_MOD_MANA_REGENERATION Restores %s mana per 5 sec.
+  ITEM_MOD_MANA_REGENERATION_SHORT Mana Regeneration per 5 sec
+  ITEM_MOD_MANA_SHORT    Mana
+  ITEM_MOD_MASTERY_RATING Increases your mastery by %s.
+  ITEM_MOD_MASTERY_RATING_SHORT Mastery
+  ITEM_MOD_MASTERY_RATING_SPELL (%s)
+  ITEM_MOD_MASTERY_RATING_TWO_SPELLS (%s/%s)
+  ITEM_MOD_MELEE_ATTACK_POWER_SHORT Melee Attack Power
+  ITEM_MOD_MINING        Increases mining skill by %s.
+  ITEM_MOD_MINING_SHORT  Mining Skill
+  ITEM_MOD_MODIFIED_CRAFTING_STAT_1 Random Stat 1
+  ITEM_MOD_MODIFIED_CRAFTING_STAT_2 Random Stat 2
+  ITEM_MOD_MULTICRAFT_SHORT Multicraft
+  ITEM_MOD_NATURE_DAMAGE_DONE Increases nature damage done by up to %s.
+  ITEM_MOD_NATURE_DAMAGE_DONE_SHORT Nature Damage
+  ITEM_MOD_NATURE_PENETRATION Increases nature piercing by %s.
+  ITEM_MOD_NATURE_PENETRATION_SHORT Nature Piercing
+  ITEM_MOD_PARRY_RATING  Increases your parry by %s.
+  ITEM_MOD_PARRY_RATING_SHORT Parry
+  ITEM_MOD_PERCEPTION_SHORT Perception
+  ITEM_MOD_PHYSICAL_DAMAGE_DONE Increases physical damage done by up to %s.
+  ITEM_MOD_PHYSICAL_DAMAGE_DONE_SHORT Physical Damage
+  ITEM_MOD_POLEARMS      Increases polearms skill by %s.
+  ITEM_MOD_POLEARMS_SHORT Polearms Skill
+  ITEM_MOD_POWER_REGEN0_SHORT Mana Per 5 Sec.
+  ITEM_MOD_POWER_REGEN1_SHORT Rage Per 5 Sec.
+  ITEM_MOD_POWER_REGEN2_SHORT Focus Per 5 Sec.
+  ITEM_MOD_POWER_REGEN3_SHORT Energy Per 5 Sec.
+  ITEM_MOD_POWER_REGEN4_SHORT Happiness Per 5 Sec.
+  ITEM_MOD_POWER_REGEN5_SHORT Runes Per 5 Sec.
+  ITEM_MOD_POWER_REGEN6_SHORT Runic Power Per 5 Sec.
+  ITEM_MOD_PVP_POWER     Increases your PvP power by %s.
+  ITEM_MOD_PVP_POWER_SHORT PvP Power
+  ITEM_MOD_PVP_PRIMARY_STAT_SHORT PvP Power
+  ITEM_MOD_RANGED_ATTACK_POWER Increases ranged attack power by %s.
+  ITEM_MOD_RANGED_ATTACK_POWER_SHORT Ranged Attack Power
+  ITEM_MOD_RESILIENCE_RATING Increases your PvP resilience by %s.
+  ITEM_MOD_RESILIENCE_RATING_SHORT PvP Resilience
+  ITEM_MOD_RESOURCEFULNESS_SHORT Resourcefulness
+  ITEM_MOD_SHADOW_DAMAGE_DONE Increases shadow damage done by up to %s.
+  ITEM_MOD_SHADOW_DAMAGE_DONE_SHORT Shadow Damage
+  ITEM_MOD_SHADOW_PENETRATION Increases shadow piercing by %s.
+  ITEM_MOD_SHADOW_PENETRATION_SHORT Shadow Piercing
+  ITEM_MOD_SKINNING      Increases skinning skill by %s.
+  ITEM_MOD_SKINNING_SHORT Skinning Skill
+  ITEM_MOD_SPELL_DAMAGE_DONE Increases damage done by magical spells and effects by up to %s.
+  ITEM_MOD_SPELL_DAMAGE_DONE_SHORT Spell Damage
+  ITEM_MOD_SPELL_DAMAGE_VS_BEAST_SHORT Spell Damage Vs Beasts
+  ITEM_MOD_SPELL_DAMAGE_VS_DEMON_SHORT Spell Damage Vs Demons
+  ITEM_MOD_SPELL_DAMAGE_VS_DRAGONKIN_SHORT Spell Damage Vs Dragonkin
+  ITEM_MOD_SPELL_DAMAGE_VS_ELEMENTAL_SHORT Spell Damage Vs Elementals
+  ITEM_MOD_SPELL_DAMAGE_VS_GIANT_SHORT Spell Damage Vs Giants
+  ITEM_MOD_SPELL_DAMAGE_VS_HUMANOID_SHORT Spell Damage Vs Humanoids
+  ITEM_MOD_SPELL_DAMAGE_VS_MECHANICAL_SHORT Spell Damage Vs Mechanical
+  ITEM_MOD_SPELL_DAMAGE_VS_UNDEAD_SHORT Spell Damage Vs Undead
+  ITEM_MOD_SPELL_HEALING_DONE Increases healing done by magical spells and effects by up to %s.
+  ITEM_MOD_SPELL_HEALING_DONE_SHORT Spell Healing
+  ITEM_MOD_SPELL_PENETRATION Increases spell piercing by %s.
+  ITEM_MOD_SPELL_PENETRATION_SHORT Spell Piercing
+  ITEM_MOD_SPELL_POWER   Increases spell power by %s.
+  ITEM_MOD_SPELL_POWER_SHORT Spell Power
+  ITEM_MOD_SPELL_RESISTANCE_ALL_SCHOOLS Increases spell resistance by %s.
+  ITEM_MOD_SPELL_RESISTANCE_ALL_SCHOOLS_SHORT Spell Resistance
+  ITEM_MOD_SPIRIT        %c%s Spirit
+  ITEM_MOD_SPIRIT_SHORT  Spirit
+  ITEM_MOD_STAMINA       %c%s Stamina
+  ITEM_MOD_STAMINA_SHORT Stamina
+  ITEM_MOD_STAVES        Increases staves skill by %s.
+  ITEM_MOD_STAVES_SHORT  Staves Skill
+  ITEM_MOD_STRENGTH      %c%s Strength
+  ITEM_MOD_STRENGTH_OR_INTELLECT_SHORT Strength or Intellect
+  ITEM_MOD_STRENGTH_SHORT Strength
+  ITEM_MOD_SWORDS        Increases swords skill by %s.
+  ITEM_MOD_SWORDS_SHORT  Swords Skill
+  ITEM_MOD_TAILORING     Increases tailoring skill by %s.
+  ITEM_MOD_TAILORING_SHORT Tailoring Skill
+  ITEM_MOD_THROWN        Increases thrown skill by %s.
+  ITEM_MOD_THROWN_SHORT  Thrown Skill
+  ITEM_MOD_TWOHANDED_AXES Increases two-handed axes skill by %s.
+  ITEM_MOD_TWOHANDED_AXES_SHORT Two-Handed Axes Skill
+  ITEM_MOD_TWOHANDED_MACES Increases two-handed maces skill by %s.
+  ITEM_MOD_TWOHANDED_MACES_SHORT Two-Handed Maces Skill
+  ITEM_MOD_TWOHANDED_SWORDS Increases two-handed swords skill by %s.
+  ITEM_MOD_TWOHANDED_SWORDS_SHORT Two-Handed Swords Skill
+  ITEM_MOD_VERSATILITY   Versatility
+  ITEM_MOD_WANDS         Increases wands skill by %s.
+  ITEM_MOD_WANDS_SHORT   Wands Skill
+
+[ADDON RESTRICTION TYPES (Enum.AddOnRestrictionType)]
+  ChallengeMode          2
+  Chat                   5
+  Combat                 0
+  Encounter              1
+  Map                    4
+  PvPMatch               3
+
+[LIVE CALLS]
+  OK       build info
+           GetBuildInfo -> 6 value(s)
+           types: string, string, string, number, string, string
+           value: 1.60.1 | 70170 | Oct  1 2026 | 16001 |  |  
+  OK       player class
+           UnitClass -> 3 value(s)
+           types: string, string, number
+           value: Hunter | HUNTER | 3
+  OK       player race
+           UnitRace -> 3 value(s)
+           types: string, string, number
+           value: Windshaper Skyborne | Skyborne | 96
+  OK       player level
+           UnitLevel -> 1 value(s)
+           types: number
+           value: 21
+  OK       realm (normalized)
+           GetNormalizedRealmName -> 1 value(s)
+           types: string
+           value: ClassicBetaPvP
+  MISSING  bag slots (legacy)                           GetContainerNumSlots
+  OK       bag slots (C_Container)
+           C_Container.GetContainerNumSlots -> 1 value(s)
+           types: number
+           value: 20
+  MISSING  bag item (legacy)                            GetContainerItemInfo
+  OK       bag item (C_Container)
+           C_Container.GetContainerItemInfo -> 1 value(s)
+           types: table
+           value: {hasLoot=false, hasNoValue=true, hyperlink=|cnIQ1:|Hitem:6948::::::::21:1485::75:::::::|h[Hearthstone]|h|r, iconFileID=134414, isBound=true, isFiltered=false, isLocked=false, isReadable=false, itemID=6948, itemName=Hearthstone, quality=1, stackCount=1}
+  MISSING  aura (legacy)                                UnitAura
+  OK       aura (C_UnitAuras)
+           C_UnitAuras.GetAuraDataByIndex -> 1 value(s)
+           types: table
+           value: {applications=0, auraInstanceID=1321, canActivePlayerDispel=false, canApplyAura=true, duration=0, expirationTime=0, hideOnPartyFrames=false, icon=136076, isBossAura=false, isDPSRoleAura=false, isFromPlayerOrPlayerPet=true, isHarmful=false, isHealerRoleAura=false, isHelpful=true, isNameplateOnly=false, isRaid=false, isStealable=false, isTankRoleAura=false, name=Aspect of the Hawk, nameplateShowAll=false, nameplateShowPersonal=false, points=table: 000001B66C1AB110, sourceUnit=player, spellId=14318, timeMod=1}
+  MISSING  item info (legacy)                           GetItemInfo
+  OK       item info (C_Item)
+           C_Item.GetItemInfo -> 18 value(s)
+           types: string, string, number, number, number, string, string, number, string, number, number, number, number, number, number, nil, boolean, string
+           value: Hearthstone | |cnIQ1:|Hitem:6948::::::::21:1485:::::::::|h[Hearthstone]|h|r | 1 | 1 | 0 | Miscellaneous | Junk | 1 | INVTYPE_NON_EQUIP_IGNORE | 134414 | 0 | 15 | 0 | 1 | 0 | nil | false | 
+  MISSING  spell info (legacy)                          GetSpellInfo
+  OK       spell info (C_Spell)
+           C_Spell.GetSpellInfo -> 1 value(s)
+           types: table
+           value: {castTime=1485, iconID=135812, maxRange=35, minRange=0, name=Fireball, originalIconID=135812, spellID=133}
+  MISSING  item stats: equipped chest                   GetItemStats
+  MISSING  item stats: known TBC socketed item          GetItemStats
+  MISSING  socket count on cursor item                  GetNumSockets
+  OK       melee crit
+           GetCritChance -> 1 value(s)
+           types: number
+           value: 7.7501997947693
+  OK       ranged crit
+           GetRangedCritChance -> 1 value(s)
+           types: number
+           value: 7.8702001571655
+  OK       spell crit (school 2)
+           GetSpellCritChance -> 1 value(s)
+           types: number
+           value: 7.4671998023987
+  OK       spell hit modifier
+           GetSpellHitModifier -> 1 value(s)
+           types: number
+           value: 0
+  OK       melee hit modifier
+           GetHitModifier -> 1 value(s)
+           types: number
+           value: 0
+  OK       expertise
+           GetExpertise -> 3 value(s)
+           types: number, number, number
+           value: 0 | 0 | 0
+  MISSING  talent tab count                             GetNumTalentTabs
+  MISSING  talent tab 1                                 GetTalentTabInfo
+  MISSING  talent 1,1                                   GetTalentInfo
+  MISSING  quest log entries                            GetNumQuestLogEntries
+  OK       quest special item 1
+           GetQuestLogSpecialItemInfo -> 0 value(s)
+           types: 
+  MISSING  trade skill line                             GetTradeSkillLine
+  OK       shapeshift form count
+           GetNumShapeshiftForms -> 1 value(s)
+           types: number
+           value: 0
+  OK       group members
+           GetNumGroupMembers -> 1 value(s)
+           types: number
+           value: 0
+  OK       in raid
+           IsInRaid -> 1 value(s)
+           types: boolean
+           value: false
+  OK       secret restrictions
+           C_Secrets.HasSecretRestrictions -> 1 value(s)
+           types: boolean
+           value: true
+  OK       cooldowns secret
+           C_Secrets.ShouldCooldownsBeSecret -> 1 value(s)
+           types: boolean
+           value: false
+  OK       chat messaging lockdown
+           C_ChatInfo.InChatMessagingLockdown -> 1 value(s)
+           types: boolean
+           value: false
+  OK       in combat
+           InCombatLockdown -> 1 value(s)
+           types: boolean
+           value: false
+  OK       restriction active: Map
+           C_RestrictedActions.IsAddOnRestrictionActive -> 1 value(s)
+           types: boolean
+           value: false
+  OK       restriction active: Combat
+           C_RestrictedActions.IsAddOnRestrictionActive -> 1 value(s)
+           types: boolean
+           value: false
+  OK       restriction active: Encounter
+           C_RestrictedActions.IsAddOnRestrictionActive -> 1 value(s)
+           types: boolean
+           value: false
+  OK       restriction active: Chat
+           C_RestrictedActions.IsAddOnRestrictionActive -> 1 value(s)
+           types: boolean
+           value: false
+  OK       restriction active: ChallengeMode
+           C_RestrictedActions.IsAddOnRestrictionActive -> 1 value(s)
+           types: boolean
+           value: false
+  OK       restriction active: PvPMatch
+           C_RestrictedActions.IsAddOnRestrictionActive -> 1 value(s)
+           types: boolean
+           value: false
+  OK       identity secret: player
+           C_Secrets.ShouldUnitIdentityBeSecret -> 1 value(s)
+           types: boolean
+           value: false
+  OK       identity secret: target
+           C_Secrets.ShouldUnitIdentityBeSecret -> 1 value(s)
+           types: boolean
+           value: false
+  OK       player GUID
+           UnitGUID -> 1 value(s)
+           types: string
+           value: Player-4619-006648E8
+  OK       target GUID
+           UnitGUID -> 1 value(s)
+           types: nil
+           value: nil
+  MISSING  creature GUID splits into parts              strsplit(UnitGUID)
+  SECRET   player health
+           UnitHealth -> 1 value(s)
+           types: number
+           value: <secret>
+  OK       player health max
+           UnitHealthMax -> 1 value(s)
+           types: number
+           value: 742
+  SECRET   player power
+           UnitPower -> 1 value(s)
+           types: number
+           value: <secret>
+  SECRET   player health pct
+           UnitHealthPercent -> 1 value(s)
+           types: number
+           value: <secret>
+  OK       player buff 1 (C_UnitAuras)
+           C_UnitAuras.GetBuffDataByIndex -> 1 value(s)
+           types: table
+           value: {applications=0, auraInstanceID=1321, canActivePlayerDispel=false, canApplyAura=true, duration=0, expirationTime=0, hideOnPartyFrames=false, icon=136076, isBossAura=false, isDPSRoleAura=false, isFromPlayerOrPlayerPet=true, isHarmful=false, isHealerRoleAura=false, isHelpful=true, isNameplateOnly=false, isRaid=false, isStealable=false, isTankRoleAura=false, name=Aspect of the Hawk, nameplateShowAll=false, nameplateShowPersonal=false, points=table: 000001B66C1AF0D0, sourceUnit=player, spellId=14318, timeMod=1}
+  OK       aura secrecy policy (Slice and Dice)
+           C_Secrets.ShouldSpellAuraBeSecret -> 1 value(s)
+           types: boolean
+           value: false
+  OK       aura secrecy detail (Slice and Dice)
+           C_Secrets.GetSpellAuraSecrecy -> 1 value(s)
+           types: number
+           value: 2
+  OK       cooldown aura by spell (Slice and Dice)
+           C_UnitAuras.GetCooldownAuraBySpellID -> 1 value(s)
+           types: nil
+           value: nil
+  OK       player aura by spell (Slice and Dice)
+           C_UnitAuras.GetPlayerAuraBySpellID -> 1 value(s)
+           types: nil
+           value: nil
+  OK       unit aura by spell (Slice and Dice)
+           C_UnitAuras.GetUnitAuraBySpellID -> 1 value(s)
+           types: nil
+           value: nil
+  OK       aura by name (Slice and Dice)
+           C_UnitAuras.GetAuraDataBySpellName -> 1 value(s)
+           types: nil
+           value: nil
+  OK       aura duration (Slice and Dice)
+           C_UnitAuras.GetAuraDuration -> 0 value(s)
+           types: 
+  ERROR    aura base duration (Slice and Dice)          C_UnitAuras.GetAuraBaseDuration
+           bad argument #1 to '?' (Usage: local newDuration = C_UnitAuras.GetAur...
+  ERROR    aura has expiry (Slice and Dice)             C_UnitAuras.DoesAuraHaveExpirationTime
+           bad argument #1 to '?' (Usage: local hasExpirationTime = C_UnitAuras....
+  OK       aura slots (player, helpful)
+           C_UnitAuras.GetAuraSlots -> 9 value(s)
+           types: nil, number, number, number, number, number, number, number, number
+           value: nil | 13 | 18 | 14 | 22 | 15 | 16 | 19 | 20
+  OK       cooldown aura by spell (Sprint)
+           C_UnitAuras.GetCooldownAuraBySpellID -> 1 value(s)
+           types: nil
+           value: nil
+  OK       spell cooldown (Sprint)
+           C_Spell.GetSpellCooldown -> 1 value(s)
+           types: table
+           value: {duration=0, isActive=false, isEnabled=true, modRate=1, startTime=0}
+  MISSING  spell cooldown (legacy)                      GetSpellCooldown
+  OK       spell cooldown (C_Spell)
+           C_Spell.GetSpellCooldown -> 1 value(s)
+           types: table
+           value: {duration=0, isActive=false, isEnabled=true, modRate=1, startTime=0}
+  OK       totem 1
+           GetTotemInfo -> 7 value(s)
+           types: boolean, nil, number, number, nil, number, number
+           value: true | nil | 516312.954 | 0 | nil | 1 | 0
+  OK       soul shard count (secondary resource)
+           UnitPower -> 1 value(s)
+           types: number
+           value: 0
+
+[UI PORT SURFACE  283 present / 64 absent]
+  -- frame type
+  PRESENT Frame                                        
+  PRESENT Button                                       
+  PRESENT CheckButton                                  
+  PRESENT StatusBar                                    
+  PRESENT Cooldown                                     
+  PRESENT ScrollFrame                                  
+  PRESENT EditBox                                      
+  PRESENT ScrollingMessageFrame                        
+  PRESENT PlayerModel                                  
+  PRESENT DressUpModel                                 
+  PRESENT ModelScene                                   
+  PRESENT AuraContainer                                
+  PRESENT DropdownButton                               
+  PRESENT EventFrame                                   
+  PRESENT ItemButton                                   
+  PRESENT UnitPositionFrame                            
+  -- template
+  PRESENT CustomAuraContainerTemplate                  AuraContainer
+  PRESENT PingableUnitFrameTemplate                    Frame
+  PRESENT SecureUnitButtonTemplate                     Button
+  PRESENT SecureActionButtonTemplate                   Button
+  PRESENT SecureGroupHeaderTemplate                    Frame
+  PRESENT SecureHandlerStateTemplate                   Frame
+  PRESENT BackdropTemplate                             Frame
+  PRESENT ContainerFrameItemButtonTemplate             ItemButton
+  PRESENT ActionButtonTemplate                         CheckButton
+  PRESENT StanceButtonTemplate                         CheckButton
+  PRESENT PetActionButtonTemplate                      CheckButton
+  PRESENT CooldownFrameTemplate                        Cooldown
+  PRESENT GameTooltipTemplate                          GameTooltip
+  PRESENT UIPanelScrollBarTemplate                     Slider
+  PRESENT UIDropDownMenuTemplate                       Frame
+  PRESENT UIPanelButtonTemplate                        Button
+  PRESENT UIPanelCloseButton                           Button
+  PRESENT MinimalScrollBar                             EventFrame
+  PRESENT WowScrollBoxList                             Frame
+  PRESENT PortraitFrameTemplate                        Frame
+  PRESENT ButtonFrameTemplate                          Frame
+  absent  ScrollingMessageFrame                        
+  -- frame method
+  PRESENT SetRolesets                                  
+  PRESENT SetClampRectInsets                           
+  PRESENT SetResizeBounds                              
+  absent  SetMinResize                                 
+  PRESENT SetAlphaFromBoolean                          
+  PRESENT SetHitRectInsets                             
+  PRESENT SetPropagateMouseClicks                      
+  PRESENT SetFlattensRenderLayers                      
+  PRESENT SetFixedFrameStrata                          
+  PRESENT SetFixedFrameLevel                           
+  PRESENT SetMouseClickEnabled                         
+  PRESENT RegisterUnitEvent                            
+  PRESENT SetAttributeNoHandler                        
+  PRESENT SetClipsChildren                             
+  PRESENT CreateMaskTexture                            
+  PRESENT SetIgnoreParentScale                         
+  PRESENT SetToplevel                                  
+  -- texture method
+  PRESENT SetTextureSliceMargins                       
+  PRESENT SetTextureSliceMode                          
+  PRESENT SetGradient                                  
+  PRESENT SetSnapToPixelGrid                           
+  PRESENT SetTexelSnappingBias                         
+  PRESENT AddMaskTexture                               
+  PRESENT SetAtlas                                     
+  PRESENT SetDesaturated                               
+  PRESENT SetColorTexture                              
+  PRESENT SetRotation                                  
+  PRESENT SetVertTile                                  
+  -- fontstring method
+  PRESENT SetTextHeight                                
+  PRESENT SetFixedColor                                
+  PRESENT SetMaxLines                                  
+  PRESENT SetTextToFit                                 
+  PRESENT SetFontObject                                
+  PRESENT SetIndentedWordWrap                          
+  -- statusbar method
+  PRESENT SetTimerDuration                             
+  PRESENT SetStatusBarDesaturated                      
+  PRESENT SetFillStyle                                 
+  PRESENT SetReverseFill                               
+  PRESENT SetColorFill                                 
+  PRESENT SetStatusBarTexture                          
+  PRESENT SetMinMaxValues                              
+  PRESENT SetRotatesTexture                            
+  -- cooldown method
+  PRESENT SetCooldown                                  
+  PRESENT SetCooldownDuration                          
+  PRESENT SetDrawEdge                                  
+  PRESENT SetHideCountdownNumbers                      
+  PRESENT SetSwipeColor                                
+  PRESENT SetDrawBling                                 
+  PRESENT SetUseAuraDisplayTime                        
+  PRESENT SetCountdownFont                             
+  PRESENT SetEdgeScale                                 
+  -- tooltip method
+  PRESENT SetItemByID                                  
+  PRESENT SetSpellByID                                 
+  PRESENT SetHyperlink                                 
+  PRESENT SetUnitAura                                  
+  PRESENT SetUnitBuffByAuraInstanceID                  
+  PRESENT SetUnitDebuffByAuraInstanceID                
+  PRESENT GetPrimaryTooltipData                        
+  PRESENT ProcessInfo                                  
+  -- colorpicker method
+  PRESENT SetupColorPickerAndShow                      
+  PRESENT GetColorRGB                                  
+  PRESENT GetColorAlpha                                
+  absent  SetColorRGB                                  
+  -- minimap method
+  PRESENT SetZoom                                      
+  PRESENT GetZoom                                      
+  PRESENT SetMaskTexture                               
+  absent  GetMinimapShape                              
+  absent  SetPlayerTexture                             
+  absent  SetBlipTexture                               
+  -- frame
+  PRESENT EditModeManagerFrame                         table
+  PRESENT SettingsPanel                                table
+  absent  InterfaceOptionsFrame                        
+  absent  VideoOptionsFrame                            
+  PRESENT MainActionBar                                table
+  absent  MainMenuBar                                  
+  PRESENT MultiBarBottomLeft                           table
+  PRESENT MultiBarBottomRight                          table
+  PRESENT MultiBarRight                                table
+  PRESENT MultiBarLeft                                 table
+  PRESENT MultiBar5                                    table
+  PRESENT MultiBar6                                    table
+  PRESENT MultiBar7                                    table
+  PRESENT StanceBar                                    table
+  PRESENT PetActionBar                                 table
+  PRESENT PossessActionBar                             table
+  PRESENT OverrideActionBar                            table
+  PRESENT ExtraActionBarFrame                          table
+  PRESENT ExtraAbilityContainer                        table
+  PRESENT MicroMenu                                    table
+  PRESENT MicroMenuContainer                           table
+  PRESENT BagsBar                                      table
+  PRESENT MainMenuBarBackpackButton                    table
+  PRESENT StatusTrackingBarManager                     table
+  PRESENT MainStatusTrackingBarContainer               table
+  PRESENT SecondaryStatusTrackingBarContainer          table
+  PRESENT ActionBarController                          table
+  PRESENT ActionBarActionEventsFrame                   table
+  PRESENT PlayerFrame                                  table
+  PRESENT TargetFrame                                  table
+  PRESENT FocusFrame                                   table
+  PRESENT PetFrame                                     table
+  PRESENT PartyFrame                                   table
+  absent  PartyMemberFrame1                            
+  PRESENT CompactRaidFrameManager                      table
+  PRESENT CompactRaidFrameContainer                    table
+  PRESENT CompactPartyFrame                            table
+  PRESENT BossTargetFrameContainer                     table
+  PRESENT Boss1TargetFrame                             table
+  PRESENT ArenaEnemyFramesContainer                    table
+  absent  CompactArenaFrame                            
+  PRESENT ComboFrame                                   table
+  PRESENT BuffFrame                                    table
+  PRESENT DebuffFrame                                  table
+  absent  TemporaryEnchantFrame                        
+  PRESENT ExternalDefensivesFrame                      table
+  PRESENT MinimapCluster                               table
+  absent  MinimapZoneTextButton                        
+  absent  MiniMapMailFrame                             
+  absent  MiniMapTracking                              
+  absent  MiniMapTrackingButton                        
+  absent  MiniMapBattlefieldFrame                      
+  PRESENT GameTimeFrame                                table
+  absent  MinimapBorder                                
+  absent  MinimapBorderTop                             
+  absent  MinimapZoomIn                                
+  absent  MinimapZoomOut                               
+  absent  MiniMapWorldMapButton                        
+  PRESENT MinimapCompassTexture                        table
+  absent  MiniMapLFGFrame                              
+  absent  LFGMinimapFrame                              
+  absent  QuestWatchFrame                              
+  PRESENT ObjectiveTrackerFrame                        table
+  absent  WatchFrame                                   
+  PRESENT QuestTimerFrame                              table
+  PRESENT DamageMeterSessionWindow1                    table
+  PRESENT CooldownViewerSettings                       table
+  PRESENT EssentialCooldownViewer                      table
+  PRESENT UtilityCooldownViewer                        table
+  PRESENT ChatFrame1                                   table
+  PRESENT GeneralDockManager                           table
+  PRESENT ChatFrameMenuButton                          table
+  PRESENT ChatFrameChannelButton                       table
+  PRESENT QuickJoinToastButton                         table
+  absent  FriendsMicroButton                           
+  PRESENT ChatFrame1EditBox                            table
+  PRESENT ColorPickerFrame                             table
+  absent  OpacitySliderFrame                           
+  PRESENT StackSplitFrame                              table
+  PRESENT CharacterFrame                               table
+  PRESENT PaperDollFrame                               table
+  absent  PetPaperDollFrame                            
+  PRESENT ReputationFrame                              table
+  absent  SkillFrame                                   
+  absent  HonorFrame                                   
+  PRESENT TokenFrame                                   table
+  absent  SpellBookFrame                               
+  absent  QuestLogFrame                                
+  absent  QuestLogDetailFrame                          
+  PRESENT FriendsFrame                                 table
+  absent  WhoFrame                                     
+  absent  GuildFrame                                   
+  PRESENT RaidFrame                                    table
+  PRESENT ChannelFrame                                 table
+  PRESENT WorldMapFrame                                table
+  PRESENT GameMenuFrame                                table
+  PRESENT MerchantFrame                                table
+  PRESENT MailFrame                                    table
+  PRESENT OpenMailFrame                                table
+  PRESENT SendMailFrame                                table
+  PRESENT BankFrame                                    table
+  PRESENT TradeFrame                                   table
+  PRESENT TaxiFrame                                    table
+  PRESENT LootFrame                                    table
+  PRESENT GroupLootFrame1                              table
+  PRESENT GossipFrame                                  table
+  PRESENT QuestFrame                                   table
+  PRESENT ItemTextFrame                                table
+  PRESENT TabardFrame                                  table
+  PRESENT PetitionFrame                                table
+  PRESENT GuildRegistrarFrame                          table
+  PRESENT PetStableFrame                               table
+  absent  StableFrame                                  
+  PRESENT DressUpFrame                                 table
+  PRESENT HelpFrame                                    table
+  PRESENT ChatConfigFrame                              table
+  PRESENT AddonList                                    table
+  PRESENT StaticPopup1                                 table
+  PRESENT ReadyCheckFrame                              table
+  PRESENT ReadyCheckListenerFrame                      table
+  PRESENT RolePollPopup                                table
+  PRESENT LFGParentFrame                               table
+  PRESENT LFGListingFrame                              table
+  PRESENT LFGBrowseFrame                               table
+  absent  PVPParentFrame                               
+  absent  PVPFrame                                     
+  absent  PVPBattlegroundFrame                         
+  absent  BattlefieldFrame                             
+  absent  ArenaFrame                                   
+  absent  WorldStateScoreFrame                         
+  PRESENT ContainerFrame1                              table
+  PRESENT ContainerFrameCombinedBags                   table
+  PRESENT TutorialFrame                                table
+  PRESENT UIErrorsFrame                                table
+  PRESENT RaidWarningFrame                             table
+  absent  MirrorTimer1                                 
+  absent  CastingBarFrame                              
+  PRESENT PlayerCastingBarFrame                        table
+  PRESENT PetCastingBarFrame                           table
+  PRESENT DurabilityFrame                              table
+  PRESENT ZoneTextFrame                                table
+  PRESENT AlertFrame                                   table
+  PRESENT GroupLootContainer                           table
+  PRESENT TicketStatusFrame                            table
+  PRESENT VehicleSeatIndicator                         table
+  PRESENT TalkingHeadFrame                             table
+  PRESENT PlayerPowerBarAlt                            table
+  -- blizzard addon
+  PRESENT Blizzard_EditMode                            loaded
+  PRESENT Blizzard_Settings_Shared                     loaded
+  PRESENT Blizzard_SettingsDefinitions_Frame           loaded
+  PRESENT Blizzard_AuraContainer                       loaded
+  PRESENT Blizzard_PingUI                              loaded
+  PRESENT Blizzard_CooldownViewer                      loaded
+  PRESENT Blizzard_DamageMeter                         loaded
+  PRESENT Blizzard_ObjectiveTracker                    loaded
+  PRESENT Blizzard_Deprecated                          loaded
+  PRESENT Blizzard_CombatText                          loaded
+  PRESENT Blizzard_NamePlates                          loaded
+  PRESENT Blizzard_Menu                                loaded
+  PRESENT Blizzard_ActionBar                           loaded
+  PRESENT Blizzard_UnitFrame                           loaded
+  PRESENT Blizzard_BuffFrame                           loaded
+  PRESENT Blizzard_Minimap                             loaded
+  PRESENT Blizzard_WorldMap                            loaded
+  PRESENT Blizzard_GameTooltip                         loaded
+  absent  Blizzard_TalentUI                            
+  PRESENT Blizzard_PlayerSpells                        load on demand
+  absent  Blizzard_ClassTalentUI                       
+  absent  Blizzard_AuctionUI                           
+  PRESENT Blizzard_AuctionHouseUI                      load on demand
+  absent  Blizzard_TradeSkillUI                        
+  absent  Blizzard_CraftUI                             
+  PRESENT Blizzard_Professions                         load on demand
+  PRESENT Blizzard_TrainerUI                           load on demand
+  PRESENT Blizzard_InspectUI                           load on demand
+  PRESENT Blizzard_MacroUI                             load on demand
+  absent  Blizzard_BindingUI                           
+  PRESENT Blizzard_ItemSocketingUI                     load on demand
+  PRESENT Blizzard_TimeManager                         loaded
+  PRESENT Blizzard_Calendar                            load on demand
+  PRESENT Blizzard_Communities                         loaded
+  PRESENT Blizzard_GuildBankUI                         load on demand
+  absent  Blizzard_GuildUI                             
+  PRESENT Blizzard_Collections                         load on demand
+  PRESENT Blizzard_EncounterJournal                    load on demand
+  PRESENT Blizzard_GroupFinder                         not loaded
+  absent  Blizzard_LookingForGroupUI                   
+  PRESENT Blizzard_PVPUI                               load on demand
+  absent  Blizzard_ArenaUI                             
+  PRESENT Blizzard_ClickBindingUI                      load on demand
+  PRESENT Blizzard_StableUI                            loaded
+  absent  Blizzard_PetStableUI                         
+  PRESENT Blizzard_SwingTimer                          loaded
+  absent  Blizzard_SpellBook                           
+  absent  Blizzard_QuestLog                            
+  PRESENT Blizzard_PrivateAurasUI                      loaded
+  PRESENT Blizzard_FrameXML                            loaded
+  PRESENT Blizzard_UIPanels_Game                       loaded
+  absent  Blizzard_CharacterFrame                      
+  -- enum
+  PRESENT Enum.StatusBarInterpolation                  table: 000001B5BA33C3D0
+  PRESENT Enum.NamePlateType                           table: 000001B5BA31D730
+  PRESENT Enum.SpellBookSpellBank                      table: 000001B5BA33E180
+  PRESENT Enum.TooltipDataType                         table: 000001B5BA340DE0
+  PRESENT Enum.PowerType.ComboPoints                   4
+  PRESENT Enum.PlayerInteractionType.GuildBanker       10
+  PRESENT Enum.BagIndex.Keyring                        -1
+  PRESENT Enum.EditModeSystem                          table: 000001B5BA2FC6F0
+  PRESENT Enum.EditModeActionBarSetting                table: 000001B5BA2F98B0
+  PRESENT Enum.UnitSex                                 table: 000001B5BA3577F0
+  PRESENT Enum.AddOnRestrictionType                    table: 000001B5BA32C630
+  absent  Enum.CustomAuraButtonDispelType              
+  PRESENT Enum.ItemQuality                             table: 000001B5BA3193B0
+  PRESENT Enum.SpellBookItemType                       table: 000001B5BA33E040
+  -- global table/constant
+  PRESENT AuraContainerSortMethod                      table
+  PRESENT AuraContainerSortDirection                   table
+  PRESENT CurveConstants                               table
+  PRESENT AnchorUtil                                   table
+  PRESENT AuraUtil                                     table
+  PRESENT RAID_CLASS_COLORS                            table
+  absent  CUSTOM_CLASS_COLORS                          
+  PRESENT UNIT_NAME_FONT                               Interface\AddOns\WickCore\Media\Fonts\PT_Sans-Narrow-Web-Bold.ttf
+  PRESENT DAMAGE_TEXT_FONT                             Interface\AddOns\WickCore\Media\Fonts\PT_Sans-Narrow-Web-Bold.ttf
+  PRESENT STANDARD_TEXT_FONT                           Fonts\FRIZQT__.TTF
+  PRESENT UISpecialFrames                              table
+  PRESENT SOUNDKIT                                     table
+  absent  NUM_PET_STABLE_SLOTS                         
+  PRESENT MAX_TALENT_TABS                              4
+  PRESENT NUM_ACTIONBAR_PAGES                          6
+  PRESENT NUM_ACTIONBAR_BUTTONS                        12
+  absent  MAX_ACCOUNT_MACROS                           
+  absent  MAX_CHARACTER_MACROS                         
+  PRESENT Constants.UnitPowerSpellIDs                  
+  -- behaviour
+  PRESENT TooltipDataProcessor fires on SetHyperlink   post call ran during SetHyperlink
+  PRESENT Blizzard_CombatText loads on demand          
+  PRESENT CombatText:AddMessage method                 
+  absent  CombatText_AddMessage global                 
+  -- cvar
+  PRESENT loadDeprecationFallbacks                     1
+  PRESENT enableFloatingCombatText                     1
+  PRESENT nameplateShowAll                             1
+  PRESENT scriptErrors                                 1
+
+[C_* NAMESPACE INVENTORY  (271 namespaces)]
+  C_AccountInfo  (3)
+      GetIDFromBattleNetAccountGUID, IsGUIDBattleNetAccountType, IsGUIDRelatedToLocalAccount
+  C_AccountServices  (10)
+      GetPreferredDatacenterLocalities, GetPreferredLocales, GetPreferredPlaySettings, GetPreferredPlaySettingsFeatures, IsAccountLockedPostSave, IsAccountSaveEnabled, IsAccountSaveInProgress, RequestPreferredPlaySettings, SaveAccountData, SetPreferredPlaySettings
+  C_AccountStore  (11)
+      BeginPurchase, GetCategories, GetCategoryInfo, GetCategoryItems, GetCurrencyAvailable, GetCurrencyIDForStore, GetCurrencyInfo, GetItemInfo, GetStoreFrontState, RefundItem, RequestStoreFrontInfoUpdate
+  C_AchievementInfo  (6)
+      AreGuildAchievementsEnabled, GetRewardItemID, GetSupercedingAchievements, IsGuildAchievement, IsValidAchievement, SetPortraitTexture
+  C_AchievementTelemetry  (3)
+      LinkAchievementInClub, LinkAchievementInWhisper, ShowAchievements
+  C_ActionBar  (73)
+      EnableActionRangeCheck, FindAssistedCombatActionButtons, FindFlyoutActionButtons, FindPetActionButtons, FindSpellActionButtons, ForceUpdateAction, GetActionAutocast, GetActionBarPage, GetActionChargeDuration, GetActionCharges, GetActionCooldown, GetActionCooldownDuration, GetActionDisplayCount, GetActionLossOfControlCooldown, GetActionLossOfControlCooldownDuration, GetActionLossOfControlCooldownInfo, GetActionText, GetActionTexture, GetActionUseCount, GetBonusBarIndex, GetBonusBarIndexForSlot, GetBonusBarOffset, GetExtraBarIndex, GetItemActionOnEquipSpellID, GetMultiCastBarIndex, GetOverrideBarIndex, GetOverrideBarSkin, GetPetActionPetBarIndices, GetProfessionQuality, GetProfessionQualityInfo, GetSpell, GetTempShapeshiftBarIndex, GetVehicleBarIndex, HasAction, HasAssistedCombatActionButtons, HasBonusActionBar, HasExtraActionBar, HasFlyoutActionButtons, HasOverrideActionBar, HasPetActionButtons, HasPetActionPetBarIndices, HasRangeRequirements, HasSpellActionButtons, HasTempShapeshiftActionBar, HasVehicleActionBar, IsActionInRange, IsAssistedCombatAction, IsAttackAction, IsAutoCastPetAction, IsAutoRepeatAction, IsConsumableAction, IsCurrentAction, IsEnabledAutoCastPetAction, IsEquippedAction, IsEquippedGearOutfitAction, IsHarmfulAction, IsHelpfulAction, IsInterruptAction, IsItemAction, IsMacroActionWithShowTooltip, IsOnBarOrSpecialBar, IsPossessBarVisible, IsStackableAction, IsUsableAction, PutActionInSlot, RegisterActionUIButton, SetActionBarPage, ShouldOverrideBarShowHealthBar, ShouldOverrideBarShowManaBar, ShouldShowKeyring, ToggleAutoCastPetAction, UnregisterActionUIButton, UsesActionText
+  C_AddOnProfiler  (10)
+      AddMeasuredCallEvent, AddPerformanceMessageShown, CheckForPerformanceMessage, GetAddOnMetric, GetApplicationMetric, GetOverallMetric, GetTicksPerSecond, GetTopKAddOnsForMetric, IsEnabled, MeasureCall
+  C_AddOns  (29)
+      DisableAddOn, DisableAllAddOns, DoesAddOnExist, DoesAddOnHaveLoadError, EnableAddOn, EnableAllAddOns, GetAddOnDependencies, GetAddOnEnableState, GetAddOnInfo, GetAddOnInterfaceVersion, GetAddOnLocalTable, GetAddOnMetadata, GetAddOnName, GetAddOnNotes, GetAddOnOptionalDependencies, GetAddOnSecurity, GetAddOnTitle, GetNumAddOns, GetScriptsDisallowedForBeta, IsAddOnDefaultEnabled, IsAddOnLoadOnDemand, IsAddOnLoadable, IsAddOnLoaded, IsAddonVersionCheckEnabled, LoadAddOn, ResetAddOns, ResetDisabledAddOns, SaveAddOns, SetAddonVersionCheck
+  C_AdventureJournal  (8)
+      ActivateEntry, CanBeShown, GetNumAvailableSuggestions, GetPrimaryOffset, GetReward, GetSuggestions, SetPrimaryOffset, UpdateSuggestions
+  C_AdventureMap  (13)
+      Close, GetAdventureMapTextureKit, GetMapID, GetMapInsetDetailTileInfo, GetMapInsetInfo, GetNumMapInsets, GetNumQuestOffers, GetNumZoneChoices, GetQuestInfo, GetQuestOfferInfo, GetQuestPortraitInfo, GetZoneChoiceInfo, StartQuest
+  C_AlliedRaces  (2)
+      GetAllRacialAbilitiesFromID, GetRaceInfoByID
+  C_AnimaDiversion  (7)
+      CloseUI, GetAnimaDiversionNodes, GetOriginPosition, GetReinforceProgress, GetTextureKit, OpenAnimaDiversionUI, SelectAnimaNode
+  C_ArdenwealdGardening  (2)
+      GetGardenData, IsGardenAccessible
+  C_AreaPoiInfo  (8)
+      GetAreaPOIForMap, GetAreaPOIInfo, GetAreaPOISecondsLeft, GetDelvesForMap, GetDragonridingRacesForMap, GetEventsForMap, GetQuestHubsForMap, IsAreaPOITimed
+  C_ArrowCalloutManager  (2)
+      AcknowledgeCallout, HideCallout
+  C_ArtifactUI  (62)
+      AddPower, ApplyCursorRelicToSlot, CanApplyArtifactRelic, CanApplyCursorRelicToSlot, CanApplyRelicItemIDToEquippedArtifactSlot, CanApplyRelicItemIDToSlot, CheckRespecNPC, Clear, ClearForgeCamera, ConfirmRespec, DoesEquippedArtifactHaveAnyRelicsSlotted, GetAppearanceInfo, GetAppearanceInfoByID, GetAppearanceSetInfo, GetArtifactArtInfo, GetArtifactInfo, GetArtifactItemID, GetArtifactTier, GetArtifactXPRewardTargetInfo, GetCostForPointAtRank, GetEquippedArtifactArtInfo, GetEquippedArtifactInfo, GetEquippedArtifactItemID, GetEquippedArtifactNumRelicSlots, GetEquippedArtifactRelicInfo, GetEquippedRelicLockedReason, GetForgeRotation, GetItemLevelIncreaseProvidedByRelic, GetMetaPowerInfo, GetNumAppearanceSets, GetNumObtainedArtifacts, GetNumRelicSlots, GetPointsRemaining, GetPowerHyperlink, GetPowerInfo, GetPowerLinks, GetPowers, GetPowersAffectedByRelic, GetPowersAffectedByRelicItemLink, GetPreviewAppearance, GetRelicInfo, GetRelicInfoByItemID, GetRelicLockedReason, GetRelicSlotType, GetRespecArtifactArtInfo, GetRespecArtifactInfo, GetRespecCost, GetTotalPowerCost, GetTotalPurchasedRanks, IsArtifactDisabled, IsArtifactItem, IsAtForge, IsEquippedArtifactDisabled, IsEquippedArtifactMaxed, IsMaxedByRulesOrEffect, IsPowerKnown, IsViewedArtifactEquipped, SetAppearance, SetForgeCamera, SetForgeRotation, SetPreviewAppearance, ShouldSuppressForgeRotation
+  C_AssistedCombat  (4)
+      GetActionSpell, GetNextCastSpell, GetRotationSpells, IsAvailable
+  C_AuctionHouse  (85)
+      CalculateCommodityDeposit, CalculateItemDeposit, CanCancelAuction, CancelAuction, CancelCommoditiesPurchase, CancelSell, CloseAuctionHouse, ConfirmCommoditiesPurchase, ConfirmPostCommodity, ConfirmPostItem, FavoritesAreAvailable, GetAuctionInfoByID, GetAuctionItemSubClasses, GetAvailablePostCount, GetBidInfo, GetBidType, GetBids, GetBrowseResults, GetCancelCost, GetCommoditySearchResultInfo, GetCommoditySearchResultsQuantity, GetExtraBrowseInfo, GetFilterGroups, GetItemCommodityStatus, GetItemKeyFromItem, GetItemKeyInfo, GetItemKeyRequiredLevel, GetItemSearchResultInfo, GetItemSearchResultsQuantity, GetMaxBidItemBid, GetMaxBidItemBuyout, GetMaxCommoditySearchResultPrice, GetMaxItemSearchResultBid, GetMaxItemSearchResultBuyout, GetMaxOwnedAuctionBid, GetMaxOwnedAuctionBuyout, GetNumBidTypes, GetNumBids, GetNumCommoditySearchResults, GetNumItemSearchResults, GetNumOwnedAuctionTypes, GetNumOwnedAuctions, GetNumReplicateItems, GetOwnedAuctionInfo, GetOwnedAuctionType, GetOwnedAuctions, GetQuoteDurationRemaining, GetReplicateItemBattlePetInfo, GetReplicateItemInfo, GetReplicateItemLink, GetReplicateItemTimeLeft, GetTimeLeftBandInfo, HasFavorites, HasFullBidResults, HasFullBrowseResults, HasFullCommoditySearchResults, HasFullItemSearchResults, HasFullOwnedAuctionResults, HasMaxFavorites, HasSearchResults, IsFavoriteItem, IsSellItemValid, IsThrottledMessageSystemReady, MakeItemKey, PlaceBid, PostCommodity, PostItem, QueryBids, QueryOwnedAuctions, RefreshCommoditySearchResults, RefreshItemSearchResults, ReplicateItems, RequestMoreBrowseResults, RequestMoreCommoditySearchResults, RequestMoreItemSearchResults, RequestOwnedAuctionBidderInfo, SearchForFavorites, SearchForItemKeys, SendBrowseQuery, SendSearchQuery, SendSellSearchQuery, SetFavoriteItem, ShouldAutoPopulatePrice, StartCommoditiesPurchase, SupportsCopperValues
+  C_AuraContainerUtil  (10)
+      ProcessAuraTooltipBackdropOptions, ProcessAuraTooltipNineSliceOptions, ProcessAuraTooltipTextureSliceOptions, ProcessCustomAuraButtonApplicationBarOptions, ProcessCustomAuraButtonApplicationCountOptions, ProcessCustomAuraButtonCasterNameOptions, ProcessCustomAuraButtonDispelTypeTextOptions, ProcessCustomAuraButtonDispelTypeTextureOptions, ProcessCustomAuraButtonDurationBarOptions, ProcessCustomAuraButtonDurationTextOptions
+  C_AutoComplete  (4)
+      GetAutoCompletePresenceID, GetAutoCompleteRealms, GetAutoCompleteResults, IsRecognizedName
+  C_AutoLoot  (1)
+      SetUseAutoLootToggle
+  C_AzeriteEmpoweredItem  (18)
+      CanSelectPower, ConfirmAzeriteEmpoweredItemRespec, GetAllTierInfo, GetAllTierInfoByItemID, GetAzeriteEmpoweredItemRespecCost, GetPowerInfo, GetPowerText, GetSpecsForPower, HasAnyUnselectedPowers, HasBeenViewed, IsAzeriteEmpoweredItem, IsAzeriteEmpoweredItemByID, IsAzeritePreviewSourceDisplayable, IsHeartOfAzerothEquipped, IsPowerAvailableForSpec, IsPowerSelected, SelectPower, SetHasBeenViewed
+  C_AzeriteEssence  (21)
+      ActivateEssence, CanActivateEssence, CanDeactivateEssence, CanOpenUI, ClearPendingActivationEssence, CloseForge, GetEssenceHyperlink, GetEssenceInfo, GetEssences, GetMilestoneEssence, GetMilestoneInfo, GetMilestoneSpell, GetMilestones, GetNumUnlockedEssences, GetNumUsableEssences, GetPendingActivationEssence, HasNeverActivatedAnyEssences, HasPendingActivationEssence, IsAtForge, SetPendingActivationEssence, UnlockMilestone
+  C_AzeriteItem  (10)
+      FindActiveAzeriteItem, GetAzeriteItemXPInfo, GetPowerLevel, GetUnlimitedPowerLevel, HasActiveAzeriteItem, IsAzeriteItem, IsAzeriteItemAtMaxLevel, IsAzeriteItemByID, IsAzeriteItemEnabled, IsUnlimitedLevelingUnlocked
+  C_Bank  (26)
+      AreAnyBankTypesViewable, AutoDepositItemsIntoBank, BankBagTypeAndIDToInvSlot, CanDepositMoney, CanPurchaseBankTab, CanUseBank, CanViewBank, CanWithdrawMoney, CloseBankFrame, DepositMoney, DoesBankTypeSupportAutoDeposit, DoesBankTypeSupportMoneyTransfer, FetchBankLockedReason, FetchDepositedMoney, FetchMaxNumBankTabs, FetchNextPurchasableBankTabData, FetchNumPurchasedBankTabs, FetchPurchasedBankTabData, FetchPurchasedBankTabIDs, FetchViewableBankTypes, HasMaxBankTabs, IsItemAllowedInBankType, PurchaseBankTab, ShouldUsePlayerBagsInBank, UpdateBankTabSettings, WithdrawMoney
+  C_BarberShop  (29)
+      ApplyCustomizationChoices, Cancel, ClearPreviewChoices, GetAvailableCustomizations, GetCurrentCameraZoom, GetCurrentCharacterData, GetCurrentCost, GetViewingChrModel, HasAlteredForm, HasAnyChanges, HasCustomizationFeature, IsViewingAlteredForm, MarkCustomizationChoiceAsSeen, MarkCustomizationOptionAsSeen, PreviewCustomizationChoice, RandomizeCustomizationChoices, ResetCameraRotation, ResetCustomizationChoices, RotateCamera, SaveSeenChoices, SetCameraDistanceOffset, SetCameraZoomLevel, SetCustomizationChoice, SetModelDressState, SetSelectedSex, SetViewingAlteredForm, SetViewingChrModel, SetViewingShapeshiftForm, ZoomCamera
+  C_BattleNet  (33)
+      AreFriendTagsEnabled, AreHighResTexturesInstalled, AreTitleFriendCustomNamesEnabled, AreTitleFriendsEnabled, BNCheckBattleTagInviteToRecentAlly, BNCheckTitleFriendInviteToUnit, CanToggleHighResTexturesWithoutClientReload, GetAccountInfoByGUID, GetAccountInfoByID, GetCustomTitleFriendName, GetFriendAccountInfo, GetFriendGameAccountInfo, GetFriendInviteInfo, GetFriendNumGameAccounts, GetGameAccountInfoByGUID, GetGameAccountInfoByID, InstallHighResTextures, InviteFriend, IsBattleNetFriendsListEnabled, IsBattleNetFriendsListSupported, IsFriendTagSupportedForCurrentGameType, SearchFriends, SendGameData, SendTitleFriendInviteByName, SendVerifiedBattleNetFriendInvite, SendWhisper, SetAFK, SetAppearOffline, SetBlocked, SetCustomMessage, SetCustomTitleFriendName, SetDND, SetFriendTags
+  C_BehavioralMessaging  (1)
+      SendNotificationReceipt
+  C_BlackMarket  (8)
+      Close, GetHotItem, GetItemInfoByID, GetItemInfoByIndex, GetNumItems, IsViewOnly, ItemPlaceBid, RequestItems
+  C_BlizzCon2026  (4)
+      GetExperience, IsActive, IsColdSwapFeatureEnabled, SetExperience
+  C_Browser  (1)
+      CloseFullscreenBrowser
+  C_CVar  (12)
+      AreCVarsLoaded, GetCVar, GetCVarBitfield, GetCVarBool, GetCVarDefault, GetCVarInfo, RegisterCVar, RemoveTempCVar, ResetTestCVars, SetCVar, SetCVarBitfield, SetTempCVar
+  C_Calendar  (90)
+      AddEvent, AreNamesReady, CanAddEvent, CanSendInvite, CloseEvent, ContextMenuEventCanComplain, ContextMenuEventCanEdit, ContextMenuEventCanRemove, ContextMenuEventClipboard, ContextMenuEventCopy, ContextMenuEventGetCalendarType, ContextMenuEventPaste, ContextMenuEventRemove, ContextMenuEventSignUp, ContextMenuGetEventIndex, ContextMenuInviteAvailable, ContextMenuInviteDecline, ContextMenuInviteRemove, ContextMenuInviteTentative, ContextMenuSelectEvent, CreateCommunitySignUpEvent, CreateGuildAnnouncementEvent, CreateGuildSignUpEvent, CreatePlayerEvent, EventAvailable, EventCanEdit, EventClearAutoApprove, EventClearLocked, EventClearModerator, EventDecline, EventGetCalendarType, EventGetClubId, EventGetInvite, EventGetInviteResponseTime, EventGetInviteSortCriterion, EventGetSelectedInvite, EventGetStatusOptions, EventGetTextures, EventGetTypes, EventGetTypesDisplayOrdered, EventHasPendingInvite, EventHaveSettingsChanged, EventInvite, EventRemoveInvite, EventRemoveInviteByGuid, EventSelectInvite, EventSetAutoApprove, EventSetClubId, EventSetDate, EventSetDescription, EventSetInviteStatus, EventSetLocked, EventSetModerator, EventSetTextureID, EventSetTime, EventSetTitle, EventSetType, EventSignUp, EventSortInvites, EventTentative, GetClubCalendarEvents, GetDayEvent, GetDefaultGuildFilter, GetEventIndex, GetEventIndexInfo, GetEventInfo, GetFirstPendingInvite, GetGuildEventInfo, GetGuildEventSelectionInfo, GetHolidayInfo, GetMaxCreateDate, GetMinDate, GetMonthInfo, GetNextClubId, GetNumDayEvents, GetNumGuildEvents, GetNumInvites, GetNumPendingInvites, GetRaidInfo, IsActionPending, IsEventOpen, MassInviteCommunity, MassInviteGuild, OpenCalendar, OpenEvent, RemoveEvent, SetAbsMonth, SetMonth, SetNextClubId, UpdateEvent
+  C_CampaignInfo  (10)
+      GetAvailableCampaigns, GetCampaignChapterInfo, GetCampaignID, GetCampaignInfo, GetChapterIDs, GetCurrentChapterID, GetFailureReason, GetState, IsCampaignQuest, SortAsNormalQuest
+  C_CatalogShop  (38)
+      BulkPurchaseProducts, BulkRefundDecors, CloseCatalogShopInteraction, ConfirmHousingPurchase, FindBestCurrencyProductForNeededAmount, GetAvailableCategoryIDs, GetAvailableTransmogRaceInfos, GetCatalogShopProductDisplayInfo, GetCategoryInfo, GetCategorySectionInfo, GetFailureInfo, GetFirstCategoryByProductID, GetNewProducts, GetProductAvailabilityTimeRemainingSecs, GetProductIDsForBundle, GetProductIDsForCategory, GetProductIDsForCategorySection, GetProductInfo, GetProductSortOrder, GetRefundableDecors, GetSectionIDsForCategory, GetSpellVisualInfoForMount, GetVCProductInfos, GetVirtualCurrencyBalance, HasNewProducts, IsProductIncludedInAnyBundle, IsShop2Enabled, OnLegalDisclaimerClicked, OnLegalPersonalizedOptOutClicked, OpenCatalogShopInteractionFromHouse, OpenCatalogShopInteractionFromShop, ProductDisplayedTelemetry, ProductSelectedTelemetry, PurchaseProduct, RefreshRefundableDecors, RefreshVirtualCurrencyBalance, ShouldShowHousingWarning, StartHousingVCPurchaseConfirmation
+  C_ChallengeMode  (29)
+      CanUseKeystoneInCurrentMap, ClearKeystone, CloseKeystoneFrame, GetActiveChallengeMapID, GetActiveKeystoneInfo, GetAffixInfo, GetChallengeCompletionInfo, GetDeathCount, GetDungeonScoreRarityColor, GetGuildLeaders, GetKeystoneLevelRarityColor, GetLeaverPenaltyWarningTimeLeft, GetMapScoreInfo, GetMapTable, GetMapUIInfo, GetOverallDungeonScore, GetPowerLevelDamageHealthMod, GetSlottedKeystoneInfo, GetSpecificDungeonOverallScoreRarityColor, GetSpecificDungeonScoreRarityColor, GetStartTime, HasSlottedKeystone, IsChallengeModeActive, IsChallengeModeResettable, RemoveKeystone, RequestLeaders, Reset, SlotKeystone, StartChallengeMode
+  C_CharacterServices  (23)
+      ArePaidCharacterTransfersBetweenBnetAccountsEnabled, AssignFCMDistribution, AssignHCTDistribution, AssignNameChangeDistribution, AssignPCTDistribution, AssignRaceOrFactionChangeDistribution, AssignUpgradeDistribution, CapitalizeCharName, GetActiveCharacterUpgradeBoostType, GetActiveClassTrialBoostType, GetAutomaticBoost, GetAutomaticBoostCharacter, GetCharacterServiceDisplayData, GetCharacterServiceDisplayDataByVASType, GetCharacterServiceDisplayInfo, GetHardcoreTransferSuperDistrictDestinations, GetPaidCharacterTransferSuperDistrictDestinations, GetVASDistributions, HasRequiredBoostForClassTrial, HasRequiredBoostForUnrevoke, IsRealmlessRealmSelectionEnabled, SetAutomaticBoost, SetAutomaticBoostCharacter
+  C_CharacterServicesPublic  (1)
+      ShouldSeeControlPopup
+  C_ChatBubbles  (1)
+      GetAllChatBubbles
+  C_ChatInfo  (45)
+      AreOutgoingAddonChatMessagesRestricted, CanPlayerSpeakLanguage, CancelEmote, DropCautionaryChatMessage, GetChannelInfoFromIdentifier, GetChannelRosterInfo, GetChannelRuleset, GetChannelRulesetForChannelID, GetChannelShortcut, GetChannelShortcutForChannelID, GetChatLineSenderGUID, GetChatLineSenderName, GetChatLineText, GetChatTypeName, GetClubStreamIDs, GetColorForChatType, GetGeneralChannelID, GetGeneralChannelLocalID, GetMentorChannelID, GetNumActiveChannels, GetNumReservedChatWindows, GetRegisteredAddonMessagePrefixes, InChatMessagingLockdown, IsAddonMessagePrefixRegistered, IsChannelRegional, IsChannelRegionalForChannelID, IsChatLineCensored, IsLoggingChat, IsLoggingCombat, IsPartyChannelType, IsRegionalServiceAvailable, IsTimerunningPlayer, IsValidChatLine, IsValidCombatFilterName, PerformEmote, RegisterAddonMessagePrefix, ReplaceIconAndGroupExpressions, RequestCanLocalWhisperTarget, ResetDefaultZoneChannels, SendAddonMessage, SendAddonMessageLogged, SendCautionaryChatMessage, SendChatMessage, SwapChatChannelsByChannelIndex, UncensorChatLine
+  C_ChromieTime  (4)
+      CloseUI, GetChromieTimeExpansionOption, GetChromieTimeExpansionOptions, SelectChromieTimeOption
+  C_ClassColor  (1)
+      GetClassColor
+  C_ClassTalents  (31)
+      CanChangeTalents, CanCreateNewConfig, CanEditTalents, CommitConfig, DeleteConfig, GetActiveConfigID, GetActiveHeroTalentSpec, GetConfigIDsBySpecID, GetHasStarterBuild, GetHeroTalentSpecsForClassSpec, GetLastSelectedSavedConfigID, GetNextStarterBuildPurchase, GetStarterBuildActive, GetTraitTreeForSpec, HasUnspentHeroTalentPoints, HasUnspentTalentPoints, ImportLoadout, InitializeViewLoadout, IsConfigPopulated, LoadConfig, RenameConfig, RequestNewConfig, SaveConfig, SetStarterBuildActive, SetUsesSharedActionBars, SwitchToLoadoutByIndex, SwitchToLoadoutByName, SwitchToSpecializationByIndex, SwitchToSpecializationByName, UpdateLastSelectedSavedConfigID, ViewLoadout
+  C_ClassTrial  (2)
+      GetClassTrialLogoutTimeSeconds, IsClassTrialCharacter
+  C_ClickBindings  (11)
+      CanSpellBeClickBound, ExecuteBinding, GetBindingType, GetEffectiveInteractionButton, GetProfileInfo, GetStringFromModifiers, GetTutorialShown, MakeModifiers, ResetCurrentProfile, SetProfileByInfo, SetTutorialShown
+  C_ClientScene  (1)
+      IsSceneTypeActive
+  C_Club  (84)
+      AcceptInvitation, AddClubStreamChatChannel, AdvanceStreamViewMarker, AreMembersReady, AssignMemberRole, CanResolvePlayerLocationFromClubMessageData, ClearAutoAdvanceStreamViewMarker, ClearClubPresenceSubscription, CompareBattleNetDisplayName, CreateClub, CreateStream, CreateTicket, DeclineInvitation, DestroyClub, DestroyMessage, DestroyStream, DestroyTicket, DoesAnyCommunityHaveUnreadMessages, DoesCommunityHaveMembersOfTheOppositeFaction, EditClub, EditMessage, EditStream, Flush, FocusCommunityStreams, FocusMembers, FocusStream, GetAssignableRoles, GetAvatarIdList, GetClubCapacity, GetClubInfo, GetClubLimits, GetClubMembers, GetClubPrivileges, GetClubStreamNotificationSettings, GetCommunityNameResultText, GetGuildClubId, GetInfoFromLastCommunityChatLine, GetInvitationCandidates, GetInvitationInfo, GetInvitationsForClub, GetInvitationsForSelf, GetLastTicketResponse, GetMemberInfo, GetMemberInfoForSelf, GetMessageInfo, GetMessageRanges, GetMessagesBefore, GetMessagesInRange, GetStreamInfo, GetStreamViewMarker, GetStreams, GetSubscribedClubs, GetTickets, IsAccountMuted, IsBeginningOfStream, IsEnabled, IsRestricted, IsSubscribedToStream, KickMember, LeaveClub, RedeemTicket, RequestInvitationsForClub, RequestMoreMessagesBefore, RequestTicket, RequestTickets, RevokeInvitation, SendBattleTagFriendRequest, SendCharacterInvitation, SendInvitation, SendMessage, SendTitleFriendRequest, SetAutoAdvanceStreamViewMarker, SetAvatarTexture, SetClubMemberNote, SetClubPresenceSubscription, SetClubStreamNotificationSettings, SetCommunityID, SetFavorite, SetSocialQueueingEnabled, ShouldAllowClubType, UnfocusAllStreams, UnfocusMembers, UnfocusStream, ValidateText
+  C_ClubFinder  (55)
+      ApplicantAcceptClubInvite, ApplicantDeclineClubInvite, CancelMembershipRequest, CheckAllPlayerApplicantSettings, ClearAllFinderCache, ClearClubApplicantsCache, ClearClubFinderPostingsCache, DoesPlayerBelongToClubFromClubGUID, GetClubFinderDisableReason, GetClubRecruitmentSettings, GetClubTypeFromFinderGUID, GetFocusIndexFromFlag, GetPlayerApplicantLocaleFlags, GetPlayerApplicantSettings, GetPlayerClubApplicationStatus, GetPlayerSettingsFocusFlagsSelectedCount, GetPostingIDFromClubFinderGUID, GetRecruitingClubInfoFromClubID, GetRecruitingClubInfoFromFinderGUID, GetStatusOfPostingFromClubId, GetTotalMatchingCommunityListSize, GetTotalMatchingGuildListSize, HasAlreadyAppliedToLinkedPosting, HasPostingBeenDelisted, IsCommunityFinderEnabled, IsEnabled, IsListingEnabledFromFlags, IsPostingBanned, IsValidSearchString, LookupClubPostingFromClubFinderGUID, PlayerGetClubInvitationList, PlayerRequestPendingClubsList, PlayerReturnPendingCommunitiesList, PlayerReturnPendingGuildsList, PostClub, RequestApplicantList, RequestClubsList, RequestMembershipToClub, RequestNextCommunityPage, RequestNextGuildPage, RequestPostingInformationFromClubId, RequestSubscribedClubPostingIDs, ResetClubPostingMapCache, RespondToApplicant, ReturnClubApplicantList, ReturnMatchingCommunityList, ReturnMatchingGuildList, ReturnPendingClubApplicantList, SendChatWhisper, SetAllRecruitmentSettings, SetPlayerApplicantLocaleFlags, SetPlayerApplicantSettings, SetRecruitmentLocale, SetRecruitmentSettings, ShouldShowClubFinder
+  C_ColorOverrides  (6)
+      ClearColorOverrides, GetColorForQuality, GetColorOverrideInfo, GetDefaultColorForQuality, RemoveColorOverride, SetColorOverride
+  C_ColorUtil  (7)
+      ConvertHSLToHSV, ConvertHSVToHSL, ConvertHSVToRGB, ConvertRGBToHSV, GenerateTextColorCode, WrapTextInColor, WrapTextInColorCode
+  C_CombatAudioAlert  (16)
+      AddToKnownTargetingList, GetCategoryVoice, GetCategoryVolume, GetFormatSetting, GetSpeakerSpeed, GetSpecSetting, GetThrottle, IsEnabled, RemoveFromKnownTargetingList, SetCategoryVoice, SetCategoryVolume, SetFormatSetting, SetSpeakerSpeed, SetSpecSetting, SetThrottle, SpeakText
+  C_CombatLog  (11)
+      ApplyFilterSettings, AreFilteredEventsEnabled, ClearEntries, DoesObjectMatchFilter, GetEntryRetentionTime, GetMessageLimit, IsCombatLogRestricted, RefilterEntries, SetEntryRetentionTime, SetFilteredEventsEnabled, SetMessageLimit
+  C_CombatText  (3)
+      GetActiveUnit, GetCurrentEventInfo, SetActiveUnit
+  C_Commentator  (144)
+      AddPlayerOverrideName, AddTrackedDefensiveAuras, AddTrackedOffensiveAuras, AreTeamsSwapped, AssignPlayerToTeam, AssignPlayersToTeam, AssignPlayersToTeamInCurrentInstance, CanUseCommentatorCheats, ClearCameraTarget, ClearFollowTarget, ClearLookAtTarget, EnterInstance, ExitInstance, FindSpectatedUnit, FindTeamNameInCurrentInstance, FindTeamNameInDirectory, FlushCommentatorHistory, FollowPlayer, FollowUnit, ForceFollowTransition, GetAdditionalCameraWeight, GetAdditionalCameraWeightByToken, GetAllPlayerOverrideNames, GetCamera, GetCameraCollision, GetCameraPosition, GetCombatEventInfo, GetCommentatorHistory, GetCommentatorMatchDataState, GetCurrentMapID, GetDampeningPercent, GetDistanceBeforeForcedHorizontalConvergence, GetDurationToForceHorizontalConvergence, GetExcludeDistance, GetHardlockWeight, GetHorizontalAngleThresholdToSmooth, GetIndirectSpellID, GetInstanceInfo, GetLookAtLerpAmount, GetMapInfo, GetMatchDuration, GetMaxNumPlayersPerTeam, GetMaxNumTeams, GetMode, GetMsToHoldForHorizontalMovement, GetMsToHoldForVerticalMovement, GetMsToSmoothHorizontalChange, GetMsToSmoothVerticalChange, GetNumMaps, GetNumPlayers, GetOrCreateSeries, GetPlayerAuraInfo, GetPlayerAuraInfoByUnit, GetPlayerCooldownInfo, GetPlayerCooldownInfoByUnit, GetPlayerCrowdControlInfo, GetPlayerCrowdControlInfoByUnit, GetPlayerData, GetPlayerFlagInfo, GetPlayerFlagInfoByUnit, GetPlayerItemCooldownInfo, GetPlayerItemCooldownInfoByUnit, GetPlayerOverrideName, GetPlayerSpellCharges, GetPlayerSpellChargesByUnit, GetPositionLerpAmount, GetSmoothFollowTransitioning, GetSoftlockWeight, GetSpeedFactor, GetStartLocation, GetTeamColor, GetTeamColorByUnit, GetTimeLeftInMatch, GetTrackedSpellID, GetTrackedSpells, GetTrackedSpellsByUnit, GetUnitData, GetWargameInfo, HasTrackedAuras, IsSmartCameraLocked, IsSpectating, IsTrackedDefensiveAura, IsTrackedOffensiveAura, IsTrackedSpell, IsTrackedSpellByUnit, IsUsingSmartCamera, LookAtPlayer, RemoveAllOverrideNames, RemovePlayerOverrideName, RequestPlayerCooldownInfo, ResetFoVTarget, ResetSeriesScores, ResetSettings, ResetTrackedAuras, SendAddonMessage, SendAddonMessageLogged, SetAdditionalCameraWeight, SetAdditionalCameraWeightByToken, SetBlocklistedAuras, SetBlocklistedCooldowns, SetBlocklistedItemCooldowns, SetCamera, SetCameraCollision, SetCameraPosition, SetCheatsEnabled, SetCommentatorHistory, SetDistanceBeforeForcedHorizontalConvergence, SetDurationToForceHorizontalConvergence, SetExcludeDistance, SetFollowCameraSpeeds, SetHardlockWeight, SetHorizontalAngleThresholdToSmooth, SetLookAtLerpAmount, SetMapAndInstanceIndex, SetMouseDisabled, SetMoveSpeed, SetMsToHoldForHorizontalMovement, SetMsToHoldForVerticalMovement, SetMsToSmoothHorizontalChange, SetMsToSmoothVerticalChange, SetPositionLerpAmount, SetRequestedDebuffCooldowns, SetRequestedDefensiveCooldowns, SetRequestedItemCooldowns, SetRequestedOffensiveCooldowns, SetSeriesScore, SetSeriesScores, SetSmartCameraLocked, SetSmoothFollowTransitioning, SetSoftlockWeight, SetSpeedFactor, SetTargetHeightOffset, SetUseSmartCamera, SnapCameraLookAtPoint, SpellUsesItemCharges, StartWargame, SwapTeamSides, ToggleCheats, UpdateMapInfo, UpdatePlayerInfo, ZoomIn, ZoomIn_Position, ZoomOut, ZoomOut_Position
+  C_ConsoleScriptCollection  (4)
+      GetCollectionDataByID, GetCollectionDataByTag, GetElements, GetScriptData
+  C_Container  (47)
+      CalculateTotalNumberOfFreeBagSlots, ContainerIDToInventoryID, ContainerRefundItemPurchase, GetBackpackAutosortDisabled, GetBackpackSellJunkDisabled, GetBagName, GetBagSlotFlag, GetBankAutosortDisabled, GetContainerFreeSlots, GetContainerItemCooldown, GetContainerItemDurability, GetContainerItemEquipmentSetInfo, GetContainerItemID, GetContainerItemInfo, GetContainerItemLink, GetContainerItemPurchaseCurrency, GetContainerItemPurchaseInfo, GetContainerItemPurchaseItem, GetContainerItemQuestInfo, GetContainerNumFreeSlots, GetContainerNumSlots, GetInsertItemsLeftToRight, GetItemCooldown, GetMaxArenaCurrency, GetSortBagsRightToLeft, HasContainerItem, IsBattlePayItem, IsContainerFiltered, PickupContainerItem, PlayerHasHearthstone, SetBackpackAutosortDisabled, SetBackpackSellJunkDisabled, SetBagPortraitTexture, SetBagSlotFlag, SetBankAutosortDisabled, SetInsertItemsLeftToRight, SetItemSearch, SetSortBagsRightToLeft, ShowContainerSellCursor, SocketContainerItem, SortAccountBankBags, SortBags, SortBank, SortBankBags, SplitContainerItem, UseContainerItem, UseHearthstone
+  C_ContentTracking  (18)
+      GetBestMapForTrackable, GetCollectableSourceTrackingEnabled, GetCollectableSourceTypes, GetCurrentTrackingTarget, GetEncounterTrackingInfo, GetNextWaypointForTrackable, GetObjectiveText, GetTitle, GetTrackablesOnMap, GetTrackedIDs, GetVendorTrackingInfo, GetWaypointText, IsNavigable, IsTrackable, IsTracking, StartTracking, StopTracking, ToggleTracking
+  C_ContributionCollector  (18)
+      Close, Contribute, GetActive, GetAtlases, GetBuffs, GetContributionAppearance, GetContributionCollectorsForMap, GetContributionResult, GetDescription, GetManagedContributionsForCreatureID, GetName, GetOrderIndex, GetRequiredContributionCurrency, GetRequiredContributionItem, GetRewardQuestID, GetState, HasPendingContribution, IsAwaitingRewardQuestData
+  C_CooldownViewer  (7)
+      GetCooldownViewerCategorySet, GetCooldownViewerCooldownInfo, GetGroupBuffItems, GetLayoutData, GetValidAlertTypes, IsCooldownViewerAvailable, SetLayoutData
+  C_CovenantCallings  (2)
+      AreCallingsUnlocked, RequestCallings
+  C_CovenantPreview  (2)
+      CloseFromUI, GetCovenantInfoForPlayerChoiceResponseID
+  C_CovenantSanctumUI  (16)
+      CanAccessReservoir, CanDepositAnima, DepositAnima, EndInteraction, GetAnimaInfo, GetCurrentTalentTreeID, GetFeatures, GetRenownLevel, GetRenownLevels, GetRenownRewardsForLevel, GetSanctumType, GetSoulCurrencies, HasMaximumRenown, IsPlayerInRenownCatchUpMode, IsWeeklyRenownCapped, RequestCatchUpState
+  C_Covenants  (3)
+      GetActiveCovenantID, GetCovenantData, GetCovenantIDs
+  C_CraftingOrders  (36)
+      AreOrderNotesDisabled, CalculateCraftingOrderPostingFee, CanOrderSkillAbility, CancelOrder, ClaimOrder, CloseCrafterCraftingOrders, CloseCustomerCraftingOrders, FulfillOrder, GetClaimedOrder, GetCrafterBuckets, GetCrafterOrders, GetCraftingOrderTime, GetCustomerCategories, GetCustomerOptions, GetCustomerOrders, GetDefaultOrdersSkillLine, GetMyOrders, GetNumFavoriteCustomerOptions, GetOrderClaimInfo, GetPersonalOrdersInfo, HasFavoriteCustomerOptions, IsCustomerOptionFavorited, ListMyOrders, OpenCrafterCraftingOrders, OpenCustomerCraftingOrders, OrderCanBeRecrafted, ParseCustomerOptions, PlaceNewOrder, RejectOrder, ReleaseOrder, RequestCrafterOrders, RequestCustomerOrders, SetCustomerOptionFavorited, ShouldShowCraftingOrderTab, SkillLineHasOrders, UpdateIgnoreList
+  C_CreatureInfo  (8)
+      GetClassInfo, GetCreatureFamilyIDs, GetCreatureFamilyInfo, GetCreatureID, GetCreatureTypeIDs, GetCreatureTypeInfo, GetFactionInfo, GetRaceInfo
+  C_CurrencyInfo  (43)
+      CanTransferCurrency, DoesCurrentFilterRequireAccountCurrencyData, DoesWarModeBonusApply, ExpandCurrencyList, FetchCurrencyDataFromAccountCharacters, FetchCurrencyTransferTransactions, GetAzeriteCurrencyID, GetBackpackCurrencyInfo, GetBasicCurrencyInfo, GetCoinIcon, GetCoinText, GetCoinTextureString, GetCostToTransferCurrency, GetCurrencyContainerInfo, GetCurrencyDescription, GetCurrencyFilter, GetCurrencyIDFromLink, GetCurrencyInfo, GetCurrencyInfoFromLink, GetCurrencyLink, GetCurrencyListInfo, GetCurrencyListLink, GetCurrencyListSize, GetDragonIslesSuppliesCurrencyID, GetFactionGrantedByCurrency, GetMaxTransferableAmountFromQuantity, GetPlayerCurrencyCategoryInfo, GetWarResourcesCurrencyID, IsAccountCharacterCurrencyDataReady, IsAccountTransferableCurrency, IsAccountWideCurrency, IsCurrencyContainer, IsCurrencyTransferInProgress, IsCurrencyTransferTransactionDataReady, PickupCurrency, PlayerHasMaxQuantity, PlayerHasMaxWeeklyQuantity, RequestCurrencyDataForAccountCharacters, RequestCurrencyFromAccountCharacter, SetCurrencyBackpack, SetCurrencyBackpackByID, SetCurrencyFilter, SetCurrencyUnused
+  C_Cursor  (1)
+      GetCursorItem
+  C_CurveUtil  (5)
+      CreateColorCurve, CreateCurve, EvaluateColorFromBoolean, EvaluateColorValueFromBoolean, EvaluateGameCurve
+  C_DamageMeter  (8)
+      GetAvailableCombatSessions, GetCombatSessionFromID, GetCombatSessionFromType, GetCombatSessionSourceFromID, GetCombatSessionSourceFromType, GetSessionDurationSeconds, IsDamageMeterAvailable, ResetAllCombatSessions
+  C_DateAndTime  (11)
+      AdjustTimeByDays, AdjustTimeByMinutes, AdjustTimeByMonths, CompareCalendarTime, GetCalendarTimeFromEpoch, GetCurrentCalendarTime, GetSecondsUntilDailyReset, GetSecondsUntilWeeklyReset, GetServerTimeLocal, GetWeeklyResetStartTime, IsDayTime
+  C_DeathInfo  (5)
+      GetCorpseMapPosition, GetDeathReleasePosition, GetGraveyardsForMap, GetSelfResurrectOptions, UseSelfResurrectOption
+  C_DeathRecap  (4)
+      GetRecapEvents, GetRecapLink, GetRecapMaxHealth, HasRecapEvents
+  C_Debug  (8)
+      DashboardIsEnabled, FrameXMLDebug, GetAllPortLocsForMap, GetMapDebugObjects, TeleportToMapDebugObject, TeleportToMapLocation, ToggleDebugCharInfo, ToggleWindDebugMenu
+  C_DelvesUI  (40)
+      GetActiveDelveTier, GetCompanionInfoForActivePlayer, GetCreatureDisplayInfoForCompanion, GetCurioLink, GetCurioNodeForCompanion, GetCurioRarityByTraitCondAccountElementID, GetCurrentDelvesSeasonNumber, GetDelveEntranceBackgroundWidgetSetID, GetDelveEntranceDescriptionString, GetDelveEntranceHeaderString, GetDelveEntranceMapID, GetDelveEntranceTiers, GetDelveEntranceTitleString, GetDelvesAffixSpellsForSeason, GetDelvesFactionForSeason, GetDelvesMinRequiredLevel, GetFactionForCompanion, GetFlavorNodeForCompanion, GetFlavorNodeNameForCompanion, GetLockedTextForCompanion, GetModelSceneForCompanion, GetPlayerCompanionPDEID, GetRoleNodeForCompanion, GetRoleSubtreeForCompanion, GetTieredEntranceOptionalAffixTraitTreeID, GetTieredEntrancePDEID, GetTieredEntranceType, GetTraitTreeForCompanion, GetUnseenCuriosBySlotType, GetWorldTierDifficultyForActivePlayer, HasActiveDelve, HasActiveLFGLair, HasActiveLair, IsDelveEntranceTierEnabled, IsEligibleForActiveDelveRewards, IsInLair, IsTraitTreeForCompanion, RequestPartyEligibilityForDelveTiers, SaveSeenCuriosBySlotType, SelectDelveEntranceTier
+  C_Discord  (20)
+      Authorize, GetDiscordChannelName, GetDiscordUserID, GetDiscordUserName, GetDisplayNameType, GetGuildLinkStatus, GetNumDiscordChannels, GetNumDiscordServers, GetServerLinkableChannels, GetServerName, GuildLink, GuildUnlink, IsEnabled, IsGuildChannelLinked, IsGuildSettingSet, IsUserOAuthed, RefreshAuth, SetGuildSetting, UpdateDiscordServers, UpdateGuildLobby
+  C_DurationUtil  (3)
+      CreateDuration, CreateDurationTextBinding, CreateManualClock
+  C_DyeColor  (10)
+      GetAllDyeColorCategories, GetAllDyeColors, GetDyeColorCategoryInfo, GetDyeColorForItem, GetDyeColorForItemLocation, GetDyeColorInfo, GetDyeColorsForItem, GetDyeColorsForItemLocation, GetDyeColorsInCategory, IsDyeColorOwned
+  C_EditMode  (12)
+      ConvertLayoutInfoToString, ConvertStringToLayoutInfo, GetAccountSettings, GetEditModeDefaultLayout, GetLayouts, IsValidLayoutName, OnEditModeExit, OnLayoutAdded, OnLayoutDeleted, SaveLayouts, SetAccountSetting, SetActiveLayout
+  C_EncodingUtil  (10)
+      CompressString, DecodeBase64, DecodeHex, DecompressString, DeserializeCBOR, DeserializeJSON, EncodeBase64, EncodeHex, SerializeCBOR, SerializeJSON
+  C_EncounterEvents  (8)
+      GetEventColor, GetEventInfo, GetEventList, GetEventSound, HasEventInfo, PlayEventSound, SetEventColor, SetEventSound
+  C_EncounterJournal  (22)
+      GetBaseDifficultyID, GetDungeonEntrancesForMap, GetEncounterJournalLink, GetEncountersOnMap, GetInstanceForGameMap, GetLootInfo, GetLootInfoByIndex, GetSectionIconFlags, GetSectionInfo, GetSlotFilter, InitalizeSelectedTier, InstanceHasDifficultyID, InstanceHasLoot, IsEncounterComplete, OnClose, OnOpen, ResetSlotFilter, SetPreviewMythicPlusLevel, SetPreviewPvpTier, SetSlotFilter, SetTab, StartArathiRPE
+  C_EncounterTimeline  (34)
+      AddEditModeEvents, AddScriptEvent, CancelAllScriptEvents, CancelEditModeEvents, CancelScriptEvent, FinishScriptEvent, GetCurrentTime, GetEventColor, GetEventCountBySource, GetEventHighlightTime, GetEventInfo, GetEventList, GetEventState, GetEventTimeElapsed, GetEventTimeRemaining, GetEventTimer, GetEventTrack, GetSortedEventList, GetTrackInfo, GetTrackList, GetTrackMaxEventDuration, GetTrackType, GetViewType, HasActiveEvents, HasAnyEvents, HasPausedEvents, HasVisibleEvents, IsEventBlocked, IsFeatureAvailable, IsFeatureEnabled, PauseScriptEvent, ResumeScriptEvent, SetEventIconTextures, SetViewType
+  C_EncounterWarnings  (10)
+      GetColorForSeverity, GetEditModeWarningInfo, GetPlayCustomSoundsWhenHidden, GetSoundKitForSeverity, GetWarningsShown, IsFeatureAvailable, IsFeatureEnabled, PlaySound, SetPlayCustomSoundsWhenHidden, SetWarningsShown
+  C_EndOfMatchUI  (1)
+      GetEndOfMatchDetails
+  C_EquipmentSet  (23)
+      AssignSpecToEquipmentSet, CanUseEquipmentSets, ClearIgnoredSlotsForSave, CreateEquipmentSet, DeleteEquipmentSet, EquipmentSetContainsLockedItems, GetEquipmentSetAssignedSpec, GetEquipmentSetForSpec, GetEquipmentSetID, GetEquipmentSetIDs, GetEquipmentSetInfo, GetIgnoredSlots, GetItemIDs, GetItemLocations, GetNumEquipmentSets, IgnoreSlotForSave, IsSlotIgnoredForSave, ModifyEquipmentSet, PickupEquipmentSet, SaveEquipmentSet, UnassignEquipmentSetSpec, UnignoreSlotForSave, UseEquipmentSet
+  C_EventScheduler  (11)
+      CanShowEvents, ClearReminder, GetActiveContinentName, GetEventUiMapID, GetEventZoneName, GetOngoingEvents, GetScheduledEvents, HasData, HasSavedReminders, RequestEvents, SetReminder
+  C_EventToastManager  (3)
+      GetLevelUpDisplayToastsFromLevel, GetNextToastToDisplay, RemoveCurrentToast
+  C_EventUtils  (2)
+      IsCallbackEvent, IsEventValid
+  C_ExpansionTrial  (2)
+      OnTrialLevelUpDialogClicked, OnTrialLevelUpDialogShown
+  C_ExternalEventURL  (3)
+      HasURL, IsNew, LaunchURL
+  C_Flyout  (6)
+      FlyoutHasSpell, GetFlyoutID, GetFlyoutInfo, GetFlyoutSlotInfo, GetFlyoutTexture, GetNumFlyouts
+  C_FogOfWar  (2)
+      GetFogOfWarForMap, GetFogOfWarInfo
+  C_FrameManager  (1)
+      GetFrameVisibilityState
+  C_FriendList  (32)
+      AddFriend, AddIgnore, AddOrDelIgnore, AddOrRemoveFriend, DelIgnore, DelIgnoreByIndex, GetFriendInfo, GetFriendInfoByIndex, GetIgnoreName, GetNumFriends, GetNumIgnores, GetNumOnlineFriends, GetNumWhoResults, GetSelectedFriend, GetSelectedIgnore, GetWhoInfo, GetWhoRaceFilters, IsFriend, IsIgnored, IsIgnoredByGuid, IsLegacyFriendSystemEnabled, IsOnIgnoredList, RemoveFriend, RemoveFriendByIndex, SendWho, SetFriendNotes, SetFriendNotesByIndex, SetSelectedFriend, SetSelectedIgnore, SetWhoToUi, ShowFriends, SortWho
+  C_FunctionContainers  (1)
+      CreateCallback
+  C_GamePad  (25)
+      AddSDLMapping, ApplyConfigs, AxisIndexToConfigName, ButtonBindingToIndex, ButtonIndexToBinding, ButtonIndexToConfigName, ClearLedColor, DeleteConfig, GetActiveDeviceID, GetAllConfigIDs, GetAllDeviceIDs, GetAllowHoverEventsWithFreeLook, GetCombinedDeviceID, GetConfig, GetDeviceMappedState, GetDeviceRawState, GetLedColor, GetPowerLevel, IsEnabled, SetAllowHoverEventsWithFreeLook, SetConfig, SetLedColor, SetVibration, StickIndexToConfigName, StopVibration
+  C_GameRules  (29)
+      AccountHasSDEnabled, AutoConnectToGameModeRealm, DoesGameModeHavePromo, GetActiveGameMode, GetCurrentEventRealmQueues, GetCurrentGameModeDisplayInfo, GetCurrentGameModeRecordID, GetDisplayedGameModeRecordIDAtIndex, GetForeverExperiencePreset, GetGameModeDisplayInfoByRecordID, GetGameModeGlueScreenName, GetGameModePromoGlobalString, GetGameRuleAsFloat, GetGameRuleAsFrameStrata, GetNumDisplayedGameModes, IsCharacterlessLoginActive, IsClassAllowedForGameMode, IsGameModeEnabled, IsGameRuleActive, IsHardcoreActive, IsMultiActionBarVisibilityForced, IsPersonalResourceDisplayEnabled, IsPlunderstorm, IsSDHDToggleEnabled, IsSelfFoundAllowed, IsStandard, IsWoWHack, SetForeverExperiencePreset, SetSDHDToggleValue
+  C_GamepadTargeting  (4)
+      Disable, Enable, HasReticleHoverTarget, SetFilter
+  C_GamepadUI  (5)
+      GetFirstGamepadActionBarStorageSlotIndexForActiveStance, GetFirstGamepadActionStorageSlotIndex, GetFirstGamepadPetActionStorageSlotIndex, IsValidGamepadActionStorageSlotIndex, IsValidGamepadPossessBarStorageSlotIndex
+  C_Garrison  (227)
+      AddFollowerToMission, AllowMissionStartAboveSoftCap, AreMissionFollowerRequirementsMet, AssignFollowerToBuilding, CanGenerateRecruits, CanOpenMissionChest, CanSetRecruitmentPreference, CanSpellTargetFollowerIDWithAddAbility, CanUpgradeGarrison, CancelConstruction, CastItemSpellOnFollowerAbility, CastSpellOnFollower, CastSpellOnFollowerAbility, CastSpellOnMission, ClearCompleteTalent, CloseArchitect, CloseGarrisonTradeskillNPC, CloseMissionNPC, CloseRecruitmentNPC, CloseTalentNPC, CloseTradeskillCrafter, GenerateRecruits, GetAllBonusAbilityEffects, GetAllEncounterThreats, GetAutoCombatDamageClassValues, GetAutoMissionBoardState, GetAutoMissionEnvironmentEffect, GetAutoMissionTargetingInfo, GetAutoMissionTargetingInfoForSpell, GetAutoTroops, GetAvailableMissions, GetAvailableRecruits, GetBasicMissionInfo, GetBuffedFollowersForMission, GetBuildingInfo, GetBuildingLockInfo, GetBuildingSizes, GetBuildingSpecInfo, GetBuildingTimeRemaining, GetBuildingTooltip, GetBuildingUpgradeInfo, GetBuildings, GetBuildingsForPlot, GetBuildingsForSize, GetClassSpecCategoryInfo, GetCombatAllyMission, GetCombatLogSpellInfo, GetCompleteMissions, GetCompleteTalent, GetCurrencyTypes, GetCurrentCypherEquipmentLevel, GetCurrentGarrTalentTreeFriendshipFactionID, GetCurrentGarrTalentTreeID, GetCyphersToNextEquipmentLevel, GetFollowerAbilities, GetFollowerAbilityAtIndex, GetFollowerAbilityAtIndexByID, GetFollowerAbilityCounterMechanicInfo, GetFollowerAbilityCountersForMechanicTypes, GetFollowerAbilityDescription, GetFollowerAbilityIcon, GetFollowerAbilityInfo, GetFollowerAbilityIsTrait, GetFollowerAbilityLink, GetFollowerAbilityName, GetFollowerActivationCost, GetFollowerAutoCombatSpells, GetFollowerAutoCombatStats, GetFollowerBiasForMission, GetFollowerClassSpec, GetFollowerClassSpecAtlas, GetFollowerClassSpecByID, GetFollowerClassSpecName, GetFollowerDisplayID, GetFollowerInfo, GetFollowerInfoForBuilding, GetFollowerIsTroop, GetFollowerItemLevelAverage, GetFollowerItems, GetFollowerLevel, GetFollowerLevelXP, GetFollowerLink, GetFollowerLinkByID, GetFollowerMissionCompleteInfo, GetFollowerMissionTimeLeft, GetFollowerMissionTimeLeftSeconds, GetFollowerModelItems, GetFollowerName, GetFollowerNameByID, GetFollowerPortraitIconID, GetFollowerPortraitIconIDByID, GetFollowerQuality, GetFollowerQualityTable, GetFollowerRecentlyGainedAbilityIDs, GetFollowerRecentlyGainedTraitIDs, GetFollowerShipments, GetFollowerSoftCap, GetFollowerSourceTextByID, GetFollowerSpecializationAtIndex, GetFollowerStatus, GetFollowerTraitAtIndex, GetFollowerTraitAtIndexByID, GetFollowerTypeByID, GetFollowerTypeByMissionID, GetFollowerUnderBiasReason, GetFollowerXP, GetFollowerXPTable, GetFollowerZoneSupportAbilities, GetFollowers, GetFollowersSpellsForMission, GetFollowersTraitsForMission, GetGarrisonInfo, GetGarrisonPlotsInstancesForMap, GetGarrisonTalentTreeCurrencyTypes, GetGarrisonTalentTreeType, GetGarrisonUpgradeCost, GetInProgressMissions, GetLandingPageGarrisonType, GetLandingPageItems, GetLandingPageShipmentCount, GetLandingPageShipmentInfo, GetLandingPageShipmentInfoByContainerID, GetLooseShipments, GetMaxCypherEquipmentLevel, GetMissionBonusAbilityEffects, GetMissionCompleteEncounters, GetMissionCost, GetMissionDeploymentInfo, GetMissionDisplayIDs, GetMissionEncounterIconInfo, GetMissionLink, GetMissionMaxFollowers, GetMissionName, GetMissionRewardInfo, GetMissionSuccessChance, GetMissionTexture, GetMissionTimes, GetMissionUncounteredMechanics, GetNumActiveFollowers, GetNumFollowerActivationsRemaining, GetNumFollowerDailyActivations, GetNumFollowers, GetNumFollowersForMechanic, GetNumFollowersOnMission, GetNumPendingShipments, GetNumShipmentCurrencies, GetNumShipmentReagents, GetOwnedBuildingInfo, GetOwnedBuildingInfoAbbrev, GetPartyBuffs, GetPartyMentorLevels, GetPartyMissionInfo, GetPendingShipmentInfo, GetPlots, GetPlotsForBuilding, GetPossibleFollowersForBuilding, GetRecruitAbilities, GetRecruiterAbilityCategories, GetRecruiterAbilityList, GetRecruitmentPreferences, GetShipDeathAnimInfo, GetShipmentContainerInfo, GetShipmentItemInfo, GetShipmentReagentCurrencyInfo, GetShipmentReagentInfo, GetShipmentReagentItemLink, GetSpecChangeCost, GetTabForPlot, GetTalentInfo, GetTalentPointsSpentInTalentTree, GetTalentTreeIDsByClassID, GetTalentTreeInfo, GetTalentTreeResetInfo, GetTalentTreeTalentPointResearchInfo, GetTalentUnlockWorldQuest, HasAdventures, HasGarrison, HasShipyard, IsAboveFollowerSoftCap, IsAtGarrisonMissionNPC, IsEnvironmentCountered, IsFollowerCollected, IsFollowerOnCompletedMission, IsInvasionAvailable, IsLandingPageMinimapButtonVisible, IsMechanicFullyCountered, IsOnGarrisonMap, IsOnShipmentQuestForNPC, IsOnShipyardMap, IsPlayerInGarrison, IsTalentConditionMet, IsUsingPartyGarrison, IsVisitGarrisonAvailable, MarkMissionComplete, MissionBonusRoll, PlaceBuilding, RecruitFollower, RegenerateCombatLog, RemoveFollower, RemoveFollowerFromBuilding, RemoveFollowerFromMission, RenameFollower, RequestClassSpecCategoryInfo, RequestGarrisonUpgradeable, RequestLandingPageShipmentInfo, RequestShipmentCreation, RequestShipmentInfo, ResearchTalent, RushHealAllFollowers, RushHealFollower, SearchForFollower, SetAutoCombatSpellFastForward, SetBuildingActive, SetBuildingSpecialization, SetFollowerFavorite, SetFollowerInactive, SetRecruitmentPreferences, SetUsingPartyGarrison, ShouldShowMapTab, ShowFollowerNameInErrorMessage, StartMission, SwapBuildings, TargetSpellHasFollowerItemLevelUpgrade, TargetSpellHasFollowerReroll, TargetSpellHasFollowerTemporaryAbility, UpgradeBuilding, UpgradeGarrison
+  C_GenericWidgetDisplay  (2)
+      Acknowledge, Close
+  C_Glue  (2)
+      IsFirstLoadThisSession, IsOnGlueScreen
+  C_GossipInfo  (20)
+      CloseGossip, ForceGossip, GetActiveQuests, GetAvailableQuests, GetCompletedOptionDescriptionString, GetCustomGossipDescriptionString, GetFriendshipReputation, GetFriendshipReputationRanks, GetNumActiveQuests, GetNumAvailableQuests, GetOptionUIWidgetSetsAndTypesByOptionID, GetOptions, GetPoiForUiMapID, GetPoiInfo, GetText, RefreshOptions, SelectActiveQuest, SelectAvailableQuest, SelectOption, SelectOptionByIndex
+  C_GuildBank  (1)
+      IsGuildBankEnabled
+  C_GuildInfo  (39)
+      AreGuildEventsEnabled, CanEditOfficerNote, CanSpeakInGuildChat, CanViewOfficerNote, Demote, Disband, GetGuildNewsInfo, GetGuildRankOrder, GetGuildTabardInfo, GetInfoText, GetMOTD, GetPreferredPlaySettings, GetPreferredPlaySettingsFeatures, GuildControlGetRankFlags, GuildRoster, Invite, IsDiscordStreamSeparate, IsEncounterGuildNewsEnabled, IsGuildOfficer, IsGuildRankAssignmentAllowed, IsGuildReputationEnabled, Leave, MemberExistsByName, Promote, QueryGuildMemberRecipes, QueryGuildMembersForRecipe, RemoveFromGuild, RequestGuildRename, RequestGuildRenameRefund, RequestPreferredPlaySettings, RequestRenameNameCheck, RequestRenameStatus, SetGuildRankOrder, SetInfoText, SetLeader, SetMOTD, SetNote, SetPreferredPlaySettings, Uninvite
+  C_Heirloom  (24)
+      CanHeirloomUpgradeFromPending, CreateHeirloom, GetClassAndSpecFilters, GetCollectedHeirloomFilter, GetHeirloomInfo, GetHeirloomItemIDFromDisplayedIndex, GetHeirloomItemIDs, GetHeirloomLink, GetHeirloomMaxUpgradeLevel, GetHeirloomSourceFilter, GetNumDisplayedHeirlooms, GetNumHeirlooms, GetNumKnownHeirlooms, GetUncollectedHeirloomFilter, IsItemHeirloom, IsPendingHeirloomUpgrade, PlayerHasHeirloom, SetClassAndSpecFilters, SetCollectedHeirloomFilter, SetHeirloomSourceFilter, SetSearch, SetUncollectedHeirloomFilter, ShouldShowHeirloomHelp, UpgradeHeirloom
+  C_HeirloomInfo  (8)
+      AreAllCollectionFiltersChecked, AreAllSourceFiltersChecked, HeirloomsAvailable, IsHeirloomSourceValid, IsUsingDefaultFilters, SetAllCollectionFilters, SetAllSourceFilters, SetDefaultFilters
+  C_HouseEditor  (10)
+      ActivateHouseEditorMode, EnterHouseEditor, GetActiveHouseEditorMode, GetHouseEditorAvailability, GetHouseEditorModeAvailability, GetHouseEditorPlayerType, IsHouseEditorActive, IsHouseEditorModeActive, IsHouseEditorStatusAvailable, LeaveHouseEditor
+  C_HouseExterior  (23)
+      CancelActiveExteriorEditing, GetCoreFixtureOptionsInfo, GetCurrentHouseExteriorSize, GetCurrentHouseExteriorType, GetFixtureDebugInfoForGUID, GetHouseExteriorSizeOptions, GetHouseExteriorTypeOptions, GetHoveredFixtureDebugInfo, GetSelectedFixtureDebugInfo, GetSelectedFixturePointInfo, HasHoveredFixture, HasSelectedFixturePoint, IsAnyDecorAttachedToCoreFixture, IsAnyDecorAttachedToDoor, IsAnyDecorAttachedToHouseExterior, IsAnyDecorAttachedToSelectedFixturePoint, IsExteriorDecorHidden, RemoveFixtureFromSelectedPoint, SelectCoreFixtureOption, SelectFixtureOption, SetExteriorDecorHidden, SetHouseExteriorSize, SetHouseExteriorType
+  C_Housing  (63)
+      AcceptNeighborhoodOwnership, CanEditCharter, CanTakeReportScreenshot, CreateGuildNeighborhood, CreateNeighborhoodCharter, DeclineNeighborhoodOwnership, DoesFactionMatchNeighborhood, EditNeighborhoodCharter, GetCurrentHouseInfo, GetCurrentHouseLevelFavor, GetCurrentHouseRefundAmount, GetCurrentNeighborhoodGUID, GetHouseLevelFavorForLevel, GetHouseLevelRewardsForLevel, GetHousingAccessFlags, GetMaxHouseLevel, GetNeighborhoodTextureSuffix, GetOthersOwnedHouses, GetPlayerOwnedHouses, GetTrackedHouseGuid, GetUIMapIDForNeighborhood, GetVisitCooldownInfo, HasHousingExpansionAccess, HouseFinderDeclineNeighborhoodInvitation, HouseFinderIgnoreNeighborhood, HouseFinderRequestNeighborhoods, HouseFinderRequestReservationAndPort, IsHousingMarketCartFullRemoveEnabled, IsHousingMarketEnabled, IsHousingMarketShopEnabled, IsHousingServiceEnabled, IsInsideHouse, IsInsideHouseOrPlot, IsInsideOwnHouse, IsInsideOwnedHouse, IsInsideOwnedHouseOrPlot, IsInsideOwnedPlot, IsInsidePlot, IsOnNeighborhoodMap, LeaveHouse, OnCharterConfirmationAccepted, OnCharterConfirmationClosed, OnCreateCharterNeighborhoodClosed, OnCreateGuildNeighborhoodClosed, OnHouseFinderClickPlot, OnRequestSignatureClicked, OnSignCharterClicked, RelinquishHouse, RequestCurrentHouseInfo, RequestHouseFinderNeighborhoodData, RequestPlayerCharacterList, ResetHouse, ReturnAfterVisitingHouse, SaveHouseSettings, SearchBNetFriendNeighborhoods, SearchBNetFriendNeighborhoodsByID, SetTrackedHouseGuid, StartTutorial, TeleportHome, TryRenameNeighborhood, ValidateCreateGuildNeighborhoodSize, ValidateNeighborhoodName, VisitHouse
+  C_HousingBasicMode  (22)
+      CancelActiveEditing, CommitDecorMovement, CommitHouseExteriorPosition, FinishPlacingNewDecor, GetHoveredDecorInfo, GetSelectedDecorInfo, IsDecorSelected, IsFreePlaceEnabled, IsGridSnapEnabled, IsGridVisible, IsHouseExteriorHovered, IsHouseExteriorSelected, IsHoveringDecor, IsPlacingNewDecor, RemoveSelectedDecor, RotateDecor, RotateHouseExterior, SetFreePlaceEnabled, SetGridSnapEnabled, SetGridVisible, StartPlacingNewDecor, StartPlacingPreviewDecor
+  C_HousingBlueprint  (19)
+      CanExportRoom, CanExportTypeFromCurrentLocation, CanImportTypeFromCurrentLocation, DeleteBlueprint, ExportBlueprint, ExportRoomBlueprint, GetBlueprintHyperlink, GetBlueprintTypeForCode, GetExportAvailability, GetFeatureAvailability, GetImportAvailability, ImportBlueprint, IsShareCodeValid, RenameBlueprint, RequestBlueprintCollection, RequestBlueprintContents, RequestBlueprintContentsForContext, StartImportRoomBlueprint, UpdateBlueprintStringFromInput
+  C_HousingCatalog  (37)
+      CanDestroyEntry, CreateCatalogSearcher, DeletePreviewCartDecor, DestroyEntry, GetAllFilterTagGroups, GetAllVariantInfosForEntry, GetBundleInfo, GetCartSizeLimit, GetCatalogCategoryAndSubcategoryNames, GetCatalogCategoryInfo, GetCatalogEntryDebugInfoForID, GetCatalogEntryInfo, GetCatalogEntryInfoByItem, GetCatalogEntryInfoByRecordID, GetCatalogEntryRefundTimeStampByRecordID, GetCatalogEntryVariantInfo, GetCatalogSubcategoryInfo, GetDecorMaxOwnedCount, GetDecorTotalOwnedCount, GetDestroyableInstanceCount, GetFeaturedBundles, GetFeaturedDecor, GetFeaturedSmallProducts, GetMarketInfoForDecor, HasFeaturedEntries, HousingMarketActionAddToCart, HousingMarketActionClearCart, HousingMarketActionRemoveFromCart, HousingMarketActionViewBundle, HousingMarketActionViewInStore, IsPreviewCartItemShown, PromotePreviewDecor, RequestHousingMarketInfoRefresh, RequestHousingMarketRefundInfo, SearchCatalogCategories, SearchCatalogSubcategories, SetPreviewCartItemShown
+  C_HousingCleanupMode  (3)
+      GetHoveredDecorInfo, IsHoveringDecor, RemoveSelectedDecor
+  C_HousingCustomizeMode  (32)
+      ApplyDyeToSelectedDecor, ApplyPetToSelectedDecor, ApplyThemeToRoom, ApplyThemeToSelectedRoomComponent, ApplyWallpaperToAllWalls, ApplyWallpaperToSelectedRoomComponent, CancelActiveEditing, ClearDyesForSelectedDecor, ClearTargetRoomComponent, CommitDyesForSelectedDecor, GetHoveredDecorInfo, GetHoveredRoomComponentInfo, GetNumDyesToRemoveOnSelectedDecor, GetNumDyesToSpendOnSelectedDecor, GetPreviewDyesOnSelectedDecor, GetRecentlyUsedDyes, GetRecentlyUsedThemeSets, GetRecentlyUsedWallpapers, GetSelectedDecorInfo, GetSelectedDecorPetInfo, GetSelectedRoomComponentInfo, GetThemeSetInfo, GetWallpapersForRoomComponentType, IsDecorSelected, IsHouseExteriorDoorHovered, IsHoveringDecor, IsHoveringRoomComponent, IsRoomComponentSelected, RoomComponentSupportsVariant, RoomConnectionSupportsDoorType, SetRoomComponentCeilingType, SetRoomComponentDoorType
+  C_HousingDecor  (38)
+      AnyDecorPlacedInRoom, CancelActiveEditing, CommitDecorMovement, EnterPreviewState, ExitPreviewState, GetAllMaxPlacementBudgets, GetAllPlacedDecor, GetAllSpentPlacementBudgets, GetDecorAssignedPetName, GetDecorCanAttachPet, GetDecorDebugInfoForGUID, GetDecorHyperlink, GetDecorIcon, GetDecorInstanceInfoForGUID, GetDecorName, GetHoveredDecorDebugInfo, GetHoveredDecorInfo, GetMaxPetPlacementBudget, GetMaxPlacementBudget, GetNumDecorPlaced, GetNumPreviewDecor, GetSelectedDecorDebugInfo, GetSelectedDecorInfo, GetSpentPetPlacementBudget, GetSpentPlacementBudget, HasMaxPlacementBudget, IsDecorSelected, IsGridVisible, IsHouseExteriorDoorHovered, IsHouseExteriorHovered, IsHoveringDecor, IsModeDisabledForPreviewState, IsPreviewState, RemovePlacedDecorEntry, RemoveSelectedDecor, SetGridVisible, SetPlacedDecorEntryHovered, SetPlacedDecorEntrySelected
+  C_HousingExpertMode  (18)
+      CancelActiveEditing, CommitDecorMovement, CommitHouseExteriorPosition, GetHoveredDecorInfo, GetPrecisionSubmode, GetPrecisionSubmodeRestriction, GetSelectedDecorInfo, IsDecorSelected, IsGridVisible, IsHouseExteriorHovered, IsHouseExteriorSelected, IsHoveringDecor, RemoveSelectedDecor, ResetPrecisionChanges, SelectNextRotationAxis, SetGridVisible, SetPrecisionIncrementingActive, SetPrecisionSubmode
+  C_HousingInspectMode  (5)
+      EnterInspectMode, ExitInspectMode, GetHoveredDecorGUID, IsHoveringDecor, IsInInspectMode
+  C_HousingLayout  (42)
+      AnyRoomsOnFloor, CanSetViewedFloor, CancelActiveLayoutEditing, ConfirmStairChoice, DeselectFloorplan, DeselectRoomOrDoor, GetBaseRoomFloor, GetHighestOccupiedFloorIndex, GetLowestOccupiedFloorIndex, GetNumActiveRooms, GetNumFloors, GetRoomPlacementBudget, GetRoomPlayerIsIn, GetSelectedBlueprintFloorplan, GetSelectedDoor, GetSelectedFloorplan, GetSelectedRoom, GetSelectedStairwellRoomCount, GetSpentPlacementBudget, GetViewedFloor, HasAnySelections, HasRoomPlacementBudget, HasSelectedBlueprintFloorplan, HasSelectedDoor, HasSelectedFloorplan, HasSelectedRoom, HasStairs, HasValidConnection, IsBaseRoom, IsDraggingRoom, MoveDraggedRoom, MoveLayoutCamera, RemoveRoom, RoomHasStairs, RotateFocusedRoom, RotateRoom, SelectFloorplan, SetViewedFloor, StartDrag, StopDrag, StopDraggingRoom, ZoomLayoutCamera
+  C_HousingNeighborhood  (30)
+      CanReturnAfterVisitingHouse, CancelInviteToNeighborhood, DemoteToResident, GetCornerstoneHouseInfo, GetCornerstoneNeighborhoodInfo, GetCornerstonePurchaseMode, GetCurrentNeighborhoodTextureSuffix, GetDiscountedMovePrice, GetMoveCooldownTime, GetNeighborhoodMapData, GetNeighborhoodName, GetNeighborhoodPlotName, GetPreviousHouseIdentifier, HasPermissionToPurchase, InvitePlayerToNeighborhood, IsNeighborhoodManager, IsNeighborhoodOwner, IsPlayerInOtherPlayersPlot, IsPlotAvailableForPurchase, IsPlotOwnedByPlayer, OnBulletinBoardClosed, OnCornerstoneClosed, PromoteToManager, RequestNeighborhoodInfo, RequestNeighborhoodRoster, RequestPendingNeighborhoodInvites, TransferNeighborhoodOwnership, TryEvictPlayer, TryMoveHouse, TryPurchasePlot
+  C_ImmersiveInteraction  (1)
+      HasImmersiveInteraction
+  C_IncomingSummon  (2)
+      HasIncomingSummon, IncomingSummonStatus
+  C_InputInterfaceStyle  (1)
+      GetCurrentStyle
+  C_InstanceEncounter  (4)
+      IsEncounterInProgress, IsEncounterLimitingResurrections, IsEncounterSuppressingRelease, ShouldShowTimelineForEncounter
+  C_InstanceLeaver  (1)
+      IsPlayerLeaver
+  C_InterfaceFileManifest  (1)
+      GetInterfaceArtFiles
+  C_Intl  (27)
+      CompareStrings, CreateLocaleContext, FindBreaks, FindStringMatches, FoldCase, FormatCurrency, FormatDate, FormatDateTime, FormatNumber, FormatTime, GetCharacterProperties, GetCurrencyFractionDigits, GetCurrencyName, GetCurrentLocale, GetDisplayName, GetSortKey, IsNormalized, Length, Normalize, ParseCurrency, ParseNumber, SelectPlural, ToLower, ToTitle, ToUpper, TransformLocale, Transliterate
+  C_InvasionInfo  (4)
+      AreInvasionsAvailable, GetInvasionForUiMapID, GetInvasionInfo, GetInvasionTimeLeft
+  C_IslandsQueue  (6)
+      CloseIslandsQueueScreen, GetIslandDifficultyInfo, GetIslandsMaxGroupSize, GetIslandsWeeklyQuestID, QueueForIsland, RequestPreloadRewardData
+  C_Item  (121)
+      ActionBindsItem, BindEnchant, CanBeRefunded, CanItemTransmogAppearance, CanScrapItem, CanViewItemPowers, ConfirmBindOnUse, ConfirmDeleteItem, ConfirmNoRefundOnUse, ConfirmOnUse, DeleteItem, DoesItemContainSpec, DoesItemExist, DoesItemExistByID, DoesItemMatchBonusTreeReplacement, DoesItemMatchSpellItemCondition, DoesItemMatchTargetEnchantingSpell, DoesItemMatchTrackJump, DropItemOnUnit, EndBoundTradeable, EndRefund, EquipItemByName, GetAppliedItemTransmogInfo, GetBaseItemTransmogInfo, GetCurrentItemLevel, GetCurrentItemTransmogInfo, GetDelvePreviewItemLink, GetDelvePreviewItemQuality, GetDetailedItemLevelInfo, GetFirstTriggeredSpellForItem, GetItemChildInfo, GetItemClassInfo, GetItemConversionOutputIcon, GetItemCooldown, GetItemCount, GetItemCreationContext, GetItemFamily, GetItemGUID, GetItemGem, GetItemGemID, GetItemID, GetItemIDByGUID, GetItemIDForItemInfo, GetItemIcon, GetItemIconByID, GetItemInfo, GetItemInfoInstant, GetItemInventorySlotInfo, GetItemInventorySlotKey, GetItemInventoryType, GetItemInventoryTypeByID, GetItemLearnTransmogSet, GetItemLink, GetItemLinkByGUID, GetItemLocation, GetItemMaxStackSize, GetItemMaxStackSizeByID, GetItemName, GetItemNameByID, GetItemNumAddedSockets, GetItemNumSockets, GetItemQuality, GetItemQualityByID, GetItemQualityColor, GetItemSetInfo, GetItemSpecInfo, GetItemSpell, GetItemStatDelta, GetItemStats, GetItemSubClassInfo, GetItemUniqueness, GetItemUniquenessByID, GetItemUpgradeInfo, GetLimitedCurrencyItemInfo, GetSetBonusesForSpecializationByItemID, GetStackCount, GetWeaponEnchantInfo, IsAnimaItemByID, IsArtifactPowerItem, IsBound, IsBoundToAccountUntilEquip, IsConsumableItem, IsCorruptedItem, IsCosmeticItem, IsCurioItem, IsCurrentItem, IsDecorItem, IsDressableItemByID, IsEquippableItem, IsEquippedItem, IsEquippedItemType, IsHarmfulItem, IsHelpfulItem, IsItemBindToAccount, IsItemBindToAccountUntilEquip, IsItemConduit, IsItemConvertibleAndValidForPlayer, IsItemCorrupted, IsItemCorruptionRelated, IsItemCorruptionResistant, IsItemDataCached, IsItemDataCachedByID, IsItemGUIDInInventory, IsItemInRange, IsItemKeystoneByID, IsItemSpecificToPlayerClass, IsLocked, IsRelicItem, IsUsableItem, ItemHasRange, LockItem, LockItemByGUID, PickupItem, ReplaceEnchant, ReplaceTradeEnchant, ReplaceTradeskillEnchant, RequestLoadItemData, RequestLoadItemDataByID, UnlockItem, UnlockItemByGUID, UseItemByName
+  C_ItemInteraction  (10)
+      ClearPendingItem, CloseUI, GetChargeInfo, GetItemConversionCurrencyCost, GetItemInteractionInfo, GetItemInteractionSpellId, InitializeFrame, PerformItemInteraction, Reset, SetPendingItem
+  C_ItemSocketInfo  (16)
+      AcceptSockets, ClickSocketButton, CloseSocketInfo, CompleteSocketing, GetCurrUIType, GetExistingSocketInfo, GetExistingSocketLink, GetNewSocketInfo, GetNewSocketLink, GetNumSockets, GetSocketItemBoundTradeable, GetSocketItemInfo, GetSocketItemRefundable, GetSocketTypes, HasBoundGemProposed, IsArtifactRelicItem
+  C_ItemUpgrade  (16)
+      CanUpgradeItem, ClearItemUpgrade, CloseItemUpgrade, GetHighWatermarkForItem, GetHighWatermarkForSlot, GetHighWatermarkSlotForItem, GetItemHyperlink, GetItemUpgradeCurrentLevel, GetItemUpgradeEffect, GetItemUpgradeItemInfo, GetItemUpgradePvpItemLevelDeltaValues, GetNumItemUpgradeEffects, IsItemBound, SetItemUpgradeFromCursorItem, SetItemUpgradeFromLocation, UpgradeItem
+  C_KeyBindings  (11)
+      ActivateBindingContext, DeactivateBindingContext, GetBindingByKey, GetBindingContextForAction, GetBindingIndex, GetCustomBindingType, GetSearchTagsForAction, GetTurnStrafeStyle, IsBindingContextActive, SetTurnStrafeStyle, UpdateTurnStrafeBindingsForCharacter
+  C_LFGInfo  (23)
+      AreCrossFactionGroupQueuesAllowed, CanPlayerUseGroupFinder, CanPlayerUseLFD, CanPlayerUseLFR, CanPlayerUsePVP, CanPlayerUsePremadeGroup, CanPlayerUseScenarioFinder, ConfirmLfgExpandSearch, DoesActivePartyMeetPremadeLaunchCount, DoesCrossFactionQueueRequireFullPremade, GetActiveLFGDungeonName, GetAllEntriesForCategory, GetDungeonInfo, GetLFDLockStates, GetLevelUpInstances, GetRoleCheckDifficultyDetails, HideNameFromUI, IsGroupFinderEnabled, IsInLFGFollowerDungeon, IsInMatchmadeRaidWithoutRoleRequirements, IsLFDEnabled, IsLFGFollowerDungeon, IsLFREnabled
+  C_LFGList  (88)
+      AcceptInvite, ApplyToGroup, CanActiveEntryUseAutoAccept, CanCreateQuestGroup, CanCreateScenarioGroup, CancelApplication, ClearApplicationTextFields, ClearCreationTextFields, ClearSearchResults, ClearSearchTextFields, ConfirmCensoredActiveEntry, CopyActiveEntryInfoToCreationFields, CreateListing, CreateScenarioListing, DeclineApplicant, DeclineInvite, DoesCensoredTextMatch, DoesEntryTitleMatchPrebuiltTitle, GetActiveEntryInfo, GetActivityFullName, GetActivityGroupInfo, GetActivityIDForQuestID, GetActivityInfoExpensive, GetActivityInfoTable, GetAdvancedFilter, GetApplicantBestDungeonScore, GetApplicantDungeonScoreForListing, GetApplicantInfo, GetApplicantMemberInfo, GetApplicantMemberStats, GetApplicantPvpRatingInfoForListing, GetApplicants, GetApplicationInfo, GetApplications, GetAvailableActivities, GetAvailableActivityGroups, GetAvailableCategories, GetAvailableLanguageSearchFilter, GetAvailableRoles, GetDefaultLanguageSearchFilter, GetFilteredSearchResults, GetGroupLeaverCountsByRole, GetKeystoneForActivity, GetLanguageSearchFilter, GetLfgCategoryInfo, GetNumApplicants, GetNumApplications, GetNumInvitedApplicantMembers, GetNumPendingApplicantMembers, GetOwnedKeystoneActivityAndGroupAndLevel, GetPlaystyleString, GetPremadeGroupFinderStyle, GetRoleCheckInfo, GetSearchResultEncounterInfo, GetSearchResultFriends, GetSearchResultInfo, GetSearchResultLeaderInfo, GetSearchResultMemberCounts, GetSearchResultPlayerInfo, GetSearchResults, HasActiveEntryInfo, HasActivityList, HasSearchResultInfo, InviteApplicant, IsCensoredActiveEntryUnresolved, IsCurrentlyApplying, IsPlayerAuthenticatedForLFG, IsPlayerValidForEndgameFieldEdits, IsPremadeGroupFinderEnabled, ListingUsesEndgameEditRestrictions, RefreshApplicants, RemoveApplicant, RemoveListing, ReportGroupAsAdvertisement, RequestAvailableActivities, RevealCensoredActiveEntry, RevealCensoredSearchResult, SaveAdvancedFilter, SaveLanguageSearchFilter, Search, SetApplicantMemberRole, SetEntryTitle, SetSearchToActivity, SetSearchToQuestID, SetSearchToScenarioID, UpdateListing, ValidateRequiredDungeonScore, ValidateRequiredPvpRatingForActivity
+  C_LFGListRoles  (3)
+      GetRoles, GetSavedRoles, SetRoles
+  C_LegendaryCrafting  (20)
+      CloseRuneforgeInteraction, CraftRuneforgeLegendary, GetRuneforgeItemPreviewInfo, GetRuneforgeLegendaryComponentInfo, GetRuneforgeLegendaryCost, GetRuneforgeLegendaryCraftSpellID, GetRuneforgeLegendaryCurrencies, GetRuneforgeLegendaryUpgradeCost, GetRuneforgeModifierInfo, GetRuneforgeModifiers, GetRuneforgePowerInfo, GetRuneforgePowerSlots, GetRuneforgePowers, GetRuneforgePowersByClassSpecAndCovenant, IsRuneforgeLegendary, IsRuneforgeLegendaryMaxLevel, IsUpgradeItemValidForRuneforgeLegendary, IsValidRuneforgeBaseItem, MakeRuneforgeCraftDescription, UpgradeRuneforgeLegendary
+  C_LevelLink  (2)
+      IsActionLocked, IsSpellLocked
+  C_LevelSquish  (2)
+      ConvertFollowerLevel, ConvertPlayerLevel
+  C_LimitedInput  (1)
+      LimitedInputAllowed
+  C_LobbyMatchmakerInfo  (8)
+      AbandonQueue, EnterQueue, GetCurrQueuePlaylistEntry, GetCurrQueueState, GetQueueFromMainlineEnabled, GetQueueStartTime, IsInQueue, RespondToQueuePop
+  C_Log  (4)
+      LogErrorMessage, LogMessage, LogMessageWithPriority, LogWarningMessage
+  C_Loot  (2)
+      GetLootRollDuration, IsLegacyLootModeEnabled
+  C_LootFrame  (1)
+      TryAutoLoot
+  C_LootHistory  (5)
+      GetAllEncounterInfos, GetInfoForEncounter, GetLootHistoryTime, GetSortedDropsForEncounter, GetSortedInfoForDrop
+  C_LootJournal  (2)
+      GetItemSetItems, GetItemSets
+  C_LoreText  (1)
+      RequestLoreTextForCampaignID
+  C_LossOfControl  (5)
+      GetActiveLossOfControlData, GetActiveLossOfControlDataByUnit, GetActiveLossOfControlDataCount, GetActiveLossOfControlDataCountByUnit, GetActiveLossOfControlDuration
+  C_Macro  (3)
+      GetMacroName, GetSelectedMacroIcon, RunMacroText
+  C_Mail  (5)
+      CanCheckInbox, GetCraftingOrderMailInfo, HasInboxMoney, IsCommandPending, SetOpeningAll
+  C_MajorFactions  (14)
+      GetCurrentRenownLevel, GetMajorFactionData, GetMajorFactionIDs, GetMajorFactionProgressionInfo, GetMajorFactionRenownInfo, GetRenownLevels, GetRenownNPCFactionID, GetRenownRewardsForLevel, GetTotalReputationForRenownLevel, HasMaximumRenown, IsMajorFactionHiddenFromExpansionPage, IsWeeklyRenownCapped, ShouldDisplayMajorFactionAsJourney, ShouldUseJourneyRewardTrack
+  C_Map  (40)
+      CanSetUserWaypointOnMap, ClearUserWaypoint, CloseWorldMapInteraction, GetAreaInfo, GetBestMapForUnit, GetBountySetMaps, GetFallbackWorldMapID, GetMapArtBackgroundAtlas, GetMapArtHelpTextPosition, GetMapArtID, GetMapArtLayerTextures, GetMapArtLayers, GetMapArtZoneTextPosition, GetMapBannersForMap, GetMapChildrenInfo, GetMapDisplayInfo, GetMapGroupID, GetMapGroupMembersInfo, GetMapHighlightInfoAtPosition, GetMapHighlightPulseInfo, GetMapInfo, GetMapInfoAtPosition, GetMapLevels, GetMapLinksForMap, GetMapPosFromWorldPos, GetMapRectOnMap, GetMapWorldSize, GetPlayerMapPosition, GetUserWaypoint, GetUserWaypointFromHyperlink, GetUserWaypointHyperlink, GetUserWaypointPositionForMap, GetWorldPosFromMapPos, HasUserWaypoint, IsCityMap, IsMapValidForNavBarDropdown, MapHasArt, OpenWorldMap, RequestPreloadMap, SetUserWaypoint
+  C_MapExplorationInfo  (2)
+      GetExploredAreaIDsAtPosition, GetExploredMapTextures
+  C_MerchantFrame  (7)
+      GetBuybackItemID, GetItemInfo, GetMerchantCurrencies, GetNumJunkItems, IsMerchantItemRefundable, IsSellAllJunkEnabled, SellAllJunkItems
+  C_Minimap  (23)
+      CanTrackBattlePets, ClearAllTracking, ClearMinimapInsetInfo, GetDefaultTrackingValue, GetDrawGroundTextures, GetNumQuestPOIWorldEffects, GetNumTrackingTypes, GetPOITextureCoords, GetTrackingFilter, GetTrackingInfo, GetUiMapID, GetViewRadius, IsFilteredOut, IsInsideQuestBlob, IsRotateMinimapIgnored, IsTrackingAccountCompletedQuests, IsTrackingBattlePets, IsTrackingHiddenQuests, SetDrawGroundTextures, SetIgnoreRotateMinimap, SetMinimapInsetInfo, SetTracking, ShouldUseHybridMinimap
+  C_ModelInfo  (8)
+      AddActiveModelScene, AddActiveModelSceneActor, ClearActiveModelScene, ClearActiveModelSceneActor, GetModelSceneActorDisplayInfoByID, GetModelSceneActorInfoByID, GetModelSceneCameraInfoByID, GetModelSceneInfoByID
+  C_ModifiedInstance  (1)
+      GetModifiedInstanceInfoFromMapID
+  C_MountJournal  (50)
+      ApplyMountEquipment, AreMountEquipmentEffectsSuppressed, ClearFanfare, ClearRecentFanfares, Dismiss, GetAllCreatureDisplayIDsForMountID, GetAppliedMountEquipmentID, GetCollectedDragonridingMounts, GetCollectedFilterSetting, GetDisplayedMountAllCreatureDisplayInfo, GetDisplayedMountID, GetDisplayedMountInfo, GetDisplayedMountInfoExtra, GetDynamicFlightModeSpellID, GetIsFavorite, GetMountAllCreatureDisplayInfoByID, GetMountEquipmentUnlockLevel, GetMountFromItem, GetMountFromSpell, GetMountIDs, GetMountInfoByID, GetMountInfoExtraByID, GetMountLink, GetMountUsabilityByID, GetNumDisplayedMounts, GetNumMounts, GetNumMountsNeedingFanfare, HasDisplayableMount, IsDragonridingUnlocked, IsItemMountEquipment, IsMountEquipmentApplied, IsSourceChecked, IsTypeChecked, IsUsingDefaultFilters, IsValidSourceFilter, IsValidTypeFilter, MountEquipmentAvailable, NeedsFanfare, Pickup, PickupDynamicFlightMode, SetAllSourceFilters, SetAllTypeFilters, SetCollectedFilterSetting, SetDefaultFilters, SetIsFavorite, SetSearch, SetSourceFilter, SetTypeFilter, SummonByID, SwapDynamicFlightMode
+  C_MythicPlus  (21)
+      GetCurrentAffixes, GetCurrentSeason, GetCurrentSeasonValues, GetCurrentUIDisplaySeason, GetEndOfRunGearSequenceLevel, GetLastWeeklyBestInformation, GetOwnedKeystoneChallengeMapID, GetOwnedKeystoneLevel, GetOwnedKeystoneMapID, GetRewardLevelForDifficultyLevel, GetRewardLevelFromKeystoneLevel, GetRunHistory, GetSeasonBestAffixScoreInfoForMap, GetSeasonBestForMap, GetSeasonBestMythicRatingFromThisExpansion, GetWeeklyBestForMap, GetWeeklyChestRewardLevel, IsMythicPlusActive, RequestCurrentAffixes, RequestMapInfo, RequestRewards
+  C_NamePlate  (4)
+      GetNamePlateForUnit, GetNamePlateSize, GetNamePlates, SetNamePlateSize
+  C_NamePlateManager  (4)
+      GetNamePlateHitTestInsets, IsNamePlateUnitBehindCamera, SetNamePlateHitTestInsets, SetNamePlateSimplified
+  C_NameUtil  (1)
+      ReplaceSurnameSeparatorWithLinkSeparator
+  C_Navigation  (7)
+      GetDistance, GetFrame, GetNearestPartyMemberToken, GetNextWaypointForMap, GetTargetState, HasValidScreenPosition, WasClampedToScreen
+  C_NeighborhoodInitiative  (20)
+      AddTrackedInitiativeTask, GetActiveNeighborhood, GetAvailableHouseXP, GetInitiativeActivityLogInfo, GetInitiativeTaskChatLink, GetInitiativeTaskInfo, GetInitiativeTaskRewardScaling, GetNeighborhoodInitiativeInfo, GetRequiredLevel, GetTrackedInitiativeTasks, IsInitiativeEnabled, IsPlayerInNeighborhoodGroup, IsViewingActiveNeighborhood, PlayerHasInitiativeAccess, PlayerMeetsRequiredLevel, RemoveTrackedInitiativeTask, RequestInitiativeActivityLog, RequestNeighborhoodInitiativeInfo, SetActiveNeighborhood, SetViewingNeighborhood
+  C_NewItems  (3)
+      ClearAll, IsNewItem, RemoveNewItem
+  C_PaperDollInfo  (21)
+      AmmoNeeded, CanAutoEquipCursorItem, CancelTemporaryEnchantment, CursorCanGoInSlot, GetArmorEffectiveness, GetArmorEffectivenessAgainstTarget, GetInspectAzeriteItemEmpoweredChoices, GetInspectGuildInfo, GetInspectItemLevel, GetInspectRatedBGBlitzData, GetInspectRatedBGData, GetInspectRatedSoloShuffleData, GetInventorySlotInfo, GetInventorySlotInfoForInvSlot, GetMinItemLevel, GetStaggerPercentage, GetTemporaryEnchantmentInfo, IsInventorySlotEnabled, IsRangedSlotShown, OffhandHasShield, OffhandHasWeapon
+  C_PartyInfo  (55)
+      AllowedToDoPartyConversion, CanFormCrossFactionParties, CanInvite, CanStartInstanceAbandonVote, ChallengeModeRestrictionsActive, ConfirmConvertToRaid, ConfirmInviteTravelPass, ConfirmInviteUnit, ConfirmLeaveParty, ConfirmReadyCheck, ConfirmRequestInviteFromUnit, ConvertToParty, ConvertToRaid, DelveTeleportOut, DemoteAssistant, DoCountdown, DoReadyCheck, GetActiveCategories, GetAvailableLootMethods, GetInstanceAbandonShutdownTime, GetInstanceAbandonVoteCooldownTime, GetInstanceAbandonVoteRequirements, GetInstanceAbandonVoteResponse, GetInstanceAbandonVoteTime, GetInviteConfirmationInvalidQueues, GetInviteReferralInfo, GetLootMethod, GetLootMethodStyle, GetMinItemLevel, GetMinLevel, GetNumInstanceAbandonGroupVoteResponses, GetRestrictPings, InviteUnit, IsChallengeModeActive, IsChallengeModeKeystoneOwner, IsCrossFactionParty, IsDelveComplete, IsDelveInProgress, IsGUIDInGroup, IsLootMethodAvailable, IsPartyFull, IsPartyInJailersTower, IsPartyWalkIn, IsRaidListEnabled, IsRaidListSupported, LeaveParty, PromoteToAssistant, PromoteToLeader, RequestInviteFromUnit, SetEveryoneIsAssistant, SetInstanceAbandonVoteResponse, SetLootMethod, SetRestrictPings, StartInstanceAbandonVote, UninviteUnit
+  C_PartyPose  (4)
+      ExtraAction, GetPartyPoseInfoByID, GetPartyPoseInfoByMapID, HasExtraAction
+  C_PerksActivities  (10)
+      AddTrackedPerksActivity, ClearPerksActivitiesPendingCompletion, GetAllPerksActivityTags, GetPerksActivitiesInfo, GetPerksActivitiesPendingCompletion, GetPerksActivityChatLink, GetPerksActivityInfo, GetPerksUIThemePrefix, GetTrackedPerksActivities, RemoveTrackedPerksActivity
+  C_PerksProgram  (24)
+      ClearFrozenPerksVendorItem, CloseInteraction, GetAvailableCategoryIDs, GetAvailableVendorItemIDs, GetCategoryInfo, GetCurrencyAmount, GetDraggedPerksVendorItem, GetFrozenPerksVendorItemInfo, GetPendingChestRewards, GetPerksProgramItemDisplayInfo, GetTimeRemaining, GetVendorItemInfo, GetVendorItemInfoRefundTimeLeft, IsAttackAnimToggleEnabled, IsFrozenPerksVendorItem, IsMountSpecialAnimToggleEnabled, ItemSelectedTelemetry, PickupPerksVendorItem, RequestCartCheckout, RequestPendingChestRewards, RequestPurchase, RequestRefund, ResetHeldItemDragAndDrop, SetFrozenPerksVendorItem
+  C_PetBattles  (56)
+      AcceptPVPDuel, AcceptQueuedPVPMatch, CanAcceptQueuedPVPMatch, CanActivePetSwapOut, CanPetSwapIn, CancelPVPDuel, ChangePet, DeclineQueuedPVPMatch, ForfeitGame, GetAbilityEffectInfo, GetAbilityInfo, GetAbilityInfoByID, GetAbilityProcTurnIndex, GetAbilityState, GetAbilityStateModification, GetActivePet, GetAllEffectNames, GetAllStates, GetAttackModifier, GetAuraInfo, GetBattleState, GetBreedQuality, GetDisplayID, GetForfeitPenalty, GetHealth, GetIcon, GetLevel, GetMaxHealth, GetName, GetNumAuras, GetNumPets, GetPVPMatchmakingInfo, GetPetSpeciesID, GetPetType, GetPlayerTrapAbility, GetPower, GetSelectedAction, GetSpeed, GetStateValue, GetTurnTimeInfo, GetXP, IsInBattle, IsPlayerNPC, IsSkipAvailable, IsTrapAvailable, IsWaitingOnOpponent, IsWildBattle, SetPendingReportBattlePetTarget, SetPendingReportTargetFromUnit, ShouldShowPetSelect, SkipTurn, StartPVPDuel, StartPVPMatchmaking, StopPVPMatchmaking, UseAbility, UseTrap
+  C_PetInfo  (13)
+      CanPetEatItem, GetPetFoodTypes, GetPetHappiness, GetPetLoyalty, GetPetTalentTree, GetPetTamersForMap, GetPetTrainingPoints, GetPetUIModelSceneID, GetSpellForPetAction, IsPetActionPassive, PetAbandon, PetAssistMode, PetRename
+  C_PetJournal  (80)
+      CagePetByID, ClearFanfare, ClearHoveredBattlePet, ClearRecentFanfares, ClearSearchFilter, DismissSummonedPet, FindPetIDByName, GetBattlePetLink, GetDisplayIDByIndex, GetDisplayProbabilityByIndex, GetNonBattlePetLinkByIndex, GetNumCollectedInfo, GetNumDisplays, GetNumPetSources, GetNumPetTypes, GetNumPets, GetNumPetsInJournal, GetNumPetsNeedingFanfare, GetOwnedBattlePetString, GetOwnedPetIDs, GetPetAbilityInfo, GetPetAbilityList, GetPetAbilityListTable, GetPetCooldownByGUID, GetPetInfoByIndex, GetPetInfoByItemID, GetPetInfoByPetID, GetPetInfoBySpeciesID, GetPetInfoTableByPetID, GetPetInfoTableBySpeciesID, GetPetLoadOutInfo, GetPetModelSceneInfoBySpeciesID, GetPetSortParameter, GetPetStats, GetPetSummonInfo, GetPetTeamAverageLevel, GetSearchFilter, GetSummonBattlePetCooldown, GetSummonRandomFavoritePetGUID, GetSummonedPetGUID, HasFavoritePets, IsCurrentlySummoned, IsFilterChecked, IsFindBattleEnabled, IsJournalReadOnly, IsJournalUnlocked, IsPetSourceChecked, IsPetTypeChecked, IsUsingDefaultFilters, PetCanBeReleased, PetIsCapturable, PetIsFavorite, PetIsHurt, PetIsLockedForConvert, PetIsRevoked, PetIsSlotted, PetIsSummonable, PetIsTradable, PetIsUsable, PetNeedsFanfare, PetUsesRandomDisplay, PickupPet, PickupSummonRandomPet, ReleasePetByID, SetAbility, SetAllPetSourcesChecked, SetAllPetTypesChecked, SetCustomName, SetDefaultFilters, SetFavorite, SetFilterChecked, SetHoveredBattlePet, SetPetLoadOutInfo, SetPetSortParameter, SetPetSourceChecked, SetPetTypeFilter, SetSearchFilter, SpellTargetBattlePet, SummonPetByGUID, SummonRandomPet
+  C_PhotoSharing  (11)
+      BeginAuthorizationFlow, ClearAuthorization, CompleteAuthorizationFlow, GetCropRatio, GetPhotoSharingAuthURL, GetStatus, IsAuthorized, IsEnabled, SetScreenshotPreviewTexture, TakePhoto, UploadPhotoToService
+  C_Ping  (6)
+      GetCooldownInfo, GetDefaultPingOptions, GetTextureKitForType, IsPingSystemEnabled, SendMacroPing, TogglePingListener
+  C_PlayerChoice  (7)
+      GetCurrentPlayerChoiceInfo, GetNumRerolls, GetRemainingTime, IsWaitingForPlayerChoiceResponse, OnUIClosed, RequestRerollPlayerChoice, SendPlayerChoiceResponse
+  C_PlayerInfo  (40)
+      CanPlayerEnterChromieTime, CanPlayerUseAreaLoot, CanPlayerUseMountEquipment, CanUseItem, GUIDIsPlayer, GetAlternateFormInfo, GetClass, GetContentDifficultyCreatureForPlayer, GetContentDifficultyQuestForPlayer, GetDisplayID, GetGlidingInfo, GetInstancesUnlockedAtLevel, GetName, GetNativeDisplayID, GetPetStableCreatureDisplayInfoID, GetPlayerCharacterData, GetPlayerMythicPlusRatingSummary, GetRace, GetSex, HasAccountInventoryLock, HasVisibleInvSlot, IsAccountBankEnabled, IsCharacterBankEnabled, IsConnected, IsDisplayRaceNative, IsExpansionLandingPageUnlockedForPlayer, IsMirrorImage, IsPlayerEligibleForNPE, IsPlayerEligibleForNPEv2, IsPlayerInChromieTime, IsPlayerInRPE, IsPlayerInTimerunningHeroicWorldTier, IsPlayerNPERestricted, IsReturningCharacter, IsSelfFoundActive, IsTradingPostAvailable, IsTravelersLogAvailable, IsTutorialsTabAvailable, ShouldDisplaySurname, UnitIsSameServer
+  C_PlayerInteractionManager  (8)
+      ClearInteraction, ConfirmationInteraction, InteractUnit, IsInteractingWithNpcOfType, IsReplacingUnit, IsValidNPCInteraction, ReopenInteraction, ShardTransferConfirm
+  C_PlayerMentorship  (5)
+      GetMentorLevelRequirement, GetMentorRequirements, GetMentorshipStatus, IsActivePlayerConsideredNewcomer, IsMentorRestricted
+  C_ProfSpecs  (27)
+      CanRefundPath, CanUnlockTab, GetChildrenForPath, GetConfigIDForSkillLine, GetCurrencyInfoForSkillLine, GetDefaultSpecSkillLine, GetDescriptionForPath, GetDescriptionForPerk, GetEntryIDForPerk, GetNewSpecReminderProfName, GetPerksForPath, GetRootPathForTab, GetSourceTextForPath, GetSpecTabIDsForSkillLine, GetSpecTabInfo, GetSpendCurrencyForPath, GetSpendEntryForPath, GetStateForPath, GetStateForPerk, GetStateForTab, GetTabInfo, GetUnlockEntryForPath, GetUnlockRankForPerk, ShouldShowPointsReminder, ShouldShowPointsReminderForSkillLine, ShouldShowSpecTab, SkillLineHasSpecialization
+  C_PrototypeDialog  (2)
+      EnsureRemoved, SelectOption
+  C_PvP  (113)
+      ArePvpTalentsUnlocked, AreTrainingGroundsEnabled, CanDisplayDeaths, CanDisplayHonorableKills, CanPlayerUseRatedPVPUI, CanPlayerUseTrainingGroundsUI, CanSurrenderArena, CanToggleWarMode, CanToggleWarModeInArea, DoesMatchOutcomeAffectRating, GetActiveBrawlInfo, GetActiveMatchBracket, GetActiveMatchDuration, GetActiveMatchState, GetActiveMatchWinner, GetArenaCrowdControlDuration, GetArenaCrowdControlInfo, GetArenaRewards, GetArenaSkirmishRewards, GetAssignedSpecForBattlefieldQueue, GetAvailableBrawlInfo, GetBattlefieldFlagPosition, GetBattlefieldVehicleInfo, GetBattlefieldVehicles, GetBattlegroundInfo, GetBrawlRewards, GetBrawlSoloRBGMinItemLevel, GetCustomVictoryStatID, GetGlobalPvpScalingInfoForSpecID, GetHonorRewardInfo, GetLevelUpBattlegrounds, GetMatchPVPStatColumn, GetMatchPVPStatColumns, GetNextHonorLevelForReward, GetOutdoorPvPWaitTime, GetPVPActiveMatchPersonalRatedInfo, GetPVPActiveRatedMatchDeserterPenalty, GetPVPSeasonRewardAchievementID, GetPersonalRatedBGBlitzSpecStats, GetPersonalRatedSoloShuffleSpecStats, GetPostMatchCurrencyRewards, GetPostMatchItemRewards, GetPvpTalentsUnlockedLevel, GetPvpTierID, GetPvpTierInfo, GetRandomBGInfo, GetRandomBGRewards, GetRandomEpicBGInfo, GetRandomEpicBGRewards, GetRandomTrainingGroundArenaRewards, GetRandomTrainingGroundBGRewards, GetRatedBGRewards, GetRatedSoloRBGMinItemLevel, GetRatedSoloRBGRewards, GetRatedSoloShuffleMinItemLevel, GetRatedSoloShuffleRewards, GetRewardItemLevelsByTierEnum, GetScoreInfo, GetScoreInfoByPlayerGuid, GetSeasonBestInfo, GetSkirmishInfo, GetSpecialEventBrawlInfo, GetTeamInfo, GetTrainingGrounds, GetUIDisplaySeason, GetWarModeRewardBonus, GetWarModeRewardBonusDefault, GetWeeklyChestInfo, GetZonePVPInfo, HasArenaSkirmishWinToday, HasMatchStarted, HasRandomTrainingGroundArenaWinToday, HasRandomTrainingGroundBGWinToday, IsActiveBattlefield, IsActiveMatchRegistered, IsArena, IsBattleground, IsBattlegroundEnlistmentBonusActive, IsBrawlSoloRBG, IsBrawlSoloShuffle, IsInBrawl, IsInRatedMatchWithDeserterPenalty, IsMatchActive, IsMatchComplete, IsMatchConsideredArena, IsMatchFactional, IsPVPMap, IsRatedArena, IsRatedBattleground, IsRatedMap, IsRatedSoloRBG, IsRatedSoloShuffle, IsSoloRBG, IsSoloShuffle, IsSubZonePVPPOI, IsTrainingGroundsArena, IsTrainingGroundsBG, IsWarModeActive, IsWarModeDesired, IsWarModeFeatureEnabled, JoinBattlefield, JoinBrawl, JoinRandomTrainingGroundArena, JoinRandomTrainingGroundBG, JoinRatedBGBlitz, JoinTrainingGround, RequestCrowdControlSpell, SetPVP, SetWarModeDesired, StartSoloRBGWarGameByName, StartSpectatorSoloRBGWarGame, TogglePVP, ToggleWarMode
+  C_QuestHub  (2)
+      IsAreaPOICurrentlyRelatedToHub, IsQuestCurrentlyRelatedToHub
+  C_QuestInfoSystem  (9)
+      GetQuestClassification, GetQuestHasShortExpirationWarning, GetQuestLogRewardFavor, GetQuestRewardCurrencies, GetQuestRewardSpellInfo, GetQuestRewardSpells, GetQuestShouldToastCompletion, HasQuestRewardCurrencies, HasQuestRewardSpells
+  C_QuestItemUse  (1)
+      CanUseQuestItemOnObject
+  C_QuestLine  (7)
+      GetAvailableQuestLines, GetForceVisibleQuests, GetQuestLineInfo, GetQuestLineQuests, IsComplete, QuestLineIgnoresAccountCompletedFiltering, RequestQuestLinesForMap
+  C_QuestLog  (93)
+      AbandonQuest, AddQuestWatch, AddWorldQuestWatch, CanAbandonQuest, DoesQuestAwardReputationWithFaction, GetAbandonQuest, GetAbandonQuestItems, GetActivePreyQuest, GetActiveThreatMaps, GetAllCompletedQuestIDs, GetBountiesForMapID, GetBountySetInfoForMapID, GetDistanceSqToQuest, GetHeaderIndexForQuest, GetInfo, GetLogIndexForQuestID, GetMapForQuestPOIs, GetMaxNumQuests, GetMaxNumQuestsCanAccept, GetNextWaypoint, GetNextWaypointForMap, GetNextWaypointText, GetNumQuestLogEntries, GetNumQuestObjectives, GetNumQuestWatches, GetNumWorldQuestWatches, GetQuestAdditionalHighlights, GetQuestDetailsTheme, GetQuestDifficultyLevel, GetQuestIDForLogIndex, GetQuestIDForQuestWatchIndex, GetQuestIDForWorldQuestWatchIndex, GetQuestLogMajorFactionReputationRewards, GetQuestLogPortraitGiver, GetQuestObjectives, GetQuestRewardCurrencies, GetQuestRewardCurrencyInfo, GetQuestTagInfo, GetQuestTimers, GetQuestType, GetQuestWatchType, GetQuestsOnMap, GetRequiredMoney, GetSelectedQuest, GetSuggestedGroupSize, GetTimeAllowed, GetTitleForLogIndex, GetTitleForQuestID, GetTrivialRange, GetZoneStoryInfo, HasActiveThreats, IsAccountQuest, IsComplete, IsEliteQuest, IsFailed, IsImportantQuest, IsMetaQuest, IsOnMap, IsOnQuest, IsPushableQuest, IsQuestBounty, IsQuestCalling, IsQuestCriteriaForBounty, IsQuestDisabledForSession, IsQuestFlaggedCompleted, IsQuestFlaggedCompletedOnAccount, IsQuestFromContentPush, IsQuestInvasion, IsQuestReplayable, IsQuestReplayedRecently, IsQuestTask, IsQuestTrivial, IsRepeatableQuest, IsThreatQuest, IsUnitOnQuest, IsWorldQuest, QuestCanHaveWarModeBonus, QuestContainsFirstTimeRepBonusForPlayer, QuestHasQuestSessionBonus, QuestHasWarModeBonus, QuestIgnoresAccountCompletedFiltering, ReadyForTurnIn, RemoveQuestWatch, RemoveWorldQuestWatch, RequestLoadQuestByID, SetAbandonQuest, SetMapForQuestPOIs, SetSelectedQuest, ShouldDisplayTimeRemaining, ShouldShowQuestRewards, SortQuestWatches, UnitIsRelatedToActiveQuest, UpdateCampaignHeaders
+  C_QuestOffer  (4)
+      GetHideRequiredItems, GetQuestOfferMajorFactionReputationRewards, GetQuestRequiredCurrencyInfo, GetQuestRewardCurrencyInfo
+  C_QuestSession  (14)
+      CanStart, CanStop, Exists, GetAvailableSessionCommand, GetPendingCommand, GetProposedMaxLevelForSession, GetSessionBeginDetails, GetSuperTrackedQuest, HasJoined, HasPendingCommand, RequestSessionStart, RequestSessionStop, SendSessionBeginResponse, SetQuestIsSuperTracked
+  C_RaidLocks  (4)
+      GetRedirectedDifficultyID, IsEncounterComplete, IsRaidLockExtendFeatureEnabled, IsRaidLockExtendFeatureSupported
+  C_RecentAllies  (15)
+      CanSetRecentAllyNote, GetRecentAllies, GetRecentAllyByFullName, GetRecentAllyByGUID, IsInteractionCategoryFilterSupportedForCurrentGameType, IsRecentAllyByFullName, IsRecentAllyByGUID, IsRecentAllyDataReady, IsRecentAllyPinned, IsSystemEnabled, IsSystemSupported, SearchRecentAllies, SetRecentAllyNote, SetRecentAllyPinned, TryRequestRecentAlliesData
+  C_RecruitAFriend  (16)
+      CanSummonFriend, ClaimActivityReward, ClaimNextReward, GenerateRecruitmentLink, GetRAFInfo, GetRAFSystemInfo, GetRecruitActivityRequirementsText, GetRecruitInfo, GetSummonFriendCooldown, IsRecruitAFriendLinked, IsRecruitingEnabled, IsSystemEnabled, IsSystemSupported, RemoveRAFRecruit, RequestUpdatedRecruitmentInfo, SummonFriend
+  C_Reincarnation  (4)
+      GetReincarnatingCharacter, IsReincarnating, StartReincarnation, StopReincarnation
+  C_RemixArtifactUI  (8)
+      ClearRemixArtifactItem, GetAppearanceInfoByID, GetArtifactArtInfo, GetArtifactItemInfo, GetCurrArtifactItemID, GetCurrItemSpecIndex, GetCurrTraitTreeID, ItemInSlotIsRemixArtifact
+  C_ReportSystem  (12)
+      CanReportPlayer, CanReportPlayerForLanguage, GetMajorCategoriesForReportType, GetMajorCategoryString, GetMinorCategoriesForReportTypeAndMajorCategory, GetMinorCategoryString, ReportServerLag, ReportStuckInCombat, RequiresScreenshotForReportType, SendReport, SetScreenshotPreviewTexture, TakeReportScreenshot
+  C_Reputation  (27)
+      AreLegacyReputationsShown, CollapseAllFactionHeaders, CollapseFactionHeader, ExpandAllFactionHeaders, ExpandFactionHeader, GetFactionDataByID, GetFactionDataByIndex, GetFactionParagonInfo, GetGuildFactionData, GetGuildRepExpirationTime, GetNumFactions, GetReputationSortType, GetSelectedFaction, GetWatchedFactionData, IsAccountWideReputation, IsFactionActive, IsFactionParagon, IsFactionParagonForCurrentPlayer, IsMajorFaction, RequestFactionParagonPreloadRewardData, SetFactionActive, SetLegacyReputationsShown, SetReputationSortType, SetSelectedFaction, SetWatchedFactionByID, SetWatchedFactionByIndex, ToggleFactionAtWar
+  C_ResearchInfo  (1)
+      GetDigSitesForMap
+  C_RestrictedActions  (3)
+      CheckAllowProtectedFunctions, GetAddOnRestrictionState, IsAddOnRestrictionActive
+  C_Roleset  (3)
+      ApplyRolesetFilters, GetActiveAllowedRolesets, GetActiveBlockedRolesets
+  C_Scenario  (9)
+      GetBonusStepRewardQuestID, GetBonusSteps, GetInfo, GetProvingGroundsInfo, GetStepInfo, GetSupersededObjectives, IsInScenario, ShouldShowCriteria, TreatScenarioAsDungeon
+  C_ScenarioInfo  (10)
+      GetCriteriaInfo, GetCriteriaInfoByStep, GetDisplayInfo, GetJailersTowerTypeString, GetScenarioIconInfo, GetScenarioInfo, GetScenarioStepInfo, GetTieredEntranceActiveSpells, GetUnitCriteriaProgressValues, IsTieredEntranceScenario
+  C_ScrappingMachineUI  (11)
+      CloseScrappingMachine, DropPendingScrapItemFromCursor, GetCurrentPendingScrapItemLocationByIndex, GetScrapSpellID, GetScrappingMachineName, HasScrappableItems, RemoveAllScrapItems, RemoveCurrentScrappingItem, RemoveItemToScrap, ScrapItems, ValidateScrappingList
+  C_ScriptedAnimations  (1)
+      GetAllScriptedAnimationEffects
+  C_SeasonInfo  (3)
+      GetCurrentDisplaySeasonExpansion, GetCurrentDisplaySeasonID, GetTimeUntilCurrentPVPSeasonEnd
+  C_Secrets  (27)
+      CanCompareUnitTokens, GetPowerTypeSecrecy, GetSpellAuraSecrecy, GetSpellCastSecrecy, GetSpellCooldownSecrecy, HasSecretRestrictions, ShouldActionCooldownBeSecret, ShouldAurasBeSecret, ShouldCooldownsBeSecret, ShouldSpellAuraBeSecret, ShouldSpellBookItemCooldownBeSecret, ShouldSpellCooldownBeSecret, ShouldTotemSlotBeSecret, ShouldTotemSpellBeSecret, ShouldUnitAuraIndexBeSecret, ShouldUnitAuraInstanceBeSecret, ShouldUnitAuraSlotBeSecret, ShouldUnitComparisonBeSecret, ShouldUnitHealthMaxBeSecret, ShouldUnitIdentityBeSecret, ShouldUnitPowerBeSecret, ShouldUnitPowerMaxBeSecret, ShouldUnitSpellCastBeSecret, ShouldUnitSpellCastingBeSecret, ShouldUnitStatsBeSecret, ShouldUnitThreatStateBeSecret, ShouldUnitThreatValuesBeSecret
+  C_SettingsUtil  (2)
+      NotifySettingsLoaded, OpenSettingsPanel
+  C_SharedCharacterServices  (10)
+      GetLastSeenCharacterUpgradePopup, GetLastSeenExpansionTrialPopup, GetUpgradeDistributions, HasFreePromotionalUpgrade, HasSeenFreePromotionalUpgradePopup, IsPurchaseIDPendingUpgrade, QueryClassTrialBoostResult, SetCharacterUpgradePopupSeen, SetExpansionTrialPopupSeen, SetPromotionalPopupSeen
+  C_SkillInfo  (8)
+      AbandonSkill, CollapseSkillHeader, ExpandSkillHeader, GetNumSkillLines, GetSelectedSkill, GetSkillLineInfo, GetSkillLineInfoByID, SetSelectedSkill
+  C_SocialQueue  (10)
+      GetAllGroups, GetConfig, GetGroupForPlayer, GetGroupInfo, GetGroupMembers, GetGroupQueues, IsSystemEnabled, IsSystemSupported, RequestToJoin, SignalToastDisplayed
+  C_SocialRestrictions  (12)
+      AcknowledgeAgeVerificationRestriction, AcknowledgeRegionalChatDisabled, CanReceiveChat, CanSendChat, IsAgeVerificationRestricted, IsAgeVerificationRestrictedMinor, IsChatDisabled, IsFriendsDisabled, IsMuted, IsSilenced, IsSquelched, SetChatDisabled
+  C_SocialUI  (1)
+      IsSystemEnabled
+  C_Soulbinds  (39)
+      ActivateSoulbind, CanActivateSoulbind, CanModifySoulbind, CanResetConduitsInSoulbind, CanSwitchActiveSoulbindTreeBranch, CloseUI, CommitPendingConduitsInSoulbind, FindNodeIDActuallyInstalled, FindNodeIDAppearingInstalled, FindNodeIDPendingInstall, FindNodeIDPendingUninstall, GetActiveSoulbindID, GetConduitCollection, GetConduitCollectionCount, GetConduitCollectionData, GetConduitCollectionDataAtCursor, GetConduitCollectionDataByVirtualID, GetConduitDisplayed, GetConduitHyperlink, GetConduitIDPendingInstall, GetConduitQuality, GetConduitRank, GetConduitSpellID, GetInstalledConduitID, GetNode, GetSoulbindData, GetSpecsAssignedToSoulbind, GetTree, HasAnyInstalledConduitInSoulbind, HasAnyPendingConduits, HasPendingConduitsInSoulbind, IsConduitInstalled, IsConduitInstalledInSoulbind, IsItemConduitByItemInfo, IsNodePendingModify, IsUnselectedConduitPendingInSoulbind, ModifyNode, SelectNode, UnmodifyNode
+  C_Sound  (6)
+      GetSoundScaledVolume, IsPlaying, PlayItemSound, PlaySound, PlaySoundWithOptions, PlayVocalErrorSound
+  C_SpecializationInfo  (31)
+      CanPlayerUsePVPTalentUI, CanPlayerUseTalentSpecUI, CanPlayerUseTalentUI, GetActiveSpecGroup, GetAllClassIDs, GetAllSelectedPvpTalentIDs, GetClassIDFromSpecID, GetCombatConfigIDForSpecGroup, GetInspectSelectedPvpTalent, GetInspectSpecialization, GetNumSpecializationsForClassID, GetPvpTalentAlertStatus, GetPvpTalentInfo, GetPvpTalentSlotInfo, GetPvpTalentSlotUnlockLevel, GetPvpTalentUnlockLevel, GetSpecIDs, GetSpecialization, GetSpecializationInfo, GetSpecializationMasterySpells, GetSpellsDisplay, GetTalentInfo, HasPlayerEarnedATalentPoint, IsInitialized, IsPvpTalentLocked, IsSpecSelectionEnabled, MatchesCurrentSpecSet, SetActiveSpecGroup, SetPetSpecialization, SetPvpTalentLocked, SetSpecialization
+  C_SpectatingUI  (6)
+      GetSpectateTargetInfo, GetSpectatingPlayerSpellItemQuality, IsSpectating, LeaveSpectateMode, SpectateChange, StartSpectating
+  C_Spell  (73)
+      CancelAutoRepeatSpell, CancelItemTempEnchantment, CancelSpellByID, DoesSpellExist, EnableSpellRangeCheck, GetAuraStatChanges, GetBaseSpell, GetDeadlyDebuffInfo, GetItemCooldown, GetItemModifiedAppearancesApplied, GetLastCategoryCooldownSource, GetMawPowerBorderAtlasBySpellID, GetMawPowerLinkBySpellID, GetMawPowerRarityInfoBySpellID, GetOverrideSpell, GetSchoolString, GetSpellAutoCast, GetSpellCastCount, GetSpellChargeDuration, GetSpellCharges, GetSpellCooldown, GetSpellCooldownDuration, GetSpellDescription, GetSpellDescriptionForItemLocation, GetSpellDisplayCount, GetSpellIDForSpellIdentifier, GetSpellInfo, GetSpellLevelLearned, GetSpellLink, GetSpellLossOfControlCooldown, GetSpellLossOfControlCooldownDuration, GetSpellLossOfControlCooldownInfo, GetSpellMaxCumulativeAuraApplications, GetSpellName, GetSpellPowerCost, GetSpellQueueWindow, GetSpellSkillLineAbilityRank, GetSpellSubtext, GetSpellTexture, GetSpellTradeSkillLink, GetTargetSpellID, GetVisibilityInfo, IsActiveSpell, IsAutoAttackSpell, IsAutoRepeatSpell, IsClassTalentSpell, IsConsumableSpell, IsCurrentSpell, IsExternalDefensive, IsPressHoldReleaseSpell, IsPriorityAura, IsPvPTalentSpell, IsRangedAutoAttackSpell, IsSelfBuff, IsSpellCrowdControl, IsSpellDataCached, IsSpellDisabled, IsSpellHarmful, IsSpellHelpful, IsSpellImportant, IsSpellInRange, IsSpellPassive, IsSpellUsable, PickupSpell, PlaceTargetingSpellAtCursor, RequestLoadSpellData, SetSpellAutoCastEnabled, SpellHasRange, TargetSpellChecksItemCondition, TargetSpellIsEnchanting, TargetSpellJumpsUpgradeTrack, TargetSpellReplacesBonusTree, ToggleSpellAutoCast
+  C_SpellActivationOverlay  (1)
+      IsSpellOverlayed
+  C_SpellBook  (52)
+      AbortSpellIntro, CastSpellBookItem, ContainsAnyDisenchantSpell, FindBaseSpellByID, FindFlyoutSlotBySpellID, FindSpellBookSlotForSpell, FindSpellOverrideByID, GetClassSkillLineInfo, GetCurrentLevelSpells, GetNumSpellBookSkillLines, GetSkillLineIndexByID, GetSpellBookItemAutoCast, GetSpellBookItemCastCount, GetSpellBookItemChargeDuration, GetSpellBookItemCharges, GetSpellBookItemCooldown, GetSpellBookItemCooldownDuration, GetSpellBookItemDescription, GetSpellBookItemInfo, GetSpellBookItemLevelLearned, GetSpellBookItemLink, GetSpellBookItemLossOfControlCooldown, GetSpellBookItemLossOfControlCooldownDuration, GetSpellBookItemLossOfControlCooldownInfo, GetSpellBookItemName, GetSpellBookItemPowerCost, GetSpellBookItemSkillLineIndex, GetSpellBookItemTexture, GetSpellBookItemTradeSkillLink, GetSpellBookItemType, GetSpellBookSkillLineInfo, HasPetSpells, IsAutoAttackSpellBookItem, IsClassTalentSpellBookItem, IsPvPTalentSpellBookItem, IsRangedAutoAttackSpellBookItem, IsSpellBookItemHarmful, IsSpellBookItemHelpful, IsSpellBookItemInRange, IsSpellBookItemLooseFlyoutMember, IsSpellBookItemLowRank, IsSpellBookItemOffSpec, IsSpellBookItemPassive, IsSpellBookItemUsable, IsSpellInSpellBook, IsSpellKnown, IsSpellKnownOrInSpellBook, PickupSpellBookItem, SetBarSlotFromIntro, SetSpellBookItemAutoCastEnabled, SpellBookItemHasRange, ToggleSpellBookItemAutoCast
+  C_SpellDiminish  (4)
+      GetAllSpellDiminishCategories, GetSpellDiminishCategoryInfo, IsSystemSupported, ShouldTrackSpellDiminishCategory
+  C_SplashScreen  (5)
+      AcknowledgeSplash, CanViewSplashScreen, RequestLatestSplashScreen, SendSplashScreenActionLaunchedTelem, SendSplashScreenCloseTelem
+  C_StableInfo  (17)
+      BuyStableSlot, ClosePetStables, GetActivePetList, GetAvailablePetSpecInfos, GetNextStableSlotCost, GetNumActivePets, GetNumStablePets, GetNumStableSlots, GetStablePetFoodTypes, GetStablePetInfo, GetStabledPetList, IsAtStableMaster, IsBonusPetSlotAvailable, IsPetFavorite, PickupStablePet, SetPetFavorite, SetPetSlot
+  C_StorePublic  (3)
+      DoesGroupHavePurchaseableProducts, EventStoreUISetShown, IsEnabled
+  C_StringUtil  (15)
+      CreateAbbreviatedNumberFormatter, CreateNumericRuleFormatter, CreateSecondsFormatter, EscapeDecimalNonPrintables, EscapeLuaFormatString, EscapeLuaPatterns, EscapeQuotedCodes, FloorToNearestString, GetDefaultAbbreviationBreakpoints, RemoveContiguousSpaces, RoundToNearestString, StripHyperlinks, StripTextureMarkupForLooseFiles, TruncateWhenZero, WrapString
+  C_SummonInfo  (7)
+      CancelSummon, ConfirmSummon, GetSummonConfirmAreaName, GetSummonConfirmSummoner, GetSummonConfirmTimeLeft, GetSummonReason, IsSummonSkippingStartExperience
+  C_SuperTrack  (21)
+      ClearAllSuperTracked, ClearSuperTrackedContent, ClearSuperTrackedMapPin, GetHighestPrioritySuperTrackingType, GetNextWaypointForMap, GetSuperTrackedContent, GetSuperTrackedItemName, GetSuperTrackedMapPin, GetSuperTrackedQuestID, GetSuperTrackedVignette, IsSuperTrackingAnything, IsSuperTrackingContent, IsSuperTrackingCorpse, IsSuperTrackingMapPin, IsSuperTrackingQuest, IsSuperTrackingUserWaypoint, SetSuperTrackedContent, SetSuperTrackedMapPin, SetSuperTrackedQuestID, SetSuperTrackedUserWaypoint, SetSuperTrackedVignette
+  C_SwingTimer  (2)
+      EnableRangeCheck, IsTargetWithinSwingRange
+  C_System  (1)
+      GetFrameStack
+  C_SystemVisibilityManager  (1)
+      IsSystemVisible
+  C_TTSSettings  (19)
+      GetChannelEnabled, GetCharacterSettingsSaved, GetChatTypeEnabled, GetSetting, GetSpeechRate, GetSpeechVolume, GetVoiceOptionID, GetVoiceOptionName, MarkCharacterSettingsSaved, SetChannelEnabled, SetChannelKeyEnabled, SetChatTypeEnabled, SetDefaultSettings, SetSetting, SetSpeechRate, SetSpeechVolume, SetVoiceOption, SetVoiceOptionName, ShouldOverrideMessage
+  C_TalkingHead  (6)
+      GetConversationsDeferred, GetCurrentLineAnimationInfo, GetCurrentLineInfo, IgnoreCurrentTalkingHead, IsCurrentTalkingHeadIgnored, SetConversationsDeferred
+  C_TaskQuest  (12)
+      DoesMapShowTaskQuestObjectives, GetQuestInfoByQuestID, GetQuestLocation, GetQuestProgressBarInfo, GetQuestTimeLeftMinutes, GetQuestTimeLeftSeconds, GetQuestUIWidgetSetByType, GetQuestZoneID, GetQuestsOnMap, GetThreatQuests, IsActive, RequestPreloadRewardData
+  C_TaxiMap  (3)
+      GetAllTaxiNodes, GetTaxiNodesForMap, ShouldMapShowTaxiNodes
+  C_Texture  (11)
+      ClearTitleIconTexture, GetAtlasElementID, GetAtlasElements, GetAtlasExists, GetAtlasID, GetAtlasInfo, GetFilenameFromFileDataID, GetTitleIconTexture, IsTitleIconTextureReady, SetTitleIconTexture, SetURLTexture
+  C_Timer  (4)
+      After, NewTicker, NewTimedSignalMap, NewTimer
+  C_TimerunningUI  (1)
+      GetActiveTimerunningSeasonID
+  C_TooltipComparison  (3)
+      CompareItem, GetItemComparisonDelta, GetItemComparisonInfo
+  C_TooltipInfo  (82)
+      GetAchievementByID, GetAction, GetArtifactItem, GetArtifactPowerByID, GetAzeriteEssence, GetAzeriteEssenceSlot, GetAzeritePower, GetBackpackToken, GetBagItem, GetBagItemChild, GetBuybackItem, GetCompanionPet, GetConduit, GetCurrencyByID, GetCurrencyToken, GetEnhancedConduit, GetEquipmentSet, GetExistingSocketGem, GetGuildBankItem, GetHeirloomByItemID, GetHyperlink, GetInboxItem, GetInstanceLockEncountersComplete, GetInventoryItem, GetInventoryItemByID, GetItemByGUID, GetItemByID, GetItemByItemModifiedAppearanceID, GetItemInteractionItem, GetItemKey, GetLFGDungeonReward, GetLFGDungeonShortageReward, GetLootCurrency, GetLootItem, GetLootRollItem, GetMerchantCostItem, GetMerchantItem, GetMinimapMouseover, GetMountBySpellID, GetOutfit, GetOwnedItemByID, GetPetAction, GetPossession, GetPvpBrawl, GetPvpTalent, GetQuestCurrency, GetQuestItem, GetQuestLogCurrency, GetQuestLogItem, GetQuestLogSpecialItem, GetQuestPartyProgress, GetRecipeRankInfo, GetRecipeReagentItem, GetRecipeResultItem, GetRecipeResultItemForOrder, GetRuneforgeResultItem, GetSendMailItem, GetShapeshift, GetSlottedKeystone, GetSocketGem, GetSocketedItem, GetSocketedRelic, GetSpellBookItem, GetSpellByID, GetTalent, GetTotem, GetToyByItemID, GetTradePlayerItem, GetTradeTargetItem, GetTrainerService, GetTraitEntry, GetUnit, GetUnitAura, GetUnitAuraByAuraInstanceID, GetUnitBuff, GetUnitBuffByAuraInstanceID, GetUnitDebuff, GetUnitDebuffByAuraInstanceID, GetUpgradeItem, GetWeeklyReward, GetWorldCursor, GetWorldLootObject
+  C_ToyBox  (26)
+      ForceToyRefilter, GetCollectedShown, GetIsFavorite, GetNumFilteredToys, GetNumLearnedDisplayedToys, GetNumTotalDisplayedToys, GetNumToys, GetToyFromIndex, GetToyInfo, GetToyLink, GetUncollectedShown, GetUnusableShown, HasFavorites, IsExpansionTypeFilterChecked, IsSourceTypeFilterChecked, IsToyUsable, PickupToyBoxItem, SetAllExpansionTypeFilters, SetAllSourceTypeFilters, SetCollectedShown, SetExpansionTypeFilter, SetFilterString, SetIsFavorite, SetSourceTypeFilter, SetUncollectedShown, SetUnusableShown
+  C_ToyBoxInfo  (6)
+      ClearFanfare, HasAnyToy, IsToySourceValid, IsUsingDefaultFilters, NeedsFanfare, SetDefaultFilters
+  C_TradeInfo  (4)
+      AddTradeMoney, PickupTradeMoney, SetTradeMoney, ShouldShowTradeOfferWarning
+  C_TradeSkillUI  (146)
+      AnyRecipeCategoriesFiltered, AreAnyInventorySlotsFiltered, CanObliterateCursorItem, CanStoreEnchantInItem, CanTradeSkillListLink, CanTradeSkillShowCraftingUI, CancelProfessionRespec, CheckRespecNPC, ClearInventorySlotFilter, ClearPendingObliterateItem, ClearRecipeCategoryFilter, ClearRecipeSourceTypeFilter, CloseObliterumForge, CloseTradeSkill, ConfirmProfessionRespec, CraftEnchant, CraftRecipe, CraftSalvage, DoesRecraftingRecipeAcceptItem, DropPendingObliterateItemFromCursor, GetAllFilterableInventorySlots, GetAllFilterableInventorySlotsCount, GetAllProfessionTradeSkillLines, GetAllRecipeIDs, GetBaseProfessionInfo, GetCategories, GetCategoryInfo, GetChildProfessionInfo, GetChildProfessionInfos, GetConcentrationCurrencyID, GetCraftableCount, GetCraftingOperationInfo, GetCraftingOperationInfoForOrder, GetCraftingReagentBonusText, GetCraftingTargetItems, GetDependentReagents, GetEnchantItems, GetFactionSpecificOutputItem, GetFilterableInventorySlotName, GetFilterableInventorySlots, GetFilteredRecipeIDs, GetGatheringOperationInfo, GetHideUnownedFlags, GetItemCraftedQualityByItemInfo, GetItemCraftedQualityInfo, GetItemReagentQualityByItemInfo, GetItemReagentQualityInfo, GetItemSlotModifications, GetItemSlotModificationsForOrder, GetObliterateSpellID, GetOnlyShowFirstCraftRecipes, GetOnlyShowMakeableRecipes, GetOnlyShowSkillUpRecipes, GetOriginalCraftRecipeID, GetPendingObliterateItemID, GetPendingObliterateItemLink, GetProfessionByInventorySlot, GetProfessionChildSkillLineID, GetProfessionForCursorItem, GetProfessionInfoByRecipeID, GetProfessionInfoBySkillLineID, GetProfessionInventorySlots, GetProfessionNameForSkillLineAbility, GetProfessionSkillLineID, GetProfessionSlots, GetProfessionSpells, GetQualitiesForRecipe, GetReagentDifficultyText, GetReagentSlotStatus, GetRecipeCooldown, GetRecipeDescription, GetRecipeInfo, GetRecipeInfoForSkillLineAbility, GetRecipeItemLevelFilter, GetRecipeItemLink, GetRecipeItemNameFilter, GetRecipeItemQualityInfo, GetRecipeLink, GetRecipeOutputItemData, GetRecipeQualityItemIDs, GetRecipeQualityReagentLink, GetRecipeRequirements, GetRecipeSchematic, GetRecipeSourceText, GetRecipesTracked, GetRecraftItems, GetRecraftRemovalWarnings, GetRemainingRecasts, GetSalvagableItemIDs, GetShowLearned, GetShowUnlearned, GetSkillLineForGear, GetSourceTypeFilter, GetSubCategories, GetTradeSkillDisplayName, GetTradeSkillLineForRecipe, GetTradeSkillListLink, GetTradeSkillTexture, HasFavoriteOrderRecipes, IsAnyRecipeFromSource, IsDataSourceChanging, IsEnchantTargetValid, IsGuildTradeSkillsEnabled, IsInventorySlotFiltered, IsNPCCrafting, IsNearProfessionSpellFocus, IsOriginalCraftRecipeLearned, IsRecipeCategoryFiltered, IsRecipeFavorite, IsRecipeFirstCraft, IsRecipeInBaseSkillLine, IsRecipeInSkillLine, IsRecipeProfessionLearned, IsRecipeRepeating, IsRecipeSearchInProgress, IsRecipeSourceTypeFiltered, IsRecipeTracked, IsRecraftItemEquipped, IsRecraftReagentValid, IsRuneforging, IsTradeSkillGuild, IsTradeSkillGuildMember, IsTradeSkillLinked, IsTradeSkillReady, ObliterateItem, OpenRecipe, OpenTradeSkill, RecraftLimitCategoryValid, RecraftRecipe, RecraftRecipeForOrder, SetInventorySlotFilter, SetOnlyShowAvailableForOrders, SetOnlyShowFirstCraftRecipes, SetOnlyShowMakeableRecipes, SetOnlyShowSkillUpRecipes, SetProfessionChildSkillLineID, SetRecipeCategoryFilter, SetRecipeFavorite, SetRecipeItemLevelFilter, SetRecipeItemNameFilter, SetRecipeSourceTypeFilter, SetRecipeTracked, SetShowLearned, SetShowUnlearned, SetSourceTypeFilter, StopRecipeRepeat
+  C_Trainer  (3)
+      GetCategorizeTrainerUI, GetTrainerType, SetCategorizeTrainerUI
+  C_Traits  (53)
+      CanEditConfig, CanPurchaseRank, CanRefundRank, CascadeRepurchaseRanks, ClearCascadeRepurchaseHistory, CloseTraitSystemInteraction, CommitConfig, ConfigHasStagedChanges, GenerateImportString, GenerateInspectImportString, GetConditionInfo, GetConfigIDBySystemID, GetConfigIDByTreeID, GetConfigInfo, GetConfigVariationID, GetConfigsByType, GetDefinitionInfo, GetEntryInfo, GetGroupCurrencyInfo, GetGroupDisplayInfoByTreeID, GetIncreasedTraitData, GetLoadoutSerializationVersion, GetMaxAvailableTraitCurrency, GetNodeCost, GetNodeInfo, GetStagedChanges, GetStagedChangesCost, GetSubTreeInfo, GetSystemIDByTreeID, GetTraitCurrencyForAchievement, GetTraitCurrencyInfo, GetTraitDescription, GetTraitSystemFlags, GetTraitSystemWidgetSetID, GetTreeCurrencyInfo, GetTreeHash, GetTreeInfo, GetTreeNodes, HasValidInspectData, IsReadyForCommit, PurchaseAllRanks, PurchaseRank, RefundAllRanks, RefundRank, ResetTree, ResetTreeByCurrency, RollbackConfig, SetSelection, StageConfig, TalentTestUnlearnSpells, TryPurchaseAllRanks, TryPurchaseToNode, TryRefundToNode
+  C_Transmog  (7)
+      CanHaveSecondaryAppearanceForSlotID, ExtractTransmogIDList, GetAllSetAppearancesByID, GetItemIDForSource, GetSlotForInventoryType, GetSlotVisualInfo, IsAtTransmogNPC
+  C_TransmogCollection  (84)
+      AccountCanCollectSource, AreAllCollectionTypeFiltersChecked, AreAllSourceTypeFiltersChecked, CanAppearanceHaveIllusion, ClearNewAppearance, ClearSearch, DeleteCustomSet, EndSearch, GetAllAppearanceSources, GetAllFactionsShown, GetAllRacesShown, GetAppearanceCameraID, GetAppearanceCameraIDBySource, GetAppearanceInfoBySource, GetAppearanceSourceDrops, GetAppearanceSourceInfo, GetAppearanceSources, GetArtifactAppearanceStrings, GetCategoryAppearances, GetCategoryCollectedCount, GetCategoryForItem, GetCategoryInfo, GetCategoryTotal, GetClassFilter, GetCollectedShown, GetCustomSetHyperlinkFromItemTransmogInfoList, GetCustomSetInfo, GetCustomSetItemTransmogInfoList, GetCustomSets, GetFallbackWeaponAppearance, GetFilteredCategoryCollectedCount, GetFilteredCategoryTotal, GetIllusionInfo, GetIllusionStrings, GetIllusions, GetInspectItemTransmogInfoList, GetIsAppearanceFavorite, GetItemInfo, GetItemTransmogInfoListFromCustomSetHyperlink, GetLatestAppearance, GetNumMaxCustomSets, GetNumTransmogSources, GetPairedArtifactAppearance, GetSourceIcon, GetSourceInfo, GetSourceItemID, GetSourceRequiredHoliday, GetUncollectedShown, GetValidAppearanceSourcesForClass, HasAnyAppearance, HasFavorites, IsAppearanceHiddenVisual, IsCategoryValidForItem, IsNewAppearance, IsSearchDBLoading, IsSearchInProgress, IsSourceTypeFilterChecked, IsSpellItemEnchantmentHiddenVisual, IsUsingDefaultFilters, IsValidCustomSetName, IsValidTransmogSource, ModifyCustomSet, NewCustomSet, PlayerCanCollectSource, PlayerHasTransmog, PlayerHasTransmogByItemInfo, PlayerHasTransmogItemModifiedAppearance, PlayerKnowsSource, RenameCustomSet, SearchProgress, SearchSize, SetAllCollectionTypeFilters, SetAllFactionsShown, SetAllRacesShown, SetAllSourceTypeFilters, SetClassFilter, SetCollectedShown, SetDefaultFilters, SetIsAppearanceFavorite, SetSearch, SetSearchAndFilterCategory, SetSourceTypeFilter, SetUncollectedShown, UpdateUsableAppearances
+  C_TransmogOutfitInfo  (69)
+      AddNewOutfit, CanPlayerTransmogSlot, ChangeDisplayedOutfit, ChangeToOutfit, ChangeViewedOutfit, ClearAllPendingSituations, ClearAllPendingTransmogs, ClearDisplayedOutfit, ClearOutfit, CommitAndApplyAllPending, CommitOutfitInfo, CommitPendingSituations, GetActiveOutfitID, GetAllSlotLocationInfo, GetAllTransmogOutfitOptionSheatheCategoryInfo, GetCollectionInfoForSlotAndOption, GetCurrentlyViewedOutfitID, GetEquippedSlotOptionFromTransmogSlot, GetIllusionDefaultIMAIDForCollectionType, GetItemModifiedAppearanceEffectiveCategory, GetLinkedSlotInfo, GetMaxNumberOfTotalOutfitsForSource, GetMaxNumberOfUsableOutfits, GetNextOutfitCost, GetNumberOfOutfitsUnlockedForSource, GetOptionsForSlot, GetOutfitInfo, GetOutfitInfoByName, GetOutfitInfoByPlayerFacingIndex, GetOutfitSituation, GetOutfitSituationsEnabled, GetOutfitsInfo, GetPendingTransmogCost, GetSecondarySlotState, GetSetSourcesForSlot, GetSlotGroupInfo, GetSourceIDsForSlot, GetTransmogOutfitSlotForInventoryType, GetTransmogOutfitSlotFromInventorySlot, GetUISituationCategoriesAndOptions, GetUnassignedAtlasForSlot, GetUnassignedDisplayAtlasForSlot, GetViewedOutfitSlotInfo, GetWeaponOptionsForSlot, HasPendingOutfitSituations, HasPendingOutfitTransmogs, InTransmogEvent, IsEquippedGearOutfitDisplayed, IsEquippedGearOutfitLocked, IsLockedOutfit, IsSlotWeaponSlot, IsTransmogEnabled, IsUsableDiscountAvailable, IsValidTransmogOutfitName, PickupOutfit, ResetOutfitSituations, RevertPendingTransmog, SetOutfitSituationsEnabled, SetOutfitToCustomSet, SetOutfitToOutfit, SetOutfitToSet, SetPendingTransmog, SetPendingTransmogSheatheCategory, SetSecondarySlotState, SetViewedOptionForSlot, SetViewedWeaponOptionForSlot, SlotHasSecondary, TransmogEventActive, UpdatePendingSituation
+  C_TransmogSets  (42)
+      ClearLatestSource, ClearNewSource, ClearSetNewSourcesForSlot, GetAllSets, GetAllSourceIDs, GetAvailableSets, GetBaseSetID, GetBaseSets, GetBaseSetsFilter, GetCameraIDs, GetFilteredBaseSetsCounts, GetFullBaseSetsCounts, GetIsFavorite, GetLatestSource, GetSetInfo, GetSetNewSources, GetSetPrimaryAppearances, GetSetsContainingSourceID, GetSetsFilter, GetSourceIDsForSlot, GetSourcesForSlot, GetTransmogSetsClassFilter, GetUsableSets, GetValidBaseSetsCountsForCharacter, GetValidClassForSet, GetVariantSets, HasAnyValidSets, HasAvailableSets, HasUsableSets, IsBaseSetCollected, IsNewSource, IsSetVisible, IsUsingDefaultBaseSetsFilters, IsUsingDefaultSetsFilters, SetBaseSetsFilter, SetDefaultBaseSetsFilters, SetDefaultSetsFilters, SetHasNewSources, SetHasNewSourcesForSlot, SetIsFavorite, SetSetsFilter, SetTransmogSetsClassFilter
+  C_Trophy  (9)
+      MonumentChangeAppearanceToTrophyID, MonumentCloseMonumentUI, MonumentGetCount, MonumentGetSelectedTrophyID, MonumentGetTrophyInfoByIndex, MonumentLoadList, MonumentLoadSelectedTrophyID, MonumentRevertAppearanceToSaved, MonumentSaveSelection
+  C_Tutorial  (3)
+      AbandonTutorialArea, GetCombatEventInfo, ReturnToTutorialArea
+  C_UI  (7)
+      DoesAnyDisplayHaveNotch, GetTopLeftNotchSafeRegion, GetTopRightNotchSafeRegion, GetUIParent, GetWorldFrame, Reload, ShouldUIParentAvoidNotch
+  C_UIColor  (1)
+      GetColors
+  C_UIFileAsset  (3)
+      GetFileID, IsKnownFile, IsLooseFile
+  C_UIWidgetManager  (42)
+      GetAllWidgetsBySetID, GetBelowMinimapWidgetSetID, GetBulletTextListWidgetVisualizationInfo, GetButtonHeaderWidgetVisualizationInfo, GetCaptureBarWidgetVisualizationInfo, GetCaptureZoneVisualizationInfo, GetDiscreteProgressStepsVisualizationInfo, GetDoubleIconAndTextWidgetVisualizationInfo, GetDoubleStateIconRowVisualizationInfo, GetDoubleStatusBarWidgetVisualizationInfo, GetFillUpFramesWidgetVisualizationInfo, GetHorizontalCurrenciesWidgetVisualizationInfo, GetIconAndTextWidgetVisualizationInfo, GetIconTextAndBackgroundWidgetVisualizationInfo, GetIconTextAndCurrenciesWidgetVisualizationInfo, GetItemDisplayVisualizationInfo, GetMapPinAnimationWidgetVisualizationInfo, GetObjectiveTrackerWidgetSetID, GetPowerBarWidgetSetID, GetPreyHuntProgressWidgetVisualizationInfo, GetScenarioHeaderCurrenciesAndBackgroundWidgetVisualizationInfo, GetScenarioHeaderDelvesWidgetVisualizationInfo, GetScenarioHeaderTimerWidgetVisualizationInfo, GetSpacerVisualizationInfo, GetSpellDisplayVisualizationInfo, GetStackedResourceTrackerWidgetVisualizationInfo, GetStatusBarWidgetVisualizationInfo, GetTextColumnRowVisualizationInfo, GetTextWithStateWidgetVisualizationInfo, GetTextWithSubtextWidgetVisualizationInfo, GetTextureAndTextRowVisualizationInfo, GetTextureAndTextVisualizationInfo, GetTextureWithAnimationVisualizationInfo, GetTopCenterWidgetSetID, GetTugOfWarWidgetVisualizationInfo, GetUnitPowerBarWidgetVisualizationInfo, GetWidgetSetInfo, GetZoneControlVisualizationInfo, RegisterUnitForWidgetUpdates, SetProcessingUnit, SetProcessingUnitGuid, UnregisterUnitForWidgetUpdates
+  C_UnitAuras  (40)
+      AddAuraSound, AddBlockedAura, AddPrivateAuraAnchor, AddPrivateAuraAppliedSound, AuraIsBigDefensive, AuraIsPrivate, CancelAuraByInstanceID, ClearBlockedAuras, DoesAuraHaveExpirationTime, GetAuraApplicationDisplayCount, GetAuraBaseDuration, GetAuraCasterGUID, GetAuraDataByAuraInstanceID, GetAuraDataByIndex, GetAuraDataBySlot, GetAuraDataBySpellName, GetAuraDispelTypeColor, GetAuraDuration, GetAuraSlots, GetBuffDataByIndex, GetCooldownAuraBySpellID, GetDebuffDataByIndex, GetGroupBuffVisualAlerts, GetHiddenGroupBuffs, GetPlayerAuraBySpellID, GetRefreshCarryOverDuration, GetRefreshExtendedDuration, GetUnitAuraBySpellID, GetUnitAuraInstanceIDs, GetUnitAuras, IsAuraFilteredOutByInstanceID, RemoveAuraSound, RemovePrivateAuraAnchor, RemovePrivateAuraAppliedSound, ResetAuraDataProvider, SetGroupBuffVisualAlerts, SetHiddenGroupBuffs, SetPrivateWarningTextAnchor, SwitchAuraDataProvider, WantsAlteredForm
+  C_UserFeedback  (2)
+      SubmitBug, SubmitSuggestion
+  C_VideoOptions  (11)
+      AreHighResTexturesAvailable, GetCurrentGameWindowSize, GetDefaultGameWindowSize, GetGameWindowSizes, GetGxAdapterInfo, IsLinearEnabledOnStart, IsOutlineModeSupported, IsPBRWaterSupported, IsSecondaryLightingSupported, IsSpellVisualDensitySystemSupported, SetGameWindowSize
+  C_VignetteInfo  (6)
+      FindBestUniqueVignette, GetHealthPercent, GetRecommendedGroupSize, GetVignetteInfo, GetVignettePosition, GetVignettes
+  C_VoiceChat  (79)
+      ActivateChannel, ActivateChannelTranscription, BeginLocalCapture, CanAccessSettings, CanPlayerUseVoiceChat, CreateChannel, DeactivateChannel, DeactivateChannelTranscription, EndLocalCapture, GetActiveChannelID, GetActiveChannelType, GetAvailableInputDevices, GetAvailableOutputDevices, GetChannel, GetChannelForChannelType, GetChannelForCommunityStream, GetCommunicationMode, GetCurrentVoiceChatConnectionStatusCode, GetInputVolume, GetJoinClubVoiceChannelError, GetLocalPlayerActiveChannelMemberInfo, GetLocalPlayerMemberID, GetMasterVolumeScale, GetMemberGUID, GetMemberID, GetMemberInfo, GetMemberName, GetMemberVolume, GetOutputVolume, GetPTTButtonPressedState, GetProcesses, GetPushToTalkBinding, GetRemoteTtsVoices, GetTtsVoices, GetVADSensitivity, IsChannelJoinPending, IsDeafened, IsEnabled, IsLoggedIn, IsMemberLocalPlayer, IsMemberMuted, IsMemberMutedForAll, IsMemberSilenced, IsMuted, IsParentalDisabled, IsParentalMuted, IsPlayerUsingVoice, IsSilenced, IsSpeakForMeActive, IsSpeakForMeAllowed, IsTranscribing, IsTranscriptionAllowed, IsVoiceChatConnected, LeaveChannel, Login, Logout, MarkChannelsDiscovered, RequestJoinAndActivateCommunityStreamChannel, RequestJoinChannelByChannelType, SetCommunicationMode, SetDeafened, SetInputDevice, SetInputVolume, SetMasterVolumeScale, SetMemberMuted, SetMemberVolume, SetMuted, SetOutputDevice, SetOutputVolume, SetPortraitTexture, SetPushToTalkBinding, SetVADSensitivity, ShouldDiscoverChannels, SpeakRemoteTextSample, SpeakText, StopSpeakingText, ToggleDeafened, ToggleMemberMuted, ToggleMuted
+  C_WarbandScene  (7)
+      GetRandomEntryID, GetWarbandSceneEntry, HasWarbandScene, IsFavorite, SearchWarbandSceneEntries, SetFavorite, WarbandScenesAvailable
+  C_Weather  (1)
+      GetCurrentWeather
+  C_WeeklyRewards  (21)
+      AreRewardsForCurrentRewardPeriod, CanClaimRewards, ClaimReward, CloseInteraction, GetActivities, GetActivityEncounterInfo, GetConquestWeeklyProgress, GetDifficultyIDForActivityTier, GetExampleRewardItemHyperlinks, GetItemHyperlink, GetNextActivitiesIncrease, GetNextMythicPlusIncrease, GetNumCompletedDungeonRuns, GetSortedProgressForActivity, HasAvailableRewards, HasGeneratedRewards, HasInteraction, IsWeeklyChestRetired, OnUIInteract, ShouldShowFinalRetirementMessage, ShouldShowRetirementMessage
+  C_Widget  (3)
+      IsFrameWidget, IsRenderableWidget, IsWidget
+  C_WoWLabsMatchmaking  (25)
+      AcceptPartyInvite, CanEnterMatchmaking, ClearFastLogin, DeclinePartyInvite, GetAutoQueueOnLogout, GetCurrentParty, GetInQueueTimeStart, GetNumPartyInvites, GetPartyInviteByIndex, GetPartyPlaylistEntry, GetPartySize, IsAloneInWoWLabsParty, IsFastLogin, IsFindingMatch, IsPartyFull, IsPartyLeader, IsPlayer, IsPlayerReady, IsWowLabsMatchmakingMember, LeaveParty, RemovePlayerFromParty, SendPartyInvite, SetAutoQueueOnLogout, SetPartyPlaylistEntry, SetPlayerReady
+  C_WorldLootObject  (8)
+      DoesSlotMatchInventoryType, GetWorldLootObjectDistanceSquared, GetWorldLootObjectInfo, GetWorldLootObjectInfoByGUID, IsWorldLootObject, IsWorldLootObjectByGUID, IsWorldLootObjectInRange, OnWorldLootObjectClick
+  C_WowLabsDataManager  (7)
+      GetConfirmedWoWLabsArea, GetWoWLabsAreaInfo, IsInPrematch, PushCircleInfoToLua, QuerySelectedWoWLabsArea, QueryWoWLabsAreaInfo, SelectWoWLabsArea
+  C_WowSurvey  (2)
+      OpenSurvey, TriggerSurveyServe
+  C_WowTokenPublic  (11)
+      BuyToken, GetCommerceSystemStatus, GetCurrentMarketPrice, GetGuaranteedPrice, GetListedAuctionableTokenInfo, GetNumListedAuctionableTokens, IsAuctionableWowToken, IsConsumableWowToken, UpdateListedAuctionableTokens, UpdateMarketPrice, UpdateTokenCount
+  C_WowTokenUI  (2)
+      ShouldDisplayInAuctionHouse, StartTokenSell
+  C_XMLUtil  (2)
+      GetTemplateInfo, GetTemplates
+  C_ZoneAbility  (2)
+      GetActiveAbilities, GetZoneAbilityIcon
+
+==================================================================
+ end of report
+==================================================================

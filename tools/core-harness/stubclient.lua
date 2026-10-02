@@ -1062,6 +1062,8 @@ if MODERN then
     EditModeManagerFrame = newMock("Frame", "EditModeManagerFrame")
     ObjectiveTrackerFrame = newMock("Frame", "ObjectiveTrackerFrame")
     BossTargetFrameContainer = newMock("Frame", "BossTargetFrameContainer")
+    -- A portrait-template window, as the client's generation is read off it.
+    CharacterFrame = newMock("Frame", "CharacterFrame")
     Enum = {
         AddOnRestrictionType = { Combat = 0, Encounter = 1, ChallengeMode = 2, PvPMatch = 3, Map = 4, Chat = 5 },
         BagIndex = { Accountbanktab = -3, Characterbanktab = -2, Keyring = -1, Backpack = 0, ReagentBag = 5,
@@ -1513,6 +1515,10 @@ if TBC then
     -- Tooltips carry no data table on this client: the processor exists and
     -- never runs (probed 2026-10-02), and the tooltip info API is absent.
     if C_TooltipInfo then C_TooltipInfo.GetHyperlink = nil; C_TooltipInfo.GetInventoryItem = nil end
+    -- The game's windows are the old Classic kind: CharacterFrame has no
+    -- NineSlice, which is what WickCore reads to tell the generation.
+    CharacterFrame = newMock("Frame", "CharacterFrame")
+    rawset(CharacterFrame, "__nokeys", { NineSlice = true, PortraitContainer = true, TitleContainer = true })
     -- Names a harness must not invent a stand-in for on this client. The
     -- function names are from the 2.5.6 probe's missing list.
     S.ABSENT = { C_ClassTalents = true, ClassTalentImportExportMixin = true, InterfaceOptions_AddCategory = true,
