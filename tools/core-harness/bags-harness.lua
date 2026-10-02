@@ -21,7 +21,7 @@ S.fire("ADDON_LOADED", "WickCore")
 WicksBagsDB = { options = { showJunk = false, sortMode = "name" }, bagPos = { posPoint = "CENTER", posRel = "CENTER", posX = 1, posY = 2, panelW = 500 } }
 WicksBagsAlts = { ["Classic Beta PvP-Altchar"] = { bags = { { itemID = 6948, count = 2 } }, bank = { { itemID = 6948, count = 5 } }, bagsLastSeen = 1 } }
 
-S.loadAddon(BAGS_DIR, "WicksBags", { "Core.lua", "Categories.lua", "UI.lua", "Options.lua", "Bag.lua", "Bank.lua", "AltViewer.lua" })
+S.loadAddon(BAGS_DIR, "WicksBags", { "Core.lua", "Categories.lua", "UI.lua", "Options.lua", "Bag.lua", "Bank.lua", "GuildBank.lua", "AltViewer.lua" })
 check(type(WicksBags) == "table" and WicksBags.A, "WicksBags namespace + WickCore addon object")
 
 io.write("== lifecycle ==\n")
@@ -161,6 +161,141 @@ S.fire("BANKFRAME_CLOSED")
 check(not WB.Bank.panel:IsShown(), "bank panel hidden on close")
 BANK_OPEN = false
 
+io.write("== guild bank ==\n")
+local GB = WB.GuildBank
+-- Forever announces the vault only through the interaction manager, as
+-- retail does; TBC sends GUILDBANKFRAME_OPENED. Each mode opens it its
+-- client's way.
+local function openVault()
+    if MODERN then S.fire("PLAYER_INTERACTION_MANAGER_FRAME_SHOW", 10)
+    else S.fire("GUILDBANKFRAME_OPENED") end
+end
+local function closeVault()
+    if MODERN then S.fire("PLAYER_INTERACTION_MANAGER_FRAME_HIDE", 10)
+    else S.fire("GUILDBANKFRAME_CLOSED") end
+end
+check(GB ~= nil, "guild bank module loaded")
+-- Blizzard numbers a tab in columns of 14 drawn as two stacks of 7.
+local cells, uniq = {}, true
+for i = 1, 98 do
+    local cx, cy = GB.SlotCell(i)
+    local key = cx .. "," .. cy
+    if cells[key] or cx < 0 or cx > 13 or cy < 0 or cy > 6 then uniq = false end
+    cells[key] = true
+end
+local function cell(i) local x, y = GB.SlotCell(i) return x .. "," .. y end
+check(uniq, "98 slots fill a 14 by 7 grid with no overlaps")
+check(cell(1) == "0,0" and cell(7) == "0,6" and cell(8) == "1,0" and cell(14) == "1,6"
+      and cell(15) == "2,0" and cell(98) == "13,6", "slot order matches Blizzard's frame")
+
+local LINEN = "|cffffffff|Hitem:2589::::::::1:::::::|h[Linen Cloth]|h|r"
+local HEARTH = "|cffffffff|Hitem:6948::::::::1:::::::|h[Hearthstone]|h|r"
+S.GB.tabs = {
+    { name = "Mats", icon = 134400, items = {
+        [1] = { tex = 132889, count = 20, quality = 1, link = LINEN },
+        [8] = { tex = 134414, count = 1, quality = 1, link = HEARTH } } },
+    { name = "Officers", icon = 134401, viewable = false },
+    { name = "Gear", icon = 134402, remaining = 2, items = {} },
+}
+S.GB.current = 2            -- left on a tab this rank cannot view
+S.GB.money = 123456
+S.GB.canWithdraw = false
+-- Worst case for the first visit: Blizzard's frame does not exist yet when
+-- our open handler runs, and loads and shows afterwards.
+check(rawget(_G, "GuildBankFrame") == nil, "Blizzard's guild bank frame not loaded before the first visit")
+S.CHAT = {}
+openVault()
+ShowGuildBankFrame()
+local gp = GB.panel
+check(gp and gp:IsShown(), "guild bank panel shown at the vault")
+local errs = 0
+for _, l in ipairs(S.CHAT) do if l:lower():find("error") then errs = errs + 1; io.write("    ", l, "\n") end end
+check(errs == 0, "no errors while opening")
+check(S.GB.current == 1, "moved off the unviewable tab to the first viewable one")
+local queried1 = false
+for _, q in ipairs(S.GB.queries) do if q == 1 then queried1 = true end end
+check(queried1, "asked the server for that tab's items")
+local s1, s8, s2 = gp._slots[1], gp._slots[8], gp._slots[2]
+check(s1._iconTex:GetTexture() == 132889 and s1._countText:GetText() == "20", "slot 1 shows its icon and stack size")
+check(s8._iconTex:GetTexture() == 134414 and s8._countText:GetText() == "", "slot 8 shows a single item with no count")
+check(s2._iconTex:GetTexture() == nil, "empty slots stay empty")
+check(gp._tabs[1]:IsShown() and gp._tabs[3]:IsShown() and not gp._tabs[4]:IsShown(), "one tab button per purchased tab")
+check(gp._tabs[2]._icon.__desaturated == true, "the unviewable tab is greyed")
+check(gp._tabs[1]._sel:IsShown() and not gp._tabs[3]._sel:IsShown(), "the current tab is marked")
+check(gp._gold:GetText() == WB.UI:FormatMoney(123456), "guild gold shown")
+check(not gp._withdraw:IsShown(), "withdraw hidden for a rank that cannot take gold")
+check(WB.Bag.panel:IsShown(), "the bags open alongside")
+check(GuildBankFrame:GetAlpha() == 0, "Blizzard's window is put out of the way even though it loaded late")
+local wrote = {}
+for k in pairs(GuildBankFrame) do if type(k) == "string" and not k:find("^__") then wrote[#wrote + 1] = k end end
+check(#wrote == 0, "nothing written onto Blizzard's frame: " .. table.concat(wrote, ","))
+check(GB:State().hooked, "its show and hide are hooked")
+
+S.GB.picked, S.GB.stored = {}, {}
+s1.__scripts.OnClick(s1, "LeftButton")
+check(S.GB.picked[1] == "1:1", "left-click picks the item up")
+s1.__scripts.OnClick(s1, "RightButton")
+check(S.GB.stored[1] == "1:1", "right-click sends it to your bags")
+s2.__scripts.OnReceiveDrag(s2)
+check(S.GB.picked[2] == "1:2", "dropping on a slot puts the carried item there")
+local realCursor = GetCursorInfo
+GetCursorInfo = function() return "money", 5000 end
+s2.__scripts.OnClick(s2, "LeftButton")
+GetCursorInfo = realCursor
+check(S.GB.deposited == 5000, "clicking with gold on the cursor deposits it")
+
+gp._tabs[3].__scripts.OnClick(gp._tabs[3])
+check(S.GB.current == 3 and S.GB.queries[#S.GB.queries] == 3, "clicking a tab selects and loads it")
+check(gp._tabLabel:GetText():find("Gear") and gp._tabLabel:GetText():find("2 left"), "tab name and withdrawals left shown: " .. tostring(gp._tabLabel:GetText()))
+check(s1._iconTex:GetTexture() == nil, "the grid now shows the new tab")
+gp._tabs[2].__scripts.OnClick(gp._tabs[2])
+check(S.GB.current == 3, "an unviewable tab cannot be selected")
+gp._tabs[1].__scripts.OnClick(gp._tabs[1])
+
+gp._search:SetText("linen")
+gp._search.__scripts.OnTextChanged(gp._search)
+check(s1:GetAlpha() == 1 and s8:GetAlpha() < 1, "search dims what does not match")
+gp._search:SetText("")
+gp._search.__scripts.OnTextChanged(gp._search)
+
+S.GB.tabs[1].items[2] = { tex = 133971, count = 5, quality = 2, link = LINEN }
+S.fire("GUILDBANKBAGSLOTS_CHANGED")
+check(s2._iconTex:GetTexture() == 133971, "a slot change redraws the grid")
+
+gp._blizzBtn.__scripts.OnClick(gp._blizzBtn)
+check(GuildBankFrame:GetAlpha() == 1 and not gp:IsShown() and GB:State().revealed, "Log & tabs steps aside for Blizzard's window")
+GuildBankFrame.__scripts.OnHide(GuildBankFrame)
+check(not GB:State().revealed, "closing Blizzard's window clears that")
+
+GB:Show()
+local closeBefore = S.GB.closed or 0
+closeVault()
+check(not gp:IsShown(), "panel hidden when the session ends")
+if MODERN then
+    S.fire("PLAYER_INTERACTION_MANAGER_FRAME_SHOW", 5)   -- some other interaction
+    check(not gp:IsShown(), "other interactions do not open it")
+    local shows = 0
+    local realShow = GB.Show
+    GB.Show = function(...) shows = shows + 1 return realShow(...) end
+    S.fire("PLAYER_INTERACTION_MANAGER_FRAME_SHOW", 10)
+    S.fire("GUILDBANKFRAME_OPENED")
+    GB.Show = realShow
+    check(shows == 1, "both open events together open it once")
+    closeVault()
+    check(not gp:IsShown(), "and the interaction hide closes it")
+end
+check((S.GB.closed or 0) == closeBefore, "and does not end it a second time")
+
+WB.db.options.hideDefaultGuildBank = false
+openVault()
+check(not gp:IsShown(), "with the option off, Blizzard's window is left in charge")
+closeVault()
+WB.db.options.hideDefaultGuildBank = true
+SlashCmdList.WICK_WICKSBAGS("defaultguildbank")
+check(WB.db.options.hideDefaultGuildBank == false, "/wbags defaultguildbank toggles it")
+SlashCmdList.WICK_WICKSBAGS("defaultguildbank")
+check(WB.db.options.hideDefaultGuildBank == true, "and back")
+
 io.write("== alt viewer ==\n")
 local okAV, errAV = pcall(function() WB.AltViewer:SnapshotBags() end)
 check(okAV, "SnapshotBags " .. tostring(errAV or ""))
@@ -208,6 +343,7 @@ for _, n in ipairs(UISpecialFrames) do listed[n] = true end
 check(listed.WicksBagsPanel, "the bag panel is listed for Escape")
 check(listed.WicksAltViewerPanel and listed.WicksBagsOptions, "so are the alt viewer and the options window")
 check(not listed.WicksBankPanel, "the bank panel is not, so the bank session is not left open")
+check(not listed.WicksGuildBankPanel, "nor the guild bank panel, for the same reason")
 local dup = 0
 for _, n in ipairs(UISpecialFrames) do if n == "WicksBagsPanel" then dup = dup + 1 end end
 check(dup == 1, "listed once, however many times the panel is built")

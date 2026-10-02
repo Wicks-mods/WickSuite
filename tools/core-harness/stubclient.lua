@@ -258,6 +258,8 @@ local function newMock(kind, name)
         elseif k == "IsMouseOver" then return function() return false end
         -- Recorded rather than fixed at 1, so a check can ask which of
         -- two overlapping buttons the click belongs to.
+        elseif k == "SetID" then return function(_, v) t.__id = v end
+        elseif k == "GetID" then return function() return t.__id or 0 end
         elseif k == "SetFrameLevel" then return function(_, v) t.__level = v end
         elseif k == "GetFrameLevel" then return function() return t.__level or 1 end
         elseif k == "GetFrameStrata" then return function() return "MEDIUM" end
@@ -678,6 +680,48 @@ end
 function RepairAllItems(useGuild) S.REPAIRED = useGuild and "guild" or "self" end
 function CanGuildBankRepair() return S.GUILD_REPAIR == true end
 function GetGuildBankWithdrawMoney() return S.GUILD_FUNDS or 0 end
+-- Guild bank. S.GB.tabs[i] = { name, icon, viewable, canDeposit, remaining,
+-- items = { [slot] = { tex, count, locked, quality, link } } }. Each call a
+-- player can make is recorded so a check can ask what a click did.
+S.GB = { tabs = {}, current = 1, money = 0, queries = {}, picked = {}, stored = {}, split = {} }
+function GetNumGuildBankTabs() return #S.GB.tabs end
+function GetGuildBankTabInfo(i)
+    local t = S.GB.tabs[i]
+    if not t then return nil end
+    return t.name, t.icon, t.viewable ~= false, t.canDeposit ~= false, -1, t.remaining or -1
+end
+function GetCurrentGuildBankTab() return S.GB.current end
+function SetCurrentGuildBankTab(i) S.GB.current = i end
+function QueryGuildBankTab(i) S.GB.queries[#S.GB.queries + 1] = i end
+local function gbItem(tab, slot)
+    local t = S.GB.tabs[tab]
+    return t and t.items and t.items[slot]
+end
+function GetGuildBankItemInfo(tab, slot)
+    local it = gbItem(tab, slot)
+    if not it then return nil end
+    return it.tex, it.count or 1, it.locked or false, false, it.quality or 1
+end
+function GetGuildBankItemLink(tab, slot) local it = gbItem(tab, slot) return it and it.link end
+function PickupGuildBankItem(tab, slot) S.GB.picked[#S.GB.picked + 1] = tab .. ":" .. slot end
+function AutoStoreGuildBankItem(tab, slot) S.GB.stored[#S.GB.stored + 1] = tab .. ":" .. slot end
+function SplitGuildBankItem(tab, slot, n) S.GB.split[#S.GB.split + 1] = tab .. ":" .. slot .. "x" .. n end
+function GetGuildBankMoney() return S.GB.money end
+function CanWithdrawGuildBankMoney() return S.GB.canWithdraw == true end
+function DepositGuildBankMoney(m) S.GB.deposited = m end
+function CloseGuildBankFrame() S.GB.closed = (S.GB.closed or 0) + 1 end
+function HandleModifiedItemClick() return false end
+function IsModifiedClick() return false end
+function StaticPopup_Hide(which) S.HIDDEN_POPUP = which end
+-- Blizzard_GuildBankUI's bootstrap: the frame itself loads on demand the
+-- first time the vault is opened, then shows.
+function ShowGuildBankFrame()
+    if not rawget(_G, "GuildBankFrame") then
+        _G.GuildBankFrame = S.newMock("Frame", "GuildBankFrame")
+        GuildBankFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 16, -116)
+    end
+    GuildBankFrame:Show()
+end
 function SaveBindings() end
 function GetCurrentBindingSet() return 1 end
 function GetWeaponEnchantInfo()
@@ -982,6 +1026,7 @@ if MODERN then
         BagIndex = { Accountbanktab = -3, Characterbanktab = -2, Keyring = -1, Backpack = 0, ReagentBag = 5,
                      CharacterBankTab_1 = 6, CharacterBankTab_2 = 7, CharacterBankTab_3 = 8 },
         BankType = { Character = 0, Guild = 1, Account = 2 },
+        PlayerInteractionType = { Banker = 8, GuildBanker = 10 },
         ItemConsumableSubclass = { Bandage = 7, Itemenhancement = 8, ItemenhancementTemporary = 9 },
         TooltipDataType = { Item = 0, Unit = 2 },
         SpellBookSpellBank = { Player = 0, Pet = 1 },
@@ -1068,6 +1113,8 @@ if MODERN then
         -- Item data is not in memory until asked for, which is the whole
         -- reason the gear panel has a loading step.
         IsItemDataCachedByID = function(id)
+            -- The client raises on a missing id rather than answering false.
+            if id == nil then error("bad argument #1 to '?' (Usage: local isCached = C_Item.IsItemDataCachedByID(itemInfo))", 2) end
             if S.UNCACHED and S.UNCACHED[id] then return false end
             return true
         end,

@@ -348,6 +348,7 @@ check(ns.Doll:TryOn(7719), "a piece can be tried on")
 check(ns.Doll.trying[7] ~= nil, "it lands in the slot it belongs to")
 check(ns.Doll.slots[7].mark:IsShown(), "and the slot is marked as borrowed")
 
+
 local d = ns.Doll:Deltas()
 check(d.agi == 5, "agility delta is the difference, not the whole item: " .. tostring(d.agi))
 check(d.sta == 4, "and stamina counts too, the old pair had none: " .. tostring(d.sta))
@@ -1211,6 +1212,20 @@ ns.Doll:TryOn(91001)
 check(ns.Doll.trying[16] ~= nil and ns.Doll.trying[16].id == 91001, "the two-hander goes in the weapon slot")
 check(ns.Doll.trying[17] ~= nil and ns.Doll.trying[17].empty == true,
     "and the off hand is emptied rather than left counted")
+
+-- The emptied hand used to read `trying.link or <what you wear>`, so it
+-- showed the real off hand, and hovering it sent a nil id to
+-- IsItemDataCachedByID.
+S.EQUIPPED = S.EQUIPPED or {}
+local hadOff = S.EQUIPPED[17]
+S.EQUIPPED[17] = "|cff1eff00|Hitem:2129::::::::1:::::::|h[Large Round Shield]|h|r"
+ns.Doll:Refresh()
+check(ns.Doll.slots[17].icon:GetTexture() == nil, "the emptied off hand draws empty, not the shield you wear")
+local okHover, errHover = pcall(ns.Doll.slots[17].__scripts.OnEnter, ns.Doll.slots[17])
+check(okHover, "hovering the emptied off hand " .. tostring(errHover or ""))
+local okNil = pcall(function() ns.Score:FillTooltip(GameTooltip, nil, S.EQUIPPED[17]) end)
+check(okNil, "the describer survives being handed no id")
+S.EQUIPPED[17] = hadOff
 
 -- An emptied slot gives nothing back, it only takes away.
 local d = ns.Doll:Deltas()
