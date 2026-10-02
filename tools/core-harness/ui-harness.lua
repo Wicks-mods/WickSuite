@@ -1952,6 +1952,25 @@ do
     d.moveWindows, d.windowPos = was, {}
 end
 
+io.write("== the other Wick addons' frames ==\n")
+do
+    -- Another Wick addon hands WickCore a bar; this UI gives it a mover.
+    local Chrome = ns.Core.Chrome
+    local Movers = ns.Movers
+    check(Movers.adopting == true, "the movers watch WickCore's list of movable frames after login")
+    local bar = CreateFrame("Frame", "WicksTestSuiteBar", UIParent)
+    bar:SetSize(200, 40)
+    bar:ClearAllPoints()
+    bar:SetPoint("TOP", UIParent, "TOP", 0, -300)
+    local stoodDown = false
+    Chrome:RegisterMovable(bar, { key = "suitebar", title = "Suite bar", addon = "WicksSuiteTest", onClaim = function() stoodDown = true end })
+    local m = Movers.list.suite_suitebar
+    check(m ~= nil and m.target == bar and m.groups.suite == true, "a registered frame takes a mover in the Wick addons group")
+    check(m and m.default == "TOP,UIParent,TOP,0,-300", "which starts where the addon had it: " .. tostring(m and m.default))
+    check(stoodDown and Chrome:MovableClaimed(bar), "and the addon is told to stand its own drag down")
+    check(ns.groupLabels.suite ~= nil, "the group has a name in the mover panel's list")
+end
+
 io.write("== slash ==\n")
 check(type(SlashCmdList.WICK_WICKSUI) == "function", "/wui registered")
 local okS, errS = pcall(SlashCmdList.WICK_WICKSUI, "help")

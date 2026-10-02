@@ -216,6 +216,35 @@ check(flag == true, "Check toggles")
 check(Chrome:Button(panel.content, "Go").label:GetText() == "Go", "Button label")
 
 
+io.write("== movable frames ==\n")
+do
+    local bar = CreateFrame("Frame", "WicksTestBar", UIParent)
+    bar:SetSize(120, 30)
+    bar:ClearAllPoints()
+    bar:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -40, -200)
+    check(Chrome:PointString(bar) == "TOPRIGHT,UIParent,TOPRIGHT,-40,-200",
+        "a frame's place reads as a point string: " .. tostring(Chrome:PointString(bar)))
+    local claimed, seen = false, {}
+    local e = Chrome:RegisterMovable(bar, { key = "testbar", title = "Test bar", addon = "WicksTest", onClaim = function() claimed = true end })
+    check(e and e.default == "TOPRIGHT,UIParent,TOPRIGHT,-40,-200" and Chrome.movables.list.testbar == e, "a registered frame starts where it is")
+    Chrome:WatchMovables(function(x) seen[#seen + 1] = x.key end, function(x) seen[#seen + 1] = "resize:" .. x.key end)
+    check(seen[1] == "testbar", "a watcher is told about frames registered before it")
+    Chrome:RegisterMovable(CreateFrame("Frame", "WicksTestBar2", UIParent), { key = "testbar2", title = "Second" })
+    check(seen[2] == "testbar2", "and about those registered after")
+    check(not Chrome:MovableClaimed("testbar") and not Chrome:MovableClaimed(bar), "nothing is claimed until a UI asks")
+    Chrome:ClaimMovable("testbar")
+    check(claimed and Chrome:MovableClaimed(bar) and Chrome:MovableClaimed("testbar"), "a claim marks the frame and tells its product")
+    Chrome:MovableResized("testbar")
+    check(seen[3] == "resize:testbar", "a resize reaches the watcher")
+    local pos = { point = "CENTER", relPoint = "CENTER", x = 0, y = 0 }
+    Chrome:RestorePosition(bar, pos)
+    local p = bar:GetPoint()
+    check(p == "TOPRIGHT", "RestorePosition leaves a claimed frame to the UI: " .. tostring(p))
+    local A = Core:NewAddon("WicksMovableTest", { title = "Wick's Movable Test" })
+    local e2 = A:RegisterMovable(CreateFrame("Frame", "WicksTestBar3", UIParent), { key = "testbar3" })
+    check(e2 and e2.addon == "WicksMovableTest" and e2.title == "Wick's Movable Test", "an addon object registers under its own name")
+end
+
 io.write("== what the client refused ==" .. string.char(10))
 do
     -- Three attempts at the bag popup were each a guess about which call
