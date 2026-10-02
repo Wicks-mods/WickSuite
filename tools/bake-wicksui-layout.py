@@ -70,6 +70,11 @@ for mod in ("unitframes", "actionbars"):
 # Your own combat text keeps the game's colours until a player picks one.
 if "combattext" in p:
     p["combattext"]["colors"] = {}
+# Looks with a layout of their own (bake-wicksui-look.py) keep it.
+import glob as _glob, json as _json, os as _os
+for _f in sorted(_glob.glob(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "data", "wicksui-looks", "*.json"))):
+    _look = _os.path.splitext(_os.path.basename(_f))[0]
+    gen.setdefault("styleSizes", {})["wick" if _look == "og" else _look] = _json.load(open(_f, encoding="utf-8"))
 # Hologram's face runs large: its player name a size of its own.
 holo = gen.setdefault("styleSizes", {}).setdefault("hologram", {})
 holo.setdefault("units", {}).setdefault("player", {}).setdefault("texts", {})["left"] = 12

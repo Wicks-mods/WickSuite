@@ -386,6 +386,25 @@ do
     g.styleSizes.otherlook, g.styleSizes[key], g.presetFor, u.texts.left.size = nil, wasSnap, wasFor, wasSize
 end
 do
+    -- A bar's shape and the power bar's height are a look's own too, so one
+    -- look's layout never leaks into another's.
+    local g, prof = ns:G(), A.db.profile
+    local bar, u = prof.actionbars.bars[1], prof.unitframes.units.player
+    local id = ns.Core.Chrome:StyleID()
+    local key = id == "og" and "wick" or id
+    local was = { perRow = bar.perRow, buttons = bar.buttons, power = u.powerHeight, for_ = g.presetFor, snap = g.styleSizes and g.styleSizes[key] }
+    g.styleSizes = g.styleSizes or {}
+    g.styleSizes[key] = { bars = { [1] = { size = bar.size, spacing = bar.spacing, perRow = 6, buttons = 12 } }, units = { player = { powerHeight = 3 } } }
+    g.presetFor = "otherlook"
+    bar.perRow, u.powerHeight = 12, 9
+    ns:ApplyStylePreset(false)
+    local other = g.styleSizes.otherlook
+    check(bar.perRow == 6 and u.powerHeight == 3 and other and other.bars[1].perRow == 12 and other.units.player.powerHeight == 9,
+        "bar shape and power bar height are kept per look")
+    bar.perRow, bar.buttons, u.powerHeight, g.presetFor = was.perRow, was.buttons, was.power, was.for_
+    g.styleSizes.otherlook, g.styleSizes[key] = nil, was.snap
+end
+do
     local got = {}
     local fs = { SetFont = function(_, p, sz) got.p, got.s = p, sz end, SetShadowOffset = function() end, SetShadowColor = function() end }
     ns.Media:SetFont(fs, 12, "OUTLINE", "Wick", true)
