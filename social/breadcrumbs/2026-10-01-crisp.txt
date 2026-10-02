@@ -1,0 +1,17 @@
+== facebook ==
+Crisp is the newest look in Wick's UI.
+
+Clean cut: see-through dark grey panels, one black pixel round everything, square corners, and your class colour as the accent. No shadows and no glows. The accent comes from your class, so it suits every character you play, and Wick's Bags and the class kits pick it up too.
+
+It came out today in Wick's UI 0.9.3, along with a soft quality glow round your gear, a crescent moon on your frame while you rest, and each look keeping its own bar layout.
+
+Nine looks to start from, and every one of them yours to change: https://wicksmods.com/ui
+
+Free on CurseForge for WoW Forever: https://www.curseforge.com/wow/addons/wicks-ui
+
+== x ==
+Crisp is the newest look in Wick's UI: see-through dark grey, one black pixel round everything, square corners, and your class colour as the accent. Out now in 0.9.3.
+
+https://wicksmods.com/ui
+
+#WoWForever #Warcraft
