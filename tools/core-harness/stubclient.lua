@@ -81,7 +81,13 @@ end })
 -- Real clients accept nearly any event name; only a few are flavor-specific.
 -- Registering one of these raises, which is what WickCore's pcall fallbacks
 -- are tested against.
-local INVALID_EVENTS = MODERN
+-- The TBC list is the 2.5.6 probe's (WickSuite/data/probe-reports, 2026-10-02):
+-- of the events the suite registers, these seven the client refused.
+local INVALID_EVENTS = TBC
+    and { HONOR_LEVEL_UPDATE = true, UNIT_POWER_POINT_CHARGE = true, LEARNED_SPELL_IN_TAB = true,
+          ACTIVE_COMBAT_CONFIG_CHANGED = true, GAME_RULES_CHANGED = true, PLAYER_SWING = true,
+          PLAYER_SWING_RANGE_UPDATE = true }
+    or MODERN
     and { LEARNED_SPELL_IN_TAB = true, TRADE_SKILL_UPDATE = true }
     or  { ADDON_RESTRICTION_STATE_CHANGED = true, BANK_TABS_CHANGED = true, TRAIT_CONFIG_UPDATED = true,
           ACTIVE_COMBAT_CONFIG_CHANGED = true, CURRENCY_DISPLAY_UPDATE = true }

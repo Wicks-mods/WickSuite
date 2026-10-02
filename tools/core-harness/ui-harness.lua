@@ -625,6 +625,25 @@ do
 end
 check(not ns.errors or #ns.errors == 0, "no module errors: " .. table.concat(ns.errors or {}, " | "))
 
+io.write("== pvp indicator ==\n")
+do
+    -- An element no layout of ours enables yet, kept honest: honor levels
+    -- and mercenary mode are Mainline's, and the TBC-shaped client refuses
+    -- the honor level event.
+    local oUF = ns.oUF
+    oUF:RegisterStyle("WicksUI_TestPvP", function(f) f.PvPIndicator = f:CreateTexture(nil, "OVERLAY") end)
+    oUF:SetActiveStyle("WicksUI_TestPvP")
+    local okP, p = pcall(oUF.Spawn, oUF, "player", "WicksUI_TestPvPFrame")
+    oUF:SetActiveStyle("WicksUI")
+    check(okP and p ~= nil, "a frame with a PvP indicator spawns on this client: " .. tostring(not okP and p or ""))
+    if okP and p then
+        check((p.__events["HONOR_LEVEL_UPDATE"] ~= nil) == (S.forever and true or false),
+            "honor level updates are watched only where the client has them")
+        local okU, errU = pcall(p.PvPIndicator.ForceUpdate, p.PvPIndicator)
+        check(okU, "the indicator updates without the mercenary and honor level calls: " .. tostring(not okU and errU or ""))
+    end
+end
+
 io.write("== buffs ==\n")
 check(ns.Auras.initialized and ns.Auras.buffs and ns.Auras.debuffs, "buff and debuff containers built")
 -- Which Auras element answered: the AuraContainer intrinsic on Forever,
