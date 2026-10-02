@@ -1405,6 +1405,133 @@ function Breadcrumb({ b = BREADCRUMB } = {}) {
   );
 }
 
+/* ── Wick's UI · TBC teaser ─────────────────────
+   One-off card for the "coming to TBC" post. A collage of in-game
+   captures laid on a tilted plane, columns staggered so the field reads
+   as moving, with the client name set as a lockup on the left. The
+   captures are HUD only (frames, nameplates, combat text, threat, swing
+   timers, minimap, bars): no skinned windows, since the TBC build does
+   not promise those, and no chat. Rendered through the breadcrumb
+   target (see ONLY_COMPONENTS). */
+const TEASER = {
+  label: 'UI',
+  over: 'COMING TO',
+  big: 'TBC',
+  under: 'CLASSIC ANNIVERSARY',
+  title: 'The whole interface is on its way.',
+  foot: 'wicksmods.com/ui',
+  note: 'Pictured on WoW Forever',
+  // name, aspect (w/h), and for full screens a wider shown aspect plus
+  // the band to keep: the bars and frames along the bottom, or the
+  // nameplates and crits in the middle, never the cave ceiling.
+  // Then the order: Full screens and close-ups alternate so no
+  // column turns into a run of the same thing. Files in
+  // images/ui/screenshots/collage/ unless the name says otherwise.
+  tiles: [
+    ['c178',2.03,2.3,'center 92%'],['c018',1.81],['action-rebel',1.74,2.3,'center 92%'],['c176',1.56],['c196',1.46,2.0,'center 38%'],['c099',0.95],
+    ['c200',1.84,2.3,'center 92%'],['c221',8.21],['c187',1.13,2.0,'center 38%'],['c064',2.68],['c261',1.54,2.0,'center 38%'],['c189',1.28],
+    ['action-gilded',1.68,2.0,'center 38%'],['c226',1.62],['c190',1.73,2.0,'center 38%'],['c145',1.20],['c191',1.17,2.0,'center 38%'],['c289',4.25],
+    ['c201',1.71,2.3,'center 92%'],['c177',0.92],['c192',1.48,2.0,'center 38%'],['c054',1.69],['c285',1.37,2.0,'center 38%'],['c278',1.07],
+    ['action-modern',1.51,2.3,'center 92%'],['c219',8.13],['c197',1.89,2.3,'center 92%'],['c106',1.16],['c185',0.97],['c262',2.50],
+    ['c210',1.59,2.3,'center 92%'],['c152',1.16],['c198',1.26],['c188',1.98],['c179',1.41,2.0,'center 38%'],['c287',1.11],
+    ['c195',1.16],['c129',5.63],['c288',1.13],
+  ],
+  // The bits that say "this is a fight": each is used once, in the
+  // bright middle of the field, and the ones in accent get fel-green chrome.
+  featured: ['c176','c177','c189','c099','c018','c195','c054','c288'],
+  accent: ['c176','c177','c189'],
+};
+
+function tileSrc(name) {
+  return name.startsWith('action-') ? `images/ui/screenshots/${name}.png` : `images/ui/screenshots/collage/${name}.png`;
+}
+
+// Columns of captures on a plane, tilted isometric (rotate, then lay it
+// down). Every column is the same width and its tiles keep their own
+// aspect, so heights vary down a column; each column starts at its own
+// offset, which is what makes the field look like it is sliding.
+function IsoCollage({ tiles, featured = [], accent = [], zone = [600, 1120, 90, 540], cols = 10, cw = 300, gap = 18, colH = 2800,
+  stagger = [-260, 70, -150, 210, -330, 10, -210, 150, -70, 110], cx = 820, cy = 300, scale = 0.86,
+  tilt = 55, turn = -45 }) {
+  const W = cols * (cw + gap);
+  // Where a point on the plane lands on the card: turn, lay down, scale.
+  const r = turn * Math.PI / 180, cosT = Math.cos(tilt * Math.PI / 180);
+  const land = (x, y) => {
+    const X = x - W / 2, Y = y - colH / 2;
+    return [cx + scale * (X * Math.cos(r) - Y * Math.sin(r)), cy + scale * cosT * (X * Math.sin(r) + Y * Math.cos(r))];
+  };
+  const byName = Object.fromEntries(tiles.map(t => [t[0], t]));
+  const rest = tiles.filter(t => !featured.includes(t[0]));
+  const queue = featured.filter(n => byName[n]);
+  const placed = [];
+  let k = 0;
+  for (let c = 0; c < cols; c++) {
+    let y = stagger[c % stagger.length] - 200;
+    while (y < colH) {
+      const [sx, sy] = land(c * (cw + gap) + cw / 2, y + 90);
+      const inZone = sx > zone[0] && sx < zone[1] && sy > zone[2] && sy < zone[3];
+      const pick = inZone && queue.length ? byName[queue.shift()] : rest[k++ % rest.length];
+      const [name, a, shown = a, pos = 'center'] = pick;
+      const h = Math.max(52, Math.min(340, Math.round(cw / shown)));
+      placed.push({ name, pos, c, y, h, key: `${c}-${y}` });
+      y += h + gap;
+    }
+  }
+  return (
+    <div style={{position:'absolute',left:cx - W / 2,top:cy - colH / 2,width:W,height:colH,
+      transformOrigin:'50% 50%',transform:`scale(${scale}) rotateX(${tilt}deg) rotateZ(${turn}deg)`}}>
+      {placed.map(t => {
+        const hot = accent.includes(t.name);
+        return (
+          <div key={t.key} style={{position:'absolute',left:t.c * (cw + gap),top:t.y,width:cw,height:t.h,
+            background:'#000',border:`${hot ? 2 : 1}px solid ${hot ? G : BR}`,
+            boxShadow:'0 26px 40px rgba(0,0,0,0.55)'}}>
+            <img src={tileSrc(t.name)} style={{display:'block',width:'100%',height:'100%',objectFit:'cover',objectPosition:t.pos,filter:'brightness(1.15) saturate(1.08)'}}/>
+            {hot && <Brackets size={14} thick={3} inset={-5}/>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function UITeaserTBC({ t = TEASER } = {}) {
+  return (
+    <div style={{width:1200,height:630,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
+      <IsoCollage tiles={t.tiles} featured={t.featured} accent={t.accent}/>
+      {/* the left third goes back to void so the lockup sits on solid ground */}
+      <div style={{position:'absolute',inset:0,background:`linear-gradient(90deg, ${BG} 0%, ${BG} 30%, ${BG}e6 40%, ${BG}66 56%, ${BG}00 70%)`}}/>
+      <div style={{position:'absolute',inset:0,background:`radial-gradient(ellipse at 72% 50%, ${BG}00 55%, ${BG}77 100%)`}}/>
+
+      <div style={{position:'absolute',left:56,top:56,bottom:56,width:360,zIndex:5,display:'flex',flexDirection:'column'}}>
+        <div style={{display:'inline-flex',flexDirection:'column',alignItems:'flex-start'}}>
+          <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
+            <WickWordmark size={54}/>
+            <div style={{fontFamily:FM,fontSize:15,letterSpacing:'0.34em',color:G,marginTop:4,textAlign:'right'}}>{t.label}</div>
+          </div>
+        </div>
+
+        <div style={{marginTop:'auto'}}>
+          <div style={{fontFamily:FM,fontSize:14,letterSpacing:'0.34em',color:G}}>{t.over}</div>
+          <div style={{fontFamily:FD,fontWeight:900,fontSize:148,lineHeight:0.84,letterSpacing:'-0.02em',color:TX,
+            margin:'10px 0 4px',textShadow:`0 0 48px ${G}2e, 0 8px 24px rgba(0,0,0,0.7)`}}>{t.big}</div>
+          <div style={{fontFamily:FM,fontSize:14,letterSpacing:'0.34em',color:G}}>{t.under}</div>
+          <div style={{height:1,width:320,background:BR,margin:'26px 0 20px'}}/>
+          <div style={{fontFamily:FU,fontSize:28,color:TX,lineHeight:1.2,fontWeight:600,maxWidth:300,
+            textShadow:'0 2px 12px rgba(0,0,0,0.8)'}}>{t.title}</div>
+        </div>
+
+        <div style={{marginTop:'auto'}}>
+          <div style={{fontFamily:FM,fontSize:14,letterSpacing:'0.12em',color:TX}}>{t.foot}</div>
+          <div style={{fontFamily:FM,fontSize:11,letterSpacing:'0.14em',color:MDIM,marginTop:6}}>{t.note}</div>
+        </div>
+      </div>
+
+      <div style={{position:'absolute',inset:0,zIndex:10,pointerEvents:'none'}}><Brackets size={20} thick={3}/></div>
+    </div>
+  );
+}
+
 function SocialCover({ flavour = 'forever' } = {}) {
   const F = FLAVOURS[flavour] || FLAVOURS.forever;
   return (
@@ -1503,6 +1630,7 @@ const ONLY_COMPONENTS = {
   social_ui: { Comp: () => <AddonSocial which="ui"/>, w: 1200, h: 630 },
   ui_looks:    { Comp: UILooks,                                            w: 1200, h: 630 },
   milestone:   { Comp: Milestone,                                          w: 1200, h: 630 },
+  ui_tbc_teaser: { Comp: UITeaserTBC, w: 1200, h: 630 },
   breadcrumb:  { Comp: Breadcrumb,                                         w: 1200, h: 630 },
   cd:       { Comp: CDThumb,            w: 460, h: 260 },
   bis:      { Comp: BISThumb,           w: 460, h: 260 },
@@ -1577,6 +1705,9 @@ function App() {
 
       <div className="section-label">Breadcrumb · a post between releases (1200×630)</div>
       <Artboard id="breadcrumb" label="Breadcrumb" w={1200} h={630} Component={Breadcrumb}/>
+
+      <div className="section-label">Wick's UI · TBC teaser (1200×630, one-off post)</div>
+      <Artboard id="ui-tbc-teaser" label="Wick's UI — TBC teaser" w={1200} h={630} Component={UITeaserTBC}/>
 
       <div className="section-label">Addon Thumbnails · Store cards</div>
       <Artboard id="suite-thumb" label="Wick's Suite" w={460} h={260} Component={SuiteThumb}/>

@@ -1,0 +1,11 @@
+== facebook ==
+Wick's UI is coming to TBC Classic Anniversary.
+
+Bars, unit frames, nameplates, threat, chat, minimap and tooltips in one look, with every part optional. It started on WoW Forever and is being brought back to the Anniversary realms on the same core, so it changes looks with the rest of the Wick suite.
+
+No date yet. It will be free on CurseForge when it lands. The tour is at https://wicksmods.com/ui
+
+== x ==
+Wick's UI is coming to TBC Classic Anniversary. Bars, frames, nameplates, threat, chat and more in one look, brought over from Forever on the same core. No date yet. Tour: https://wicksmods.com/ui
+
+#WoWClassic #TBCClassic
