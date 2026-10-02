@@ -625,6 +625,38 @@ do
 end
 check(not ns.errors or #ns.errors == 0, "no module errors: " .. table.concat(ns.errors or {}, " | "))
 
+io.write("== Blizzard's frames without role sets ==\n")
+do
+    -- A client without SetRolesets (TBC Anniversary): the game's unit
+    -- frame is hidden under a frame that never shows, a nameplate's own
+    -- frame is hidden where it is and hidden again when the client shows it.
+    local oUF = ns.oUF
+    local NOROLE = setmetatable({ SetRolesets = true }, { __index = OUF_KEYS })
+    local blizz = CreateFrame("Frame", "WicksUI_TestBlizzFocus", UIParent)
+    rawset(blizz, "__nokeys", NOROLE)
+    blizz:Show()
+    local wasFocus = rawget(_G, "FocusFrame")
+    rawset(_G, "FocusFrame", blizz)
+    local okF, errF = pcall(oUF.DisableBlizzard, oUF, "focus")
+    rawset(_G, "FocusFrame", wasFocus)
+    check(okF, "disabling a unit frame without role sets runs: " .. tostring(errF or ""))
+    check(blizz:IsShown() == false and blizz:GetParent() ~= nil and blizz:GetParent() ~= UIParent,
+        "the frame is hidden under a frame that never shows")
+    local plate = CreateFrame("Frame", "WicksUI_TestBlizzPlate", UIParent)
+    local uf = CreateFrame("Button", nil, plate)
+    rawset(uf, "__nokeys", NOROLE)
+    uf:Show()
+    plate.UnitFrame = uf
+    C_NamePlate = C_NamePlate or {}
+    local wasGet = C_NamePlate.GetNamePlateForUnit
+    C_NamePlate.GetNamePlateForUnit = function() return plate end
+    local okN, errN = pcall(oUF.DisableBlizzard, oUF, "nameplate1")
+    C_NamePlate.GetNamePlateForUnit = wasGet
+    check(okN and uf:IsShown() == false and uf:GetParent() == plate, "a nameplate's own frame is hidden and left on its nameplate: " .. tostring(errN or ""))
+    uf:Show()
+    check(uf:IsShown() == false, "and hidden again when the client shows it")
+end
+
 io.write("== pvp indicator ==\n")
 do
     -- An element no layout of ours enables yet, kept honest: honor levels
