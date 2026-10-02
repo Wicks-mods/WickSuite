@@ -225,6 +225,7 @@ const SHOTS = {
   core:     'images/core/screenshots/main.png',
   comforts: 'images/comforts/screenshots/main.png',
   beasts:   'images/beasts/screenshots/main.png',
+  demons:   'images/demons/screenshots/main.png',
   gear:     'images/gear/screenshots/main.png',
   poisons:  'images/poisons/screenshots/main.png',
   // Wick's UI, one per look, each titled in the look's own heading font.
@@ -641,6 +642,37 @@ function BeastsThumb() {
   );
 }
 
+function DemonsThumb() {
+  return (
+    <div style={{width:460,height:260,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
+      <DungeonBg width={460} height={260} glowX="25%" glowY="45%" glowColor={G} accent="#6B21A8" opacity={0.2}/>
+      <div style={{position:'absolute',left:-20,top:'50%',transform:'translateY(-50%)',
+        width:200,height:200,borderRadius:'50%',
+        background:`radial-gradient(circle, ${G}22 0%, transparent 70%)`,pointerEvents:'none'}}/>
+      <div style={{position:'absolute',left:20,top:18,bottom:18,width:128,
+        display:'flex',flexDirection:'column',justifyContent:'flex-start',gap:10}}>
+        <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
+          <WickWordmark size={22}/>
+          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>DEMONS</div>
+        </div>
+        <div style={{height:1,width:'100%',background:BR}}/>
+        <div style={{fontFamily:FU,fontSize:10,color:TX,lineHeight:1.35,fontWeight:500}}>Warlock kit.<br/>Stones and demons.</div>
+        <div style={{display:'flex',flexDirection:'column',gap:3,marginTop:'auto'}}>
+          {['Healthstone and Soulstone in a click','A summon key for every demon','Soul shards at a glance'].map(f=>(
+            <div key={f} style={{display:'flex',alignItems:'center',gap:4}}>
+              <div style={{width:3,height:3,borderRadius:'50%',background:G}}/>
+              <span style={{fontFamily:FM,fontSize:6.5,color:MDIM}}>{f}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{position:'absolute',right:14,top:14,bottom:14,left:160}}>
+        <Shot which="demons" size="contain" origin="center" glowAt="50% 50%"/>
+      </div>
+    </div>
+  );
+}
+
 function GearThumb() {
   return (
     <div style={{width:460,height:260,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
@@ -1003,6 +1035,7 @@ const SOCIAL = {
   core: { label: 'CORE', title: false, tagline: 'The floor everything else stands on.', features: ['Brand chrome, profiles and themes', 'One options panel for the suite', 'Client dialect shim and restriction guard', 'Minimap launcher and version broadcast'] },
   comforts: { label: 'COMFORTS', title: true, tagline: 'Small comforts, each one off until you turn it on.', features: ['Square minimap in Wick chrome', 'Richer unit tooltips', 'Auto loot, auto repair, junk selling', 'Auto quest accept and hand in'] },
   beasts: { label: 'BEASTS', title: true, tagline: 'The hunter kit: pet care, ammo and a beast atlas.', features: ['Pet happiness, loyalty and training', 'One key feeding from your own bags', 'Ammo read as shots against the quiver', 'Atlas of what each beast family brings'] },
+  demons: { label: 'DEMONS', title: true, tagline: 'The warlock kit: stones, demons and shards.', features: ['Healthstone and Soulstone: use one, or make one', 'A summon key for every demon you know', 'Soul shards at a glance', 'Talents, checklist, racials and a cooldown bar'] },
   bags: { label: 'BAGS', title: true, tagline: 'Bags and bank in one window, sorted the way you say.', features: ['Auto-categorize by class + subclass', 'Masonry layout, resizable', 'Bank panel with buy-slot button'] },
   trade: { label: 'TRADE', title: true, tagline: 'What a run earned, and what trade chat is offering.', features: ['Session earnings with gold per hour', 'Loot valued at vendor price, marked when unknown', 'The trade channel as a board', 'Badges, item icons, filters and search'] },
   gear: { label: 'GEAR', title: true, tagline: 'What to chase while levelling, and where it drops.', features: ['Upgrades scored against what you wear', 'Dungeons, crafted, quest rewards and sets', 'Live set bonuses read from the client', 'Try on, dressing room, link in chat'] },
@@ -1623,6 +1656,7 @@ const ONLY_COMPONENTS = {
   social_core: { Comp: () => <AddonSocial which="core"/>, w: 1200, h: 630 },
   social_comforts: { Comp: () => <AddonSocial which="comforts"/>, w: 1200, h: 630 },
   social_beasts: { Comp: () => <AddonSocial which="beasts"/>, w: 1200, h: 630 },
+  social_demons: { Comp: () => <AddonSocial which="demons"/>, w: 1200, h: 630 },
   social_bags: { Comp: () => <AddonSocial which="bags"/>, w: 1200, h: 630 },
   social_trade: { Comp: () => <AddonSocial which="trade"/>, w: 1200, h: 630 },
   social_gear: { Comp: () => <AddonSocial which="gear"/>, w: 1200, h: 630 },
@@ -1644,6 +1678,7 @@ const ONLY_COMPONENTS = {
   core:     { Comp: CoreThumb,          w: 460, h: 260 },
   comforts: { Comp: ComfortsThumb,      w: 460, h: 260 },
   beasts:   { Comp: BeastsThumb,        w: 460, h: 260 },
+  demons:   { Comp: DemonsThumb,        w: 460, h: 260 },
   poisons:  { Comp: PoisonsThumb,       w: 460, h: 260 },
   gear:     { Comp: GearThumb,          w: 460, h: 260 },
   ui:       { Comp: UIThumb,            w: 460, h: 260 },
@@ -1723,6 +1758,7 @@ function App() {
       <Artboard id="core-thumb" label="WickCore" w={460} h={260} Component={CoreThumb}/>
       <Artboard id="comforts-thumb" label="Wick's Comforts" w={460} h={260} Component={ComfortsThumb}/>
       <Artboard id="beasts-thumb" label="Wick's Beasts and Things" w={460} h={260} Component={BeastsThumb}/>
+      <Artboard id="demons-thumb" label="Wick's Demons and Things" w={460} h={260} Component={DemonsThumb}/>
       <Artboard id="gear-thumb" label="Wick's Gear" w={460} h={260} Component={GearThumb}/>
       <Artboard id="ui-thumb" label="Wick's UI" w={460} h={260} Component={UIThumb}/>
       <Artboard id="travel-thumb" label="Wick's Travel Form" w={460} h={260} Component={TravelThumb}/>

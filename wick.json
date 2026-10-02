@@ -497,6 +497,26 @@
       "repo": "WicksPoisonsAndThings"
     },
     {
+      "folder": "WicksDemonsAndThings",
+      "title": "Wick's Demons and Things",
+      "short": "Demons",
+      "client": "forever",
+      "slash": "/wdt",
+      "tagline": "The warlock kit: stones, demons and shards.",
+      "short_tagline": "The warlock kit: stones, demons and shards.",
+      "accent": "#4FC778",
+      "accent_name": "Fel Green",
+      "cf_slug": "wicks-demons-and-things",
+      "cf_project_id": null,
+      "features": [
+        "Healthstone and Soulstone: use one, or make one",
+        "A summon key for every demon you know",
+        "Soul shards at a glance",
+        "Talents, checklist, racials and a cooldown bar"
+      ],
+      "repo": "WicksDemonsAndThings"
+    },
+    {
       "folder": "WicksBags",
       "title": "Wick's Bags",
       "short": "Bags",
