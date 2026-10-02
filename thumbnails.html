@@ -236,6 +236,7 @@ const SHOTS = {
   ui_Arena:       'images/ui/screenshots/looks/Arena.png',
   ui_Foundry:     'images/ui/screenshots/looks/Foundry.png',
   ui_Frost:       'images/ui/screenshots/looks/Frost.png',
+  ui_Crisp:       'images/ui/screenshots/looks/Crisp.png',
 };
 function Shot({ which, style={}, accent=G, size='auto', origin='left top', glowAt='20% 25%' }) {
   return (
@@ -708,7 +709,7 @@ function UIThumb() {
           ))}
         </div>
         <div style={{fontFamily:FM,fontSize:6.5,letterSpacing:'0.28em',color:MDIM,textAlign:'center',textTransform:'uppercase'}}>
-          Eight looks <span style={{color:G}}>&middot;</span> or your own
+          Nine looks <span style={{color:G}}>&middot;</span> or your own
         </div>
       </div>
     </div>
@@ -1006,7 +1007,7 @@ const SOCIAL = {
   trade: { label: 'TRADE', title: true, tagline: 'What a run earned, and what trade chat is offering.', features: ['Session earnings with gold per hour', 'Loot valued at vendor price, marked when unknown', 'The trade channel as a board', 'Badges, item icons, filters and search'] },
   gear: { label: 'GEAR', title: true, tagline: 'What to chase while levelling, and where it drops.', features: ['Upgrades scored against what you wear', 'Dungeons, crafted, quest rewards and sets', 'Live set bonuses read from the client', 'Try on, dressing room, link in chat'] },
   poisons: { label: 'POISONS', title: true, tagline: 'The rogue kit: coatings, combo points and weapon swaps.', features: ['What coats each blade, and how long is left', 'One key per hand to recoat', 'Combo points over your target, energy under them', 'Weapon swap keys for a dagger opener'] },
-  ui: { label: 'UI', title: true, tagline: 'The whole interface, in one look.', features: ['Bars, frames, nameplates and chat', "The game's own windows, dressed to match", 'Eight looks, full customization', 'Take the tour at wicksmods.com/ui'] },
+  ui: { label: 'UI', title: true, tagline: 'The whole interface, in one look.', features: ['Bars, frames, nameplates and chat', "The game's own windows, dressed to match", 'Nine looks, full customization', 'Take the tour at wicksmods.com/ui'] },
 };
 
 // 1200x630, which is what Facebook asks for and what a boosted post
@@ -1060,7 +1061,7 @@ function AddonSocial({ which }) {
               ))}
             </div>
             <div style={{fontFamily:FM,fontSize:14,letterSpacing:'0.3em',color:MDIM,textAlign:'center',textTransform:'uppercase'}}>
-              Eight looks <span style={{color:G}}>&middot;</span> or your own
+              Nine looks <span style={{color:G}}>&middot;</span> or your own
             </div>
           </div>
         ) : (
@@ -1074,7 +1075,7 @@ function AddonSocial({ which }) {
 /* ── Wick's UI · the looks ──────────────────────
    A gallery card for the CurseForge page: every look Wick's UI (and the
    suite) can wear, each a real screenshot titled in the look's own font. */
-const UI_LOOKS = ['WicksModern', 'WicksOG', 'Hologram', 'Rebel', 'Gilded', 'Arena', 'Foundry', 'Frost'];
+const UI_LOOKS = ['WicksModern', 'WicksOG', 'Hologram', 'Rebel', 'Gilded', 'Arena', 'Foundry', 'Frost', 'Crisp'];
 // The main parts, two lines across the top of the screenshots.
 const UI_FEATURES = [
   ['Unit frames', 'Nameplates', 'Action bars', 'Threat meter', 'Window skins', 'Chat', 'Minimap', 'Tooltips'],
@@ -1116,9 +1117,9 @@ function UILooks() {
         ))}
       </div>
       <div style={{position:'absolute',left:40,right:40,bottom:40,
-        display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:16}}>
+        display:'flex',flexWrap:'wrap',justifyContent:'center',gap:14}}>
         {UI_LOOKS.map(n => (
-          <div key={n} style={{aspectRatio:'16 / 9'}}>
+          <div key={n} style={{width:'calc((100% - 56px) / 5)',aspectRatio:'16 / 9'}}>
             <Shot which={'ui_' + n} size="cover" origin="center" glowAt="50% 50%"/>
           </div>
         ))}
