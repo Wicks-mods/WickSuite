@@ -1,8 +1,10 @@
 """Offline load tests for WickCore and the products built on it.
 
     python WickSuite/tools/core-harness/run.py                 # WickCore, Forever-shaped stub client
-    python WickSuite/tools/core-harness/run.py --legacy        # WickCore, TBC-shaped stub client
-    python WickSuite/tools/core-harness/run.py --both          # WickCore, both
+    python WickSuite/tools/core-harness/run.py --tbc           # WickCore, TBC Anniversary 2.5.6-shaped stub client
+    python WickSuite/tools/core-harness/run.py --legacy        # WickCore, Era-shaped stub client (no modern API)
+    python WickSuite/tools/core-harness/run.py --both          # WickCore, modern + legacy
+    python WickSuite/tools/core-harness/run.py --all           # WickCore, modern + legacy + tbc
     python WickSuite/tools/core-harness/run.py --bags --both   # Wick's Bags on WickCore, both
     python WickSuite/tools/core-harness/run.py --kits --both   # Totems, Demons, Forms kits, both
     python WickSuite/tools/core-harness/run.py --probe        # Wick's Probe, aura-route watcher
@@ -56,14 +58,25 @@ def main():
     ap.add_argument("--ui", action="store_true", help="run the Wick's UI harness")
     ap.add_argument("--probe", action="store_true",
                     help="run the Wick's Probe harness (aura-route watcher)")
-    ap.add_argument("--legacy", action="store_true")
-    ap.add_argument("--both", action="store_true")
+    ap.add_argument("--legacy", action="store_true", help="Era-shaped stub client, none of the modern API")
+    ap.add_argument("--tbc", action="store_true", help="TBC Anniversary 2.5.6-shaped stub client")
+    ap.add_argument("--both", action="store_true", help="modern and legacy")
+    ap.add_argument("--all", action="store_true", help="modern, legacy and tbc")
     ap.add_argument("--styles", action="store_true",
                     help="with --ui: run once in every WickCore style (Modern, OG and the seven looks)")
     args = ap.parse_args()
 
     stub = HERE + "/stubclient.lua"
-    modes = ["modern", "legacy"] if args.both else (["legacy"] if args.legacy else ["modern"])
+    if args.all:
+        modes = ["modern", "legacy", "tbc"]
+    elif args.both:
+        modes = ["modern", "legacy"]
+    elif args.tbc:
+        modes = ["tbc"]
+    elif args.legacy:
+        modes = ["legacy"]
+    else:
+        modes = ["modern"]
     # Wick's Gear is Forever only. It reads C_Item and WickCore's modern
     # dialect throughout, so a legacy pass would only ever fail on the
     # first line that asks the client for an item.

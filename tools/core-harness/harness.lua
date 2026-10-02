@@ -22,9 +22,18 @@ local Core = WickCore
 
 -- ---------- client --------------------------------------------------------
 io.write("== client ==\n")
-check(Core.Client:Flavor() == (MODERN and "forever" or "tbc"), "flavor " .. Core.Client:Flavor())
+check(Core.Client:Flavor() == (S.forever and "forever" or "tbc"), "flavor " .. Core.Client:Flavor())
 check(Core.Client.isModern == MODERN, "dialect detection")
-check(Core.Client.hasSecrets == MODERN, "secrets detection")
+check(Core.Client.hasSecrets == S.forever, "secrets detection")
+-- Capabilities are detected, never inferred from the flavour. Edit Mode and
+-- the Settings panel are on every 12.x-engine client; aura containers and
+-- boss frames are Forever's.
+check(Core.Client.hasEditMode == MODERN, "edit mode detection")
+check(Core.Client.hasSettings == MODERN, "settings panel detection")
+check(Core.Client.hasAuraContainer == S.forever, "aura container detection")
+check(Core.Client.hasPing == S.forever, "ping template detection")
+check(Core.Client.hasBossFrames == S.forever, "boss frame detection")
+check(Core.Client.hasObjectiveTracker == S.forever, "objective tracker detection")
 check(#Core.Client:Report() == 2, "client report")
 
 -- ---------- lifecycle -----------------------------------------------------
@@ -95,8 +104,8 @@ check(ts and ts.name == "Alchemy" and ts.rank == 150, "GetTradeSkillLine")
 local totem = D.GetTotemInfo(1)
 check(totem and totem.haveTotem == true and not totem.secret, "GetTotemInfo at rest")
 check(#D:Report() > 15, "Dialect report")
-if MODERN then check(D.GetActiveTalentConfigID() == 4242, "talent config id (traits)")
-else check(D.GetActiveTalentConfigID() == nil, "talent config id nil on legacy") end
+if S.forever then check(D.GetActiveTalentConfigID() == 4242, "talent config id (traits)")
+else check(D.GetActiveTalentConfigID() == nil, "talent config id nil without class talents") end
 
 -- ---------- restriction --------------------------------------------------
 io.write("== restrict ==\n")
@@ -105,10 +114,14 @@ check(R:IsCombat() == false, "not in combat")
 local changes = {}
 R:OnChange(function(kind, active) changes[#changes + 1] = kind .. "=" .. tostring(active) end)
 COMBAT = true
-if MODERN then fire("ADDON_RESTRICTION_STATE_CHANGED", 0, 2) else fire("PLAYER_REGEN_DISABLED") end
+-- Forever announces combat through the restriction system; a client that
+-- never restricts anything (TBC) still has combat lockdown, and WickCore
+-- reads that too.
+if S.forever then fire("ADDON_RESTRICTION_STATE_CHANGED", 0, 2) else fire("PLAYER_REGEN_DISABLED") end
 check(R:IsCombat() == true, "in combat detected")
 check(changes[1] == "Combat=true", "OnChange fired: " .. tostring(changes[1]))
-if MODERN then
+check(#changes == 1, "and fired once: " .. #changes)
+if S.forever then
     check(R:AurasBlocked(), "auras blocked in combat")
     local a, why = D.GetAura("player", 1)
     check(a == nil and why == "restricted", "GetAura returns nil,restricted in combat")
@@ -127,8 +140,17 @@ else
     check(D.GetAura("player", 1) ~= nil, "GetAura works in combat on legacy")
 end
 COMBAT = false
-if MODERN then fire("ADDON_RESTRICTION_STATE_CHANGED", 0, 0) else fire("PLAYER_REGEN_ENABLED") end
+if S.forever then fire("ADDON_RESTRICTION_STATE_CHANGED", 0, 0) else fire("PLAYER_REGEN_ENABLED") end
 check(changes[2] == "Combat=false", "OnChange fired on clear")
+-- Forever sends both the restriction event and the regen event for one
+-- fight; the second must not be a second notification.
+if S.forever then
+    COMBAT = true
+    fire("ADDON_RESTRICTION_STATE_CHANGED", 0, 2); fire("PLAYER_REGEN_DISABLED")
+    COMBAT = false
+    fire("PLAYER_REGEN_ENABLED"); fire("ADDON_RESTRICTION_STATE_CHANGED", 0, 0)
+    check(#changes == 4, "one notification per change of state, both events in: " .. #changes)
+end
 check(D.GetAura("player", 1) ~= nil, "auras readable again")
 check(type(R:Summary()) == "string", "Summary")
 
@@ -198,11 +220,20 @@ do
     -- was refused. The popup does not name it and a forbidden action
     -- never reaches the taint log, so the event that does name it is the
     -- only source, and nothing was listening.
+    -- Kept always; said only with /wickcore debug on, because the name of
+    -- a protected function is for Wick, not for a player's chat frame.
+    S.CHAT = {}
+    S.fire("ADDON_ACTION_FORBIDDEN", "WicksBags", "SortBags()")
+    check(#S.CHAT == 0, "with debug off the refusal is kept quietly")
+    check(#Core.Restrict:Refusals() == 1, "and kept for later")
+    Core.Restrict.refusals = {}
+    local wasDebug = Core.debug
+    Core.debug = true
     S.CHAT = {}
     S.fire("ADDON_ACTION_FORBIDDEN", "WicksBags", "SortBags()")
     local said = table.concat(S.CHAT, " | ")
     check(said:find("SortBags()", 1, true) ~= nil,
-        "a forbidden call is named in chat: " .. said:sub(1, 80))
+        "with debug on a forbidden call is named in chat: " .. said:sub(1, 80))
     check(#Core.Restrict:Refusals() == 1, "and kept for later")
 
     -- Once per distinct call: a popup in a loop is not a wall of chat.
@@ -223,6 +254,7 @@ do
     S.fire("ADDON_ACTION_FORBIDDEN", "SomeOtherAddon", "CastSpellByName()")
     check(#S.CHAT == 0, "another addon's refusal is not reported as ours")
     check(#Core.Restrict:Refusals() == 2, "nor recorded")
+    Core.debug = wasDebug
 end
 
 -- ---------- the reload prompt --------------------------------------------
@@ -243,8 +275,16 @@ do
         "Crisp's accent is the class colour, its darks neutral grey with a black border")
 end
 check(Chrome.ThemeByID.rebel and Chrome.ThemeByID.rebel.look, "a look's palette is a theme")
-check(Chrome:ThemeSetting() == "auto" and (Chrome:CharStore().theme == nil or Chrome:CharStore().theme == "auto")
-    and Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "a new install follows the class")
+if Core.Client.isTBC then
+    -- TBC's addons were always fel green; an update must look like them.
+    check(Chrome:ThemeSetting() == "fel" and (Chrome:CharStore().theme == nil or Chrome:CharStore().theme == "fel")
+        and Chrome.activeTheme == "fel", "a new install on TBC starts on fel")
+    check(Chrome:StyleID() == "og", "and on Wick OG")
+else
+    check(Chrome:ThemeSetting() == "auto" and (Chrome:CharStore().theme == nil or Chrome:CharStore().theme == "auto")
+        and Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "a new install follows the class")
+    check(Chrome:StyleID() == "modern", "and starts on Wick Modern")
+end
 -- The rest of this section starts from Fel.
 Chrome:SetTheme("fel")
 local felBefore = Chrome.Colors.fel[3]
@@ -326,7 +366,10 @@ do
     Store.enabled = nil
     local needed, why = Store:Needed()
     check(needed == false, "with the client keeping settings, the store is not needed")
-    check(tostring(why):find("handed", 1, true) ~= nil, "and says why: " .. tostring(why))
+    -- Forever says the client handed the table over; any other client is
+    -- told the store is not for it at all.
+    check(tostring(why):find("handed", 1, true) ~= nil or (not Core.Client.isForever and why == "not needed on this client"),
+        "and says why: " .. tostring(why))
     check(Store:Decide() == false, "so it decides itself off")
 
     -- And it must not put macro contents back over settings the client
@@ -357,7 +400,8 @@ check(Chrome:CharStore().theme == "shaman", "and left where it was")
 
 Chrome:CharStore().theme = nil                       -- the store has not landed yet
 Chrome:ApplySavedTheme()
-check(Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "with nothing to read it follows the class")
+local freshTheme = Core.Client.isTBC and "fel" or Chrome.ThemeByClass[select(2, UnitClass("player"))].id
+check(Chrome.activeTheme == freshTheme, "with nothing to read it falls back to the client's default, " .. freshTheme)
 check(Chrome:CharStore().theme == nil,
     "and writes nothing, so a late store still has something to restore: " ..
     tostring(Chrome:CharStore().theme))
@@ -629,6 +673,20 @@ check(A.db.handedOver == false, "the client handed nothing over for the product"
 -- WickCoreDB is nil at binding; put the decision input back to that.
 Core.self.db.handedOver = false
 Store.enabled, Store.reason, Store.optedIn = nil, nil, nil
+
+-- The store is Forever's. Any other client keeps settings itself, and a
+-- first session there (no file on disk yet) must not read as the client
+-- handing nothing back.
+if not Core.Client.isForever then
+    local needed, why = Store:Needed()
+    check(needed == false and why == "not needed on this client", "off Forever the store is not needed: " .. tostring(why))
+    check(Store:TurnOn() == false, "and cannot be turned on")
+    Store.enabled, Store.reason, Store.optedIn = nil, nil, nil
+end
+-- The mechanism itself is client-agnostic; the rest of the section tests
+-- it as Forever, and puts the flag back at the end.
+local wasForever = Core.Client.isForever
+Core.Client.isForever = true
 
 -- Off until asked. Macros are the player's screen space.
 S.MACROS.acct = { { name = "ss", icon = 134400, body = "#showtooltip\n/cast Serpent Sting" } }
@@ -935,6 +993,7 @@ check(#S.MACROS.acct == 1, "and nothing comes back afterwards")
 S.CHAT = {}
 SlashCmdList.WICK_WICKCORE("store")
 check(#S.CHAT >= 3, "/wickcore store reports")
+Core.Client.isForever = wasForever
 
 
 

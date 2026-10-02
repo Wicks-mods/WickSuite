@@ -9,23 +9,41 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const ROOT = "C:/Program Files (x86)/World of Warcraft/_anniversary_/Interface/AddOns";
+// Both clients' AddOns folders: the TBC suite lives in _anniversary_, and
+// WickCore, Wick's UI (with its vendored oUF and LibActionButton under
+// Libs/) and the Forever products live in _classic_beta_. A folder that is
+// a junction into the other client is scanned once, by real path.
+const ROOTS = [
+  "C:/Program Files (x86)/World of Warcraft/_anniversary_/Interface/AddOns",
+  "C:/Program Files (x86)/World of Warcraft/_classic_beta_/Interface/AddOns",
+];
 
-const ADDONS = fs.readdirSync(ROOT, { withFileTypes: true })
-  .filter(d => d.isDirectory() && /^(Wicks|Wickid)/.test(d.name) && !/\.bak$/.test(d.name))
-  .filter(d => d.name !== "WicksProbe")
-  .map(d => d.name);
+const seenReal = new Set();
+const ADDONS = [];   // { name, dir }
+for (const root of ROOTS) {
+  if (!fs.existsSync(root)) continue;
+  for (const d of fs.readdirSync(root, { withFileTypes: true })) {
+    if (!/^(Wicks|Wickid|WickCore)/.test(d.name) || /\.bak$/.test(d.name) || d.name === "WicksProbe") continue;
+    const dir = path.join(root, d.name);
+    let real;
+    try { real = fs.realpathSync(dir); } catch { continue; }
+    if (!fs.statSync(real).isDirectory() || seenReal.has(real)) continue;
+    seenReal.add(real);
+    ADDONS.push({ name: d.name, dir: real });
+  }
+}
 
 const files = [];
 for (const a of ADDONS) {
   const walk = dir => {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.name === ".git") continue;
       const p = path.join(dir, e.name);
       if (e.isDirectory()) walk(p);
-      else if (e.name.endsWith(".lua")) files.push({ addon: a, path: p });
+      else if (e.name.endsWith(".lua")) files.push({ addon: a.name, path: p });
     }
   };
-  walk(path.join(ROOT, a));
+  walk(a.dir);
 }
 
 const srcs = files.map(f => ({ ...f, src: fs.readFileSync(f.path, "utf8") }));

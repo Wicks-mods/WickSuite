@@ -16,9 +16,23 @@ strsplit = strsplit or function(sep, s) local out = {} for piece in (s .. sep):g
 strtrim = strtrim or function(s) return (s:gsub("^%s+", ""):gsub("%s+$", "")) end
 format = string.format
 
+-- Three client shapes:
+--   "modern"  Forever: the 12.x engine, Mainline FrameXML, secrets on.
+--   "tbc"     TBC Anniversary 2.5.6: the same engine with Classic FrameXML.
+--             The modern API set, plus the legacy globals as deprecation
+--             fallbacks; no secrets, no aura containers, no ping, no class
+--             talents, no InterfaceOptions panel.
+--   "legacy"  The lowest common denominator: an Era-shaped client with
+--             none of the modern API.
+-- S.modern is "speaks the modern API"; S.forever is "is Forever".
 local MODE = ... or "modern"
-local MODERN = MODE == "modern"
-local S = { mode = MODE, modern = MODERN, SENT = {}, CHAT = {}, MISSING = {} }
+local TBC = MODE == "tbc"
+local MODERN = MODE == "modern" or TBC
+-- Midnight rules (secret values in combat, aura reads that throw) are
+-- Forever's alone; TBC has the API shape without the restrictions.
+local SECRETS = MODE == "modern"
+local S = { mode = MODE, modern = MODERN, tbc = TBC, forever = MODE == "modern", secrets = SECRETS,
+            SENT = {}, CHAT = {}, MISSING = {} }
 
 COMBAT = false
 LOGGED = true
@@ -339,6 +353,11 @@ function CreateFrame(kind, name, parent, template)
     if kind == "ItemButton" and not MODERN then
         error("CreateFrame: Unknown frame type 'ItemButton'", 2)
     end
+    -- The aura container intrinsic is Forever's alone (Blizzard_AuraContainer
+    -- is not in the TBC 2.5.6 UI source).
+    if kind == "AuraContainer" and (TBC or not MODERN) then
+        error("CreateFrame: Unknown frame type 'AuraContainer'", 2)
+    end
     local f = newMock(kind, name)
     f.__parent = parent
     f.__template = template
@@ -382,7 +401,9 @@ end
 UIParent = newMock("Frame", "UIParent"); UIParent.__w, UIParent.__h = 1600, 900
 Minimap = newMock("Minimap", "Minimap"); Minimap.__w = 140
 -- Forever ships the compass ring and keeps the zoom controls on the frame.
-if MODERN then
+-- Classic FrameXML (TBC and Era) keeps the old round border and the named
+-- cluster pieces around it.
+if MODERN and not TBC then
     -- Blizzard sizes the container to the ring art, larger than the map.
     MinimapCluster = newMock("Frame", "MinimapCluster")
     MinimapCluster.MinimapContainer = newMock("Frame", "MinimapContainer")
@@ -391,7 +412,17 @@ if MODERN then
     MinimapCompassTexture = newMock("Texture", "MinimapCompassTexture")
     MinimapCompassTextureUnderlay = newMock("Texture", "MinimapCompassTextureUnderlay")
 else
+    MinimapCluster = newMock("Frame", "MinimapCluster")
     MinimapBorder = newMock("Texture", "MinimapBorder")
+    MinimapBorderTop = newMock("Texture", "MinimapBorderTop")
+    MinimapZoneTextButton = newMock("Button", "MinimapZoneTextButton")
+    MiniMapMailFrame = newMock("Frame", "MiniMapMailFrame")
+    MiniMapTracking = newMock("Frame", "MiniMapTracking")
+    MiniMapBattlefieldFrame = newMock("Frame", "MiniMapBattlefieldFrame")
+    GameTimeFrame = newMock("Button", "GameTimeFrame")
+    MinimapZoomIn = newMock("Button", "MinimapZoomIn")
+    MinimapZoomOut = newMock("Button", "MinimapZoomOut")
+    MiniMapWorldMapButton = newMock("Button", "MiniMapWorldMapButton")
 end
 -- Tooltips accumulate lines, and a test that cannot read them back can
 -- only check that nothing threw.
@@ -595,7 +626,7 @@ function HasPetUI() return true, CLASS == "HUNTER" end
 -- Hunter pet reads. Modern: C_PetInfo. Legacy: the old globals.
 local PET = { happiness = 2, damage = 100, rate = 1, loyalty = "Best Friend", total = 12, used = 7, diet = { "Meat", "Fish" } }
 S.PET = PET
-local function petHappiness() if COMBAT and MODERN then return SECRET, SECRET, SECRET end return PET.happiness, PET.damage, PET.rate end
+local function petHappiness() if COMBAT and SECRETS then return SECRET, SECRET, SECRET end return PET.happiness, PET.damage, PET.rate end
 -- Mana by default. A druid changes it by changing form, which is what
 -- makes the bar under a nameplate mean different things.
 function UnitPowerType() return S.POWER_TYPE or 0 end
@@ -825,7 +856,7 @@ function StaticPopup_Show(which) S.LAST_POPUP = which end
 function GetScreenWidth() return 1600 end
 function GetScreenHeight() return 900 end
 function GetTotemInfo(slot)
-    if MODERN and COMBAT then return SECRET, SECRET, SECRET, SECRET, nil, SECRET, SECRET end
+    if SECRETS and COMBAT then return SECRET, SECRET, SECRET, SECRET, nil, SECRET, SECRET end
     if slot == 1 then return true, "Strength of Earth Totem", 100, 120, 136024, 1, 8075 end
     return false, "", 0, 0, nil, 0, 0
 end
@@ -1021,6 +1052,12 @@ if MODERN then
     function GetBuildInfo() return "1.60.1", "69893", "Sep 16 2026", 16001, "", "" end
     WOW_PROJECT_ID = 1
     function issecretvalue(v) return v == SECRET end
+    -- Systems WickCore's capability flags read at load. Edit Mode is on
+    -- every 12.x-engine client; the tracker and boss frames are Mainline
+    -- FrameXML and come off again for TBC below.
+    EditModeManagerFrame = newMock("Frame", "EditModeManagerFrame")
+    ObjectiveTrackerFrame = newMock("Frame", "ObjectiveTrackerFrame")
+    BossTargetFrameContainer = newMock("Frame", "BossTargetFrameContainer")
     Enum = {
         AddOnRestrictionType = { Combat = 0, Encounter = 1, ChallengeMode = 2, PvPMatch = 3, Map = 4, Chat = 5 },
         BagIndex = { Accountbanktab = -3, Characterbanktab = -2, Keyring = -1, Backpack = 0, ReagentBag = 5,
@@ -1143,8 +1180,8 @@ if MODERN then
         -- reading anything it is not allowed to.
         GetSpellCooldown = function(id)
             local on = S.ON_COOLDOWN and S.ON_COOLDOWN[id] or false
-            return { startTime = COMBAT and SECRET or (on and 100 or 0),
-                     duration = COMBAT and SECRET or (on and 30 or 0),
+            return { startTime = (COMBAT and SECRETS) and SECRET or (on and 100 or 0),
+                     duration = (COMBAT and SECRETS) and SECRET or (on and 30 or 0),
                      isEnabled = true, isActive = on, modRate = 1 }
         end,
     }
@@ -1192,12 +1229,12 @@ if MODERN then
     }
     C_UnitAuras = {
         GetAuraDataByIndex = function(unit, i, filter)
-            if COMBAT then error("GetAuraDataByIndex(): Auras cannot be accessed when secret while tainted") end
+            if COMBAT and SECRETS then error("GetAuraDataByIndex(): Auras cannot be accessed when secret while tainted") end
             if i > 2 then return nil end
             return { name = i == 1 and "Lightning Shield" or "Water Shield", icon = 136051, applications = 3, duration = 600, expirationTime = 1000, spellId = 324 }
         end,
         GetAuraDataBySpellName = function(unit, name)
-            if COMBAT then error("GetAuraDataBySpellName(): Auras cannot be accessed when secret while tainted") end
+            if COMBAT and SECRETS then error("GetAuraDataBySpellName(): Auras cannot be accessed when secret while tainted") end
             return { name = name, spellId = 324 }
         end,
     }
@@ -1303,7 +1340,12 @@ if MODERN then
         RegisterAddOnCategory = function() end,
         OpenToCategory = function(id) OPENED = id end,
     }
-else
+end
+
+-- The legacy globals: the whole API of an Era-shaped client, and on TBC
+-- 2.5.6 the deprecation fallbacks (Blizzard_Deprecated, alive while the
+-- loadDeprecationFallbacks CVar is on) that the TBC addons still call.
+if not MODERN or TBC then
     function GetBuildInfo() return "2.5.5", "51536", "Sep 12 2026", 20505 end
     WOW_PROJECT_ID, WOW_PROJECT_BURNING_CRUSADE_CLASSIC = 5, 5
     -- A legacy client has no consumable subclass enum, so a rogue's bag
@@ -1436,6 +1478,34 @@ else
     end
     function InterfaceOptions_AddCategory() end
     function InterfaceOptionsFrame_OpenToCategory(f) OPENED = f end
+end
+
+-- TBC Anniversary 2.5.6: what it lacks against Forever, read off Blizzard's
+-- classic_anniversary UI source (2.5.6.69795, 2026-10-02). The restriction
+-- state is the one entry still to be confirmed by the in-game probe; it is
+-- modelled as "the API exists and nothing is restricted".
+if TBC then
+    function GetBuildInfo() return "2.5.6", "69795", "Sep 12 2026", 20506, "", "" end
+    WOW_PROJECT_ID, WOW_PROJECT_BURNING_CRUSADE_CLASSIC = 5, 5
+    function issecretvalue() return false end
+    C_Secrets.HasSecretRestrictions = function() return false end
+    C_Secrets.ShouldCooldownsBeSecret = function() return false end
+    C_Secrets.ShouldUnitPowerBeSecret = function() return false end
+    C_Secrets.ShouldUnitPowerMaxBeSecret = function() return false end
+    C_RestrictedActions.IsAddOnRestrictionActive = function() return false end
+    C_ClassTalents = nil
+    ClassTalentImportExportMixin = nil
+    local templateInfo = C_XMLUtil.GetTemplateInfo
+    local ABSENT_TEMPLATES = { CustomAuraContainerTemplate = true, PingableUnitFrameTemplate = true }
+    C_XMLUtil.GetTemplateInfo = function(t)
+        if ABSENT_TEMPLATES[t] then return nil end
+        return templateInfo(t)
+    end
+    InterfaceOptions_AddCategory = nil
+    InterfaceOptionsFrame_OpenToCategory = nil
+    ObjectiveTrackerFrame = nil
+    BossTargetFrameContainer = nil
+    QuestWatchFrame = newMock("Frame", "QuestWatchFrame")
 end
 
 -- Load a list of files as one addon, passing (addonName, ns) like the client.
