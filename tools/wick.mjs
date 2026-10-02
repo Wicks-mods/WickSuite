@@ -652,8 +652,8 @@ function composeXRelease(addon, version) {
   const tagline = addon.short_tagline || addon.tagline || "";
   // The tags follow the client this release is for. Every post said TBC
   // Classic, the Forever ones included, which is the wrong audience.
-  const tags = (addon.client || "tbc") === "forever"
-    ? "#WoWForever #Warcraft"
+  const tags = (addon.client || "tbc") === "forever" ? "#WoWForever #Warcraft"
+    : addon.client === "both" ? "#WoWClassic #TBCClassic #WoWForever"
     : "#WoWClassic #TBCClassic";
   const parts = [`${addon.title} v${version} is live on CurseForge.`, "", tagline, "", cfUrl, "", tags];
   let text = parts.join("\n").replace(/\n{3,}/g, "\n\n");
@@ -836,22 +836,37 @@ function cmdScaffold(rawTitle) {
 // ═══════════════════════════════════════════════════════════════════════════
 // sync — regenerate suite cross-link blocks from wick.json
 // ═══════════════════════════════════════════════════════════════════════════
-function cmdSync() {
+function cmdSync(...flags) {
   const config = readConfig();
   const marker = {
     start: "<!-- wick:suite-table:start -->",
     end:   "<!-- wick:suite-table:end -->",
   };
-  const table = [
+  // Rows follow the reader's client. A TBC README lists what a TBC player
+  // can install (tbc and both entries), a Forever README lists forever and
+  // both, and a both-client README lists everything. An addon with no
+  // CurseForge project has nothing to link to and stays out; Bags and
+  // Trade Hall have an entry per client under one slug, so rows are
+  // deduplicated by slug.
+  const clientKey = a => a.client || "tbc";
+  const fits = (host, a) => clientKey(a) === "both" || clientKey(host) === "both" || clientKey(a) === clientKey(host);
+  const rowsFor = host => {
+    const seen = new Set();
+    return config.addons
+      .filter(a => !a.benched && a.cf_slug && a.cf_project_id && fits(host, a))
+      .filter(a => { if (seen.has(a.cf_slug)) return false; seen.add(a.cf_slug); return true; });
+  };
+  const tableFor = host => [
     "| Addon | GitHub | CurseForge |",
     "|---|---|---|",
-    ...config.addons.filter(a => !a.benched).map(a =>
+    ...rowsFor(host).map(a =>
       `| **${a.title}** | [repo](https://github.com/${config.github_user}/${a.repo}) | [CurseForge](https://www.curseforge.com/wow/addons/${a.cf_slug}) |`),
   ].join("\n");
   const discord = config.social?.discord_invite
     ? `\n\n**Community:** [Discord](${config.social.discord_invite})`
     : "";
-  const block = `${marker.start}\n${table}${discord}\n${marker.end}`;
+  const blockFor = host => `${marker.start}\n${tableFor(host)}${discord}\n${marker.end}`;
+  const dryRun = (flags || []).includes("--dry-run");
 
   // Each addon README + each MoreFromWick.lua + the suite README is one phase.
   const TOTAL = config.addons.length * 2 + 1;
@@ -861,18 +876,24 @@ function cmdSync() {
   for (const a of config.addons) {
     phase++;
     setProgress("wick sync", phase, TOTAL, `README: ${a.folder}`);
-    const readme = path.join(config.addons_root_local, a.folder, "README.md");
+    // The addon's own root: a Forever entry's README is in the Forever
+    // folder, not under the same name in the TBC root.
+    const readme = path.join(rootOf(config, a), a.folder, "README.md");
     if (!fs.existsSync(readme)) continue;
     let body = fs.readFileSync(readme, "utf8");
     const re = new RegExp(`${marker.start}[\\s\\S]*?${marker.end}`);
     if (re.test(body)) {
-      const next = body.replace(re, block);
-      if (next !== body) { fs.writeFileSync(readme, next); touched++; ok(`updated ${a.folder}/README.md`); }
+      const next = body.replace(re, blockFor(a));
+      if (next !== body) {
+        touched++;
+        if (dryRun) { log(`  would update ${a.folder}/README.md (${clientKey(a)}: ${rowsFor(a).length} rows)`); }
+        else { fs.writeFileSync(readme, next); ok(`updated ${a.folder}/README.md`); }
+      }
     } else {
       log(`  (${a.folder}/README.md has no wick:suite-table marker — add it manually to enable sync)`);
     }
   }
-  // Also sync WickSuite/README.md
+  // Also sync WickSuite/README.md, which speaks for every client.
   phase++;
   setProgress("wick sync", phase, TOTAL, "README: WickSuite");
   const suiteReadme = path.join(SUITE_DIR, "README.md");
@@ -880,8 +901,12 @@ function cmdSync() {
     let body = fs.readFileSync(suiteReadme, "utf8");
     const re = new RegExp(`${marker.start}[\\s\\S]*?${marker.end}`);
     if (re.test(body)) {
-      const next = body.replace(re, block);
-      if (next !== body) { fs.writeFileSync(suiteReadme, next); touched++; ok(`updated WickSuite/README.md`); }
+      const next = body.replace(re, blockFor({ client: "both" }));
+      if (next !== body) {
+        touched++;
+        if (dryRun) { log(`  would update WickSuite/README.md`); }
+        else { fs.writeFileSync(suiteReadme, next); ok(`updated WickSuite/README.md`); }
+      }
     }
   }
   // ── MoreFromWick.lua suite-data block ─────────────────────────────
@@ -895,10 +920,11 @@ function cmdSync() {
   for (const a of config.addons) {
     phase++;
     setProgress("wick sync", phase, TOTAL, `MoreFromWick: ${a.folder}`);
-    const mfwPath = path.join(config.addons_root_local, a.folder, "MoreFromWick.lua");
+    const mfwPath = path.join(rootOf(config, a), a.folder, "MoreFromWick.lua");
     if (!fs.existsSync(mfwPath)) continue;
-    const rows = config.addons
-      .filter(x => !x.benched && x.folder !== a.folder && x.cf_project_id)
+    // The same rows the README gets, minus the host itself.
+    const rows = rowsFor(a)
+      .filter(x => x.folder !== a.folder)
       .map(x => {
         const tag = x.short_tagline || x.tagline || "";
         return `    { folder = "${luaEsc(x.folder)}", title = "${luaEsc(x.title)}", tagline = "${luaEsc(tag)}", slug = "${luaEsc(x.cf_slug)}" },`;
@@ -909,7 +935,11 @@ function cmdSync() {
     const re = new RegExp(`${luaMarker.start}[\\s\\S]*?${luaMarker.end}`);
     if (re.test(body)) {
       const next = body.replace(re, luaBlock);
-      if (next !== body) { fs.writeFileSync(mfwPath, next); touched++; ok(`updated ${a.folder}/MoreFromWick.lua`); }
+      if (next !== body) {
+        touched++;
+        if (dryRun) { log(`  would update ${a.folder}/MoreFromWick.lua (${rows.split("\n").length} rows)`); }
+        else { fs.writeFileSync(mfwPath, next); ok(`updated ${a.folder}/MoreFromWick.lua`); }
+      }
     } else {
       log(`  (${a.folder}/MoreFromWick.lua has no wick:suite-data marker — add it manually to enable sync)`);
     }
@@ -950,7 +980,21 @@ function cmdRender(...targets) {
 // ---------------------------------------------------------------------------
 function clientOf(config, addon) {
   const name = (addon && addon.client) || "tbc";
-  const c = (config.clients || {})[name];
+  const clients = config.clients || {};
+  // One build for every client (WickCore, Comforts, Wick's UI): the folder
+  // lives in the TBC root and is junctioned into the other client, one zip
+  // goes up under every game version, and the tag and display name carry
+  // no flavour.
+  if (name === "both") {
+    const tbc = clients.tbc || clientOf(config, { client: "tbc" });
+    return {
+      ...tbc,
+      label: "every client",
+      both: true,
+      cf_game_versions: Object.values(clients).map(c => c.cf_game_version_id).filter(Boolean),
+    };
+  }
+  const c = clients[name];
   if (c) return c;
   // A config from before the clients map: the top level is the tbc client.
   return {
@@ -972,7 +1016,8 @@ function resolveAddon(config, folder, flags) {
   const all = config.addons.filter(a => a.folder === folder);
   if (all.length === 0) die(`addon not found in wick.json: ${folder}`);
   if (want) {
-    const hit = all.find(a => (a.client || "tbc") === want);
+    // A "both" entry is that client's entry too.
+    const hit = all.find(a => (a.client || "tbc") === want || a.client === "both");
     if (!hit) die(`${folder} has no ${want} entry in wick.json`);
     return hit;
   }
@@ -1051,7 +1096,8 @@ async function cmdRelease(folder, newVer, ...flags) {
   // Forever on its own branch, so a bare vX.Y.Z collides: Bags had already
   // used v0.9.0 through v0.9.3 on the TBC line. Non-tbc releases get their
   // own prefix so the two lines can run at the same numbers.
-  const tagName = (addon.client && addon.client !== "tbc")
+  // One build for both clients is one line, so it takes the bare tag.
+  const tagName = (addon.client && addon.client !== "tbc" && addon.client !== "both")
     ? `${addon.client}-v${newVer}`
     : `v${newVer}`;
   // An existing tag on this very commit is a re-ship, not a mistake:
@@ -1079,27 +1125,42 @@ async function cmdRelease(folder, newVer, ...flags) {
   const zipDir = process.env.TEMP || process.env.TMP || config.addons_root_local;
   const zipPath = path.join(zipDir, zipName);
   if (fs.existsSync(zipPath)) fs.rmSync(zipPath);
+  // What ships is what git knows about: tracked files, plus untracked ones
+  // that are not ignored. A disk walk shipped everything on disk, including
+  // git-ignored strays (a zip left in Trade Hall's folder, a draft page).
+  // .wick-* are this tool's own markers (an announcement made); they sit in
+  // the addon folder but are never part of the addon.
+  const listed = runCapture(`git -C "${dir}" ls-files -z --cached --others --exclude-standard`)
+    .split("\0").filter(Boolean)
+    .filter(rel => !(rel.startsWith(".git/") || rel.startsWith(".claude/") || rel === ".gitignore" || rel.startsWith(".wick-")))
+    .filter(rel => fs.existsSync(path.join(dir, rel)));
+  if (listed.length === 0) die(`nothing to zip: git lists no files under ${dir}`);
+  const listPath = path.join(zipDir, `.wick-zip-list-${folder}.txt`);
+  fs.writeFileSync(listPath, Buffer.from(listed.join("\n"), "utf8"));
   // Compress-Archive writes backslash ZIP entries which CF rejects — use ZipArchive directly.
   const psZip = [
     `Add-Type -AssemblyName System.IO.Compression`,
     `Add-Type -AssemblyName System.IO.Compression.FileSystem`,
     `$src = '${dir.replace(/'/g, "''")}'`,
     `$dst = '${zipPath.replace(/'/g, "''")}'`,
+    `$list = '${listPath.replace(/'/g, "''")}'`,
     `$folder = '${folder}'`,
     `$stream = [System.IO.File]::Open($dst, [System.IO.FileMode]::Create)`,
     `$zip = New-Object System.IO.Compression.ZipArchive($stream, [System.IO.Compression.ZipArchiveMode]::Create)`,
     `try {`,
-    `  foreach ($f in Get-ChildItem -Path $src -Recurse -File -Force) {`,
-    `    $rel = $f.FullName.Substring($src.Length + 1).Replace('\\', '/')`,
-    // .wick-* are this tool's own markers (an announcement made); they sit
-    // in the addon folder but are never part of the addon.
-    `    if ($rel -like '.git/*' -or $rel -like '.claude/*' -or $rel -eq '.gitignore' -or $rel -like '.wick-*') { continue }`,
-    `    [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $f.FullName, $folder + '/' + $rel, [System.IO.Compression.CompressionLevel]::Optimal)`,
+    `  foreach ($rel in (Get-Content -LiteralPath $list -Encoding UTF8)) {`,
+    `    if (-not $rel) { continue }`,
+    `    $full = Join-Path $src ($rel.Replace('/', '\\'))`,
+    `    [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $full, $folder + '/' + $rel, [System.IO.Compression.CompressionLevel]::Optimal)`,
     `  }`,
     `} finally { $zip.Dispose(); $stream.Dispose() }`,
   ].join("; ");
-  run(`powershell -NoProfile -Command "${psZip}"`);
-  ok(`zip: ${zipName}`);
+  try {
+    run(`powershell -NoProfile -Command "${psZip}"`);
+  } finally {
+    try { fs.rmSync(listPath); } catch (_) {}
+  }
+  ok(`zip: ${zipName} (${listed.length} files)`);
 
   // ── Upload to CurseForge ─────────────────────────────────────────
   // Write metadata to a temp JSON file and use curl's `-F metadata=<file`
@@ -1110,14 +1171,15 @@ async function cmdRelease(folder, newVer, ...flags) {
   const metadata = JSON.stringify({
     // An addon that ships one package for several clients lists them all
     // in cf_game_versions; everything else takes the suite default.
-    gameVersions: addon.cf_game_versions || [clientOf(config, addon).cf_game_version_id],
+    gameVersions: addon.cf_game_versions || clientOf(config, addon).cf_game_versions
+      || [clientOf(config, addon).cf_game_version_id],
     releaseType: "release",
     changelog: `Release ${newVer}. See CHANGELOG.md for details.`,
     changelogType: "markdown",
     // Bags and Trade Hall host both flavours on one project, so the file
     // list would otherwise show two files with the same name and nothing
     // to tell them apart. TBC names are left exactly as they were.
-    displayName: (addon.client && addon.client !== "tbc")
+    displayName: (addon.client && addon.client !== "tbc" && addon.client !== "both")
       ? `${addon.title} v${newVer} (${clientOf(config, addon).label})`
       : `${addon.title} v${newVer}`,
   });
@@ -1710,7 +1772,7 @@ const [,, sub, ...rest] = process.argv;
 switch (sub) {
   case "list":     cmdList(); break;
   case "scaffold": cmdScaffold(rest.join(" ")); break;
-  case "sync":     cmdSync(); break;
+  case "sync":     cmdSync(...rest); break;
   case "render":   cmdRender(...rest); break;
   case "release":       await cmdRelease(rest[0], rest[1], ...rest.slice(2)); break;
   case "audit-secrets": cmdAuditSecrets(); break;
