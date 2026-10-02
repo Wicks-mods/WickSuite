@@ -798,7 +798,10 @@ function ClearCursor() end
 function GetMoney() return S.MONEY or 123456 end
 -- The structured tooltip. S.TOOLTIP_LINES_FOR lets a test put words in
 -- the client's mouth, which is how the set bonus reader is exercised:
--- on the real client those lines are Forever's own set data.
+-- on the real client those lines are Forever's own set data. The
+-- namespace belongs to the modern API; an Era-shaped client has none
+-- (and the TBC block below takes these two calls off again).
+if MODERN then
 C_TooltipInfo = C_TooltipInfo or {}
 C_TooltipInfo.GetHyperlink = function(link)
     if not S.TOOLTIP_LINES_FOR then return nil end
@@ -821,6 +824,7 @@ C_TooltipInfo.GetInventoryItem = function(unit, slot)
     end
     lines[#lines + 1] = { leftText = "Durability 57 / 75" }
     return { lines = lines }
+end
 end
 
 function GetInventoryItemID(unit, inv)
@@ -1506,12 +1510,20 @@ if TBC then
     ObjectiveTrackerFrame = nil
     BossTargetFrameContainer = nil
     QuestWatchFrame = newMock("Frame", "QuestWatchFrame")
-    -- Names a harness must not invent a stand-in for on this client.
+    -- Tooltips carry no data table on this client: the processor exists and
+    -- never runs (probed 2026-10-02), and the tooltip info API is absent.
+    if C_TooltipInfo then C_TooltipInfo.GetHyperlink = nil; C_TooltipInfo.GetInventoryItem = nil end
+    -- Names a harness must not invent a stand-in for on this client. The
+    -- function names are from the 2.5.6 probe's missing list.
     S.ABSENT = { C_ClassTalents = true, ClassTalentImportExportMixin = true, InterfaceOptions_AddCategory = true,
                  InterfaceOptionsFrame_OpenToCategory = true, ObjectiveTrackerFrame = true, BossTargetFrameContainer = true,
-                 OverrideActionBar = true, ClickBindingFrame = true, LegacySystemFrame = true, CollectionsJournal = true,
+                 ClickBindingFrame = true, LegacySystemFrame = true, CollectionsJournal = true,
                  EncounterJournal = true, ProfessionsFrame = true, PlayerSpellsFrame = true, AuctionHouseFrame = true,
-                 C_PingSystem = true, NameUtil = true }
+                 C_PingSystem = true, NameUtil = true,
+                 UnitSelectionType = true, PlayerVehicleHasComboPoints = true, GetUnitChargedPowerPoints = true,
+                 UnitIsMercenary = true, UnitHonorLevel = true, UnitIsQuestBoss = true, GetMouseFocus = true,
+                 C_LevelLink = true, GetContainerNumSlots = true, GetContainerItemInfo = true, GetNumPartyMembers = true,
+                 GetNumRaidMembers = true, GetAddOnMetadata = true, IsAddOnLoaded = true }
 end
 
 -- Load a list of files as one addon, passing (addonName, ns) like the client.

@@ -34,6 +34,7 @@ check(Core.Client.hasAuraContainer == S.forever, "aura container detection")
 check(Core.Client.hasPing == S.forever, "ping template detection")
 check(Core.Client.hasBossFrames == S.forever, "boss frame detection")
 check(Core.Client.hasObjectiveTracker == S.forever, "objective tracker detection")
+check(Core.Client.hasTooltipData == S.forever, "tooltip data detection")
 check(#Core.Client:Report() == 2, "client report")
 
 -- ---------- lifecycle -----------------------------------------------------
