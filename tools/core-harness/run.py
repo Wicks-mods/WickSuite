@@ -86,9 +86,10 @@ def main():
     # there is nothing for a legacy pass to say about it.
     if args.probe:
         modes = ["modern"]
-    # Wick's UI is Forever only: its libraries take the retail path.
+    # Wick's UI ships to Forever and TBC Anniversary, both 12.x-engine
+    # clients; the Era-shaped stub has nothing to say about it.
     if args.ui:
-        modes = ["modern"]
+        modes = ["modern", "tbc"] if args.all else (["tbc"] if args.tbc else ["modern"])
     ok = True
     for mode in modes:
         if args.bags:

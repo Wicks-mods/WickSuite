@@ -1506,6 +1506,12 @@ if TBC then
     ObjectiveTrackerFrame = nil
     BossTargetFrameContainer = nil
     QuestWatchFrame = newMock("Frame", "QuestWatchFrame")
+    -- Names a harness must not invent a stand-in for on this client.
+    S.ABSENT = { C_ClassTalents = true, ClassTalentImportExportMixin = true, InterfaceOptions_AddCategory = true,
+                 InterfaceOptionsFrame_OpenToCategory = true, ObjectiveTrackerFrame = true, BossTargetFrameContainer = true,
+                 OverrideActionBar = true, ClickBindingFrame = true, LegacySystemFrame = true, CollectionsJournal = true,
+                 EncounterJournal = true, ProfessionsFrame = true, PlayerSpellsFrame = true, AuctionHouseFrame = true,
+                 C_PingSystem = true, NameUtil = true }
 end
 
 -- Load a list of files as one addon, passing (addonName, ns) like the client.

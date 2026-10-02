@@ -41,7 +41,14 @@ for _, k in ipairs({ "Stagger", "Totems", "Runes", "AlternativePower", "Addition
     "QuestIndicator", "RaidRoleIndicator", "MasterLooterIndicator", "PrivateAuras", "Happiness", "Auras",
     "HealingAll", "HealingPlayer", "HealingOther", "DamageAbsorb", "HealAbsorb", "TempLoss", "OverHealIndicator",
     "OverDamageAbsorbIndicator", "OverHealAbsorbIndicator", "CostPrediction", "SafeZone", "Shield", "Spark",
-    "Icon", "Text", "Time", "Delay", "Buffs", "Debuffs", "Pips", "PostUpdate", "PostCastStart", "Override", "UpdateColor" }) do OUF_KEYS[k] = true end
+    "Icon", "Text", "Time", "Delay", "Buffs", "Debuffs", "Pips", "PostUpdate", "PostCastStart", "Override", "UpdateColor",
+    -- oUF's meta functions. RegisterMetaFunction skips a name the prototype
+    -- frame already answers, so an invented method here would keep the real
+    -- CreateAuras and the tag functions from ever being installed.
+    "CreateAuras", "Tag", "Untag", "UpdateTags",
+    -- Aura element overrides a layout may set; invented, they would win the
+    -- "options.X or self.X or default" chain and swallow the real builder.
+    "CreateButton", "PostCreateButton", "PostUpdateButton" }) do OUF_KEYS[k] = true end
 
 function CreateFrame(kind, name, parent, template)
     local f = realCreateFrame(kind, name, parent, template)
@@ -112,6 +119,27 @@ stubGlobal("SetOverrideBindingClick", function(owner, _, key, button) owner.__ov
 stubGlobal("SetBinding", function() return true end)
 stubGlobal("LoadBindings", noop)
 stubGlobal("GetPhysicalScreenSize", function() return 2560, 1440 end)
+-- The action-slot API, as empty slots. LibActionButton's Classic path
+-- reads these on every update (the Forever path goes through secrets and
+-- never did), and a nil from the auto-stub where a number belongs throws.
+stubGlobal("HasAction", function() return false end)
+stubGlobal("GetActionInfo", function() return nil end)
+stubGlobal("GetActionText", function() return nil end)
+stubGlobal("GetActionTexture", function() return nil end)
+stubGlobal("GetActionCount", function() return 0 end)
+stubGlobal("GetActionCooldown", function() return 0, 0, 1, 1 end)
+stubGlobal("GetActionCharges", function() return nil end)
+stubGlobal("GetActionLossOfControlCooldown", function() return 0, 0 end)
+stubGlobal("IsAttackAction", function() return false end)
+stubGlobal("IsEquippedAction", function() return false end)
+stubGlobal("IsCurrentAction", function() return false end)
+stubGlobal("IsAutoRepeatAction", function() return false end)
+stubGlobal("IsUsableAction", function() return false, false end)
+stubGlobal("IsConsumableAction", function() return false end)
+stubGlobal("IsStackableAction", function() return false end)
+stubGlobal("IsItemAction", function() return false end)
+stubGlobal("IsActionInRange", function() return nil end)
+stubGlobal("ActionHasRange", function() return false end)
 stubGlobal("GetNumShapeshiftForms", function() return 0 end)
 stubGlobal("GetShapeshiftForm", function() return 0 end)
 stubGlobal("GetShapeshiftFormInfo", function() return nil end)
@@ -129,13 +157,19 @@ stubGlobal("RANGE_INDICATOR", "\226\128\162")
 stubGlobal("LEAVE_VEHICLE", "Leave")
 stubGlobal("C_Timer", { After = function(_, fn) fn() end, NewTimer = function(_, fn) return { Cancel = noop } end, NewTicker = function() return { Cancel = noop } end })
 
--- Blizzard frames oUF and the bar module reach for by name.
-for _, n in ipairs({ "TotemFrame", "PlayerFrame", "TargetFrame", "FocusFrame", "PetFrame", "BossTargetFrameContainer",
+-- Blizzard frames oUF and the bar module reach for by name. The second
+-- list is Mainline FrameXML and stays absent on the TBC-shaped client.
+for _, n in ipairs({ "TotemFrame", "PlayerFrame", "TargetFrame", "FocusFrame", "PetFrame",
     "CompactRaidFrameContainer", "EditModeManagerFrame", "MainActionBar", "MultiBarBottomLeft", "MultiBarBottomRight",
-    "MultiBarLeft", "MultiBarRight", "BuffFrame", "DebuffFrame", "StanceBar", "PetActionBar", "PossessActionBar", "OverrideActionBar",
+    "MultiBarLeft", "MultiBarRight", "BuffFrame", "DebuffFrame", "StanceBar", "PetActionBar", "PossessActionBar",
     "ActionBarController", "ActionBarActionEventsFrame", "PlayerCastingBarFrame", "PetCastingBarFrame",
-    "OverlayPlayerCastingBarFrame", "RuneFrame", "MonkStaggerBar", "AlternatePowerBar", "PlayerFrameAlternatePowerBarArea" }) do
+    "RuneFrame", "MonkStaggerBar", "AlternatePowerBar", "PlayerFrameAlternatePowerBarArea" }) do
     if rawget(_G, n) == nil then rawset(_G, n, realCreateFrame("Frame", n)) end
+end
+if not S.tbc then
+    for _, n in ipairs({ "BossTargetFrameContainer", "OverrideActionBar", "OverlayPlayerCastingBarFrame" }) do
+        if rawget(_G, n) == nil then rawset(_G, n, realCreateFrame("Frame", n)) end
+    end
 end
 if rawget(_G, "PartyFrame") == nil then
     local pf = realCreateFrame("Frame", "PartyFrame")
@@ -143,7 +177,42 @@ if rawget(_G, "PartyFrame") == nil then
     rawset(_G, "PartyFrame", pf)
 end
 
+-- Number formatting and the unit percent calls the tags read. These are
+-- FrameXML and engine functions on every 12.x client.
+stubGlobal("AbbreviateLargeNumbers", function(n) return tostring(n) end)
+stubGlobal("AbbreviateNumbers", function(n) return tostring(n) end)
+stubGlobal("BreakUpLargeNumbers", function(n) return tostring(n) end)
+stubGlobal("UnitHealthPercent", function() return 100 end)
+stubGlobal("UnitPowerPercent", function() return 100 end)
+stubGlobal("UnitHealthMissing", function() return 0 end)
+stubGlobal("UnitPowerMissing", function() return 0 end)
+-- Forever's name helper (Mainline FrameXML); the TBC-shaped client has none
+-- and the tag falls back to UnitName.
+if S.forever then
+    stubGlobal("NameUtil", { GetUnmodifiedUnitFullName = function(u) return UnitName(u) end })
+end
+stubGlobal("C_StringUtil", {})
+C_StringUtil.TruncateWhenZero = C_StringUtil.TruncateWhenZero or function(v) if v == 0 then return "" end return tostring(v) end
+C_StringUtil.CreateSecondsFormatter = C_StringUtil.CreateSecondsFormatter or function() return S.newMock("SecondsFormatter") end
+
 -- Retail helpers oUF leans on.
+stubGlobal("GenerateClosure", function(f, ...)
+    local n, bound = select("#", ...), { ... }
+    return function(...)
+        local args, m = {}, select("#", ...)
+        for i = 1, n do args[i] = bound[i] end
+        for i = 1, m do args[n + i] = (select(i, ...)) end
+        return f(unpack(args, 1, n + m))
+    end
+end)
+-- The aura container's option vocabulary (Forever only; the TBC-shaped
+-- client has none of it and the plain-frame element never asks).
+if S.forever then
+    stubGlobal("AuraContainerSortMethod", { ExpirationOnly = 1, Default = 0 })
+    stubGlobal("AuraContainerSortDirection", { Normal = 1, Reverse = 2 })
+    stubGlobal("CustomAuraContainerAuraProcessingPolicy", { ProcessAura = 1 })
+end
+stubGlobal("AnchorUtil", { FlowLayoutAxis = { Horizontal = 1, Vertical = 2 } })
 stubGlobal("Mixin", function(o, ...) for i = 1, select("#", ...) do for k, v in pairs((select(i, ...))) do o[k] = v end end return o end)
 stubGlobal("CreateFromMixins", function(...) return Mixin({}, ...) end)
 local ColorMixin = {}
@@ -181,8 +250,12 @@ rawset(_G, "Constants", rawget(_G, "Constants") or {})
 setmetatable(Constants, { __index = function(t, k) local g = {}; rawset(t, k, g); return g end })
 stubGlobal("CurveConstants", { ScaleTo100 = 100, Reverse = true })
 stubGlobal("C_Texture", { GetAtlasInfo = function() return nil end })
-C_Secrets = C_Secrets or {}
-C_Secrets.CanCompareUnitTokens = C_Secrets.CanCompareUnitTokens or function() return true end
+-- Forever can compare unit tokens through C_Secrets; the TBC-shaped client
+-- has the namespace without that call, and oUF must cope.
+if not S.tbc then
+    C_Secrets = C_Secrets or {}
+    C_Secrets.CanCompareUnitTokens = C_Secrets.CanCompareUnitTokens or function() return true end
+end
 stubGlobal("RAID_CLASS_COLORS", setmetatable({}, { __index = function() return col(1, 1, 1) end }))
 stubGlobal("CLASS_SORT_ORDER", { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "SHAMAN", "MAGE", "WARLOCK", "DRUID" })
 stubGlobal("UnitSelectionType", function() return 3 end)
@@ -194,6 +267,9 @@ stubGlobal("GetThreatStatusColor", function() return 1, 1, 1 end)
 local AUTO = {}
 local function autoStub() setmetatable(_G, { __index = function(_, k)
     if type(k) ~= "string" then return nil end
+    -- What the stub says this client does not have stays missing; an
+    -- invented stand-in would hide the very gap the run is for.
+    if S.ABSENT and S.ABSENT[k] then return nil end
     S.MISSING[k] = (S.MISSING[k] or 0) + 1
     local verb = k:match("^(%u%l+)%u")
     local VERBS = { Get = 1, Is = 1, Has = 1, Can = 1, Unit = 1, Set = 1, Create = 1, Clear = 1, Enable = 1,
@@ -342,7 +418,14 @@ io.write("== unit frames ==\n")
 local UF = ns.UnitFrames
 check(UF.initialized, "unit frames initialized")
 check(UF.frames.player ~= nil and UF.frames.target ~= nil, "player and target spawned")
-check(UF.frames.boss and #UF.frames.boss == 5, "five boss frames")
+if S.forever then
+    check(UF.frames.boss and #UF.frames.boss == 5, "five boss frames")
+else
+    check(UF.frames.boss == nil and rawget(_G, "WicksUI_Boss1") == nil, "no boss frames on a client without boss units")
+    local hasBossPage = false
+    for _, k in ipairs(UF.PAGE_ORDER) do if k == "boss" then hasBossPage = true end end
+    check(not hasBossPage, "and no boss page")
+end
 do
     -- An incoming heal stops at full health rather than running past the
     -- frame's edge (the client's calculator allows 5% over by default).
@@ -544,6 +627,30 @@ check(not ns.errors or #ns.errors == 0, "no module errors: " .. table.concat(ns.
 
 io.write("== buffs ==\n")
 check(ns.Auras.initialized and ns.Auras.buffs and ns.Auras.debuffs, "buff and debuff containers built")
+-- Which Auras element answered: the AuraContainer intrinsic on Forever,
+-- the plain-frame element on a client without it. oUF hides its Private
+-- table after load, so the answer is read off the elements and frames.
+if S.forever then
+    -- The real element, not a mock standing in for it: the stub names an
+    -- invented object after the method that made it.
+    check(rawget(ns.Auras.buffs, "__kind") == "AuraContainer" and ns.Auras.buffs.sources == nil,
+        "the AuraContainer intrinsic answers CreateAuras: " .. tostring(rawget(ns.Auras.buffs, "__kind")))
+else
+    check(ns.Auras.buffs.sources ~= nil, "the plain-frame element answers CreateAuras without the intrinsic")
+end
+local playerFrame = rawget(_G, "WicksUI_Player")
+local pingable = playerFrame and (playerFrame.__template or ""):find("Pingable") ~= nil
+check(playerFrame and pingable == S.forever, "pingable template only where the client has it: " .. tostring(playerFrame and playerFrame.__template))
+if not S.forever then
+    local a = ns.Auras.buffs
+    check(a.sources and #a.sources == 1 and a.sources[1].filter == "HELPFUL", "the classic element holds one HELPFUL group")
+    a:ForceUpdate()
+    local shown = a.activeButtons or {}
+    check(#shown == 2, "two buffs drawn from C_UnitAuras: " .. #shown)
+    local b = shown[1]
+    check(b and b.Icon and b.Time and b.Count and b.Cooldown, "a classic aura button has icon, time, count and cooldown")
+    check(b and b.auraData and b.auraData.name == "Lightning Shield", "and carries its aura: " .. tostring(b and b.auraData and b.auraData.name))
+end
 check(ns.Movers.list.auras_buffs ~= nil, "buffs have a mover")
 
 io.write("== info panels ==\n")
