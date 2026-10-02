@@ -1039,6 +1039,137 @@ do
     check(kids == 0, "and gets no panel of ours")
 end
 
+io.write("== windows of the Classic kind ==\n")
+do
+    local PS = ns.PanelSkins
+    check(PS.Classic ~= nil and PS.H ~= nil and PS.Classic.WINDOWS.CharacterFrame ~= nil,
+        "the Classic window pass is loaded, with the character window on its list")
+    if S.tbc then
+        -- The stub invents any Capitalised field on first read. A frame of
+        -- the old kind has none of the portrait template's parts, and a
+        -- widget of the old kind none of the keyed pieces the scanners ask
+        -- about; these stay nil, as they are on the client.
+        local KEYS = {}
+        for _, k in ipairs({ "NineSlice", "PortraitContainer", "TitleContainer", "Border", "BG", "Bg", "Center", "CloseButton",
+            "ClosePanelButton", "Portrait", "Inset", "Header", "Background", "TopTileStreaks", "BorderFrame", "Tabs", "TabSystem",
+            "Left", "Right", "Middle", "Mid", "LeftDisabled", "Text", "Label", "Icon", "IconBorder", "IconTexture", "IconMask",
+            "ScrollUpButton", "ScrollDownButton", "ScrollBar", "ScrollTarget", "Arrow", "Button", "Fill", "Mask", "Track", "Slider",
+            "Back", "Forward", "TopLeft", "BottomRight", "MiddleMiddle", "Name", "StateIcon", "CollapseButton", "ResetButton",
+            "FilterDropdown", "FilterButton", "SkillUps", "Glow", "BorderSelected", "SelectedTexture", "IconOverlay", "NameFrame",
+            "RankBorder", "Rank", "ButtonText", "JunkIcon", "NewItemTexture", "HighlightTexture", "MaximizeMinimizeFrame",
+            "MaximizeButton", "MinimizeButton", "ItemSlotBackground" }) do KEYS[k] = true end
+        local BLOCK = setmetatable({}, { __index = function(_, k) return OUF_KEYS[k] or KEYS[k] end })
+        local function mock(kind, name, parent, w, h)
+            local f = CreateFrame(kind, name, parent)
+            rawset(f, "__nokeys", BLOCK)
+            f:SetSize(w or 100, h or 20)
+            return f
+        end
+        local function tex(parent, name, w, h, layer)
+            local t = S.newMock("Texture", name)
+            t.__parent = parent
+            t.__w, t.__h = w or 256, h or 256
+            rawset(t, "GetDrawLayer", function() return layer or "ARTWORK" end)
+            rawset(t, "GetAtlas", function() return nil end)
+            if name then _G[name] = t end
+            return t
+        end
+        local function regions(f, list) rawset(f, "GetRegions", function() return unpack(list) end) end
+        local function children(f, list) rawset(f, "GetChildren", function() return unpack(list) end) end
+
+        -- The character window as Blizzard_CharacterFrame/TBC builds it.
+        local cf = mock("Frame", "CharacterFrame", UIParent, 384, 512)
+        local art = { tex(cf, nil, 256, 256), tex(cf, nil, 128, 256), tex(cf, nil, 256, 256), tex(cf, nil, 128, 256),
+            tex(cf, "CharacterFramePortrait", 60, 60, "BACKGROUND") }
+        regions(cf, art)
+        local close = mock("Button", "CharacterFrameCloseButton", cf, 32, 32)
+        local tab1 = mock("Button", "CharacterFrameTab1", cf, 10, 32)
+        for _, k in ipairs({ "Left", "Middle", "Right", "LeftDisabled", "MiddleDisabled", "RightDisabled" }) do
+            tex(tab1, "CharacterFrameTab1" .. k, 20, 32, "BACKGROUND")
+        end
+        local tabText = S.newMock("FontString", "CharacterFrameTab1Text")
+        rawset(tab1, "GetFontString", function() return tabText end)
+        local page = mock("Frame", "PaperDollFrame", cf, 384, 512)
+        local pageArt = { tex(page, nil, 256, 256), tex(page, nil, 128, 256) }
+        regions(page, pageArt)
+        local res = mock("Frame", "MagicResFrame1", page, 32, 29)
+        local resIcon = tex(res, nil, 32, 32, "BACKGROUND")
+        regions(res, { resIcon })
+        local slot = mock("Button", "CharacterHeadSlot", page, 37, 37)
+        slot.icon = tex(slot, "CharacterHeadSlotIconTexture", 37, 37, "BORDER")
+        slot.IconBorder = tex(slot, nil, 37, 37, "OVERLAY")
+        regions(slot, { slot.icon, slot.IconBorder })
+        local sf = mock("ScrollFrame", "SkillListScrollFrame", page, 296, 220)
+        local sfArt = { tex(sf, nil, 30, 128), tex(sf, nil, 30, 128) }
+        regions(sf, sfArt)
+        local sb = mock("Slider", "SkillListScrollFrameScrollBar", sf, 16, 200)
+        local up = mock("Button", "SkillListScrollFrameScrollBarScrollUpButton", sb, 18, 16)
+        local down = mock("Button", "SkillListScrollFrameScrollBarScrollDownButton", sb, 18, 16)
+        local thumb = tex(sb, nil, 16, 24)
+        rawset(sb, "GetThumbTexture", function() return thumb end)
+        regions(sb, { thumb, tex(sb, nil, 16, 100) })
+        children(sb, { up, down })
+        children(sf, { sb })
+        local row = mock("Button", "SkillTypeLabel1", page, 285, 14)
+        local plate = tex(row, "SkillTypeLabel1Plate", 285, 14, "BACKGROUND")
+        local plus = tex(row, nil, 16, 16)
+        plus.__tex = "Interface\\Buttons\\UI-PlusButton-Up"
+        rawset(row, "GetNormalTexture", function() return plus end)
+        local rowText = S.newMock("FontString")
+        rowText.__text = "Weapon Skills"
+        rawset(row, "GetFontString", function() return rowText end)
+        regions(row, { plate, plus })
+        children(page, { res, slot, sf, row })
+        children(cf, { close, tab1, page })
+        local okC, errC = pcall(function() PS:Skin(cf) end)
+        check(okC, "skins a window of the Classic kind: " .. tostring(errC or ""))
+        local bd = PS.extrasOf(cf) and PS.extrasOf(cf).backdrop
+        local pts = bd and rawget(bd, "__points")
+        local p1, p2 = pts and pts[1], pts and pts[2]
+        check(p1 and p1[1] == "TOPLEFT" and p1[4] == 11 and p1[5] == -12 and p2 and p2[1] == "BOTTOMRIGHT" and p2[4] == -32 and p2[5] == 76,
+            "its panel is cut to the painted art, not the frame")
+        check(art[1].__alpha == 0 and art[5].__alpha == 0, "the quarters of art and the portrait are faded")
+        check(pageArt[1].__alpha == 0, "a page's art goes with them")
+        check(resIcon.__alpha ~= 0, "a resistance icon is content and stays")
+        check(_G.CharacterFrameTab1Left.__alpha == 0 and _G.CharacterFrameTab1MiddleDisabled.__alpha == 0
+            and PS.extrasOf(tab1) and PS.extrasOf(tab1).backdrop ~= nil and PS.skinnedTabs[tab1] == true,
+            "an old tab loses its named pieces and takes a tile")
+        check(ns.glyphs[close] ~= nil, "the close button wears our mark")
+        check(PS.extrasOf(slot) and PS.extrasOf(slot).backdrop ~= nil, "a gear slot takes its tile")
+        check(sfArt[1].__alpha == 0 and up.__alpha == 0 and (thumb.__color ~= nil or thumb.__tex ~= nil),
+            "an old scroll bar: its art gone, its arrows hidden, a slim thumb")
+        check(plate.__alpha == 0 and plus.__alpha ~= 0 and plus.__desaturated == true,
+            "a list row loses its plate and keeps its plus mark, greyed")
+
+        -- A dialog of the old kind has a background that fills its rect, and
+        -- takes the pass every window gets; a window of a shape this pass
+        -- does not know keeps the game's art.
+        local popup = mock("Frame", "StaticPopup1", UIParent, 320, 72)
+        popup.BG = mock("Frame", nil, popup, 320, 72)
+        local okD, errD = pcall(function() PS:Skin(popup) end)
+        check(okD and PS.extrasOf(popup) and PS.extrasOf(popup).backdrop ~= nil,
+            "a dialog of the old kind takes the pass every window gets: " .. tostring(errD or ""))
+        local odd = mock("Frame", "SomeOldWindow", UIParent, 300, 300)
+        PS:Skin(odd)
+        check(PS.extrasOf(odd) == nil, "an old window of unknown shape keeps the game's art")
+
+        -- A portrait-template window on this client holds old widgets too.
+        local mf = mock("Frame", "MerchantFrame", UIParent, 336, 444)
+        mf.NineSlice = CreateFrame("Frame", nil, mf)
+        mf.TitleContainer = { TitleText = S.newMock("FontString") }
+        local mtab = mock("Button", "MerchantFrameTab1", mf, 10, 32)
+        for _, k in ipairs({ "Left", "Middle", "Right", "LeftDisabled", "MiddleDisabled", "RightDisabled" }) do
+            tex(mtab, "MerchantFrameTab1" .. k, 20, 32, "BACKGROUND")
+        end
+        rawset(mtab, "GetFontString", function() return S.newMock("FontString") end)
+        children(mf, { mtab })
+        local okM, errM = pcall(function() PS:Skin(mf) end)
+        check(okM, "a portrait window on this client skins: " .. tostring(errM or ""))
+        check(_G.MerchantFrameTab1Left.__alpha == 0 and PS.extrasOf(mtab) and PS.extrasOf(mtab).backdrop ~= nil,
+            "and the old tab pieces inside it go too")
+    end
+end
+
 io.write("== click bindings ==\n")
 do
     local PS = ns.PanelSkins
