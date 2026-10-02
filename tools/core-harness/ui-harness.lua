@@ -636,20 +636,53 @@ if S.forever then
     check(rawget(ns.Auras.buffs, "__kind") == "AuraContainer" and ns.Auras.buffs.sources == nil,
         "the AuraContainer intrinsic answers CreateAuras: " .. tostring(rawget(ns.Auras.buffs, "__kind")))
 else
-    check(ns.Auras.buffs.sources ~= nil, "the plain-frame element answers CreateAuras without the intrinsic")
+    check(rawget(ns.Auras.buffs, "__template") == "SecureAuraHeaderTemplate",
+        "the buffs are a secure aura header on a client without the intrinsic: " .. tostring(rawget(ns.Auras.buffs, "__template")))
 end
 local playerFrame = rawget(_G, "WicksUI_Player")
 local pingable = playerFrame and (playerFrame.__template or ""):find("Pingable") ~= nil
 check(playerFrame and pingable == S.forever, "pingable template only where the client has it: " .. tostring(playerFrame and playerFrame.__template))
 if not S.forever then
-    local a = ns.Auras.buffs
-    check(a.sources and #a.sources == 1 and a.sources[1].filter == "HELPFUL", "the classic element holds one HELPFUL group")
-    a:ForceUpdate()
-    local shown = a.activeButtons or {}
-    check(#shown == 2, "two buffs drawn from C_UnitAuras: " .. #shown)
-    local b = shown[1]
-    check(b and b.Icon and b.Time and b.Count and b.Cooldown, "a classic aura button has icon, time, count and cooldown")
-    check(b and b.auraData and b.auraData.name == "Lightning Shield", "and carries its aura: " .. tostring(b and b.auraData and b.auraData.name))
+    local h = ns.Auras.buffs
+    check(h:GetAttribute("filter") == "HELPFUL" and h:GetAttribute("template") == "WicksUI_AuraButtonTemplate"
+        and h:GetAttribute("includeWeapons") == 1, "the header carries our template, the HELPFUL filter and the weapon enchants")
+    -- The layout comes from the profile (the shipped layout here): the
+    -- header is told the same numbers, with the signs of the growth.
+    local g = ns.Auras:db().buffs
+    local corner = (g.growthY == "UP" and "BOTTOM" or "TOP") .. (g.growthX == "LEFT" and "RIGHT" or "LEFT")
+    check(h:GetAttribute("point") == corner and h:GetAttribute("wrapAfter") == g.perRow and h:GetAttribute("maxWraps") == g.rows
+        and h:GetAttribute("xOffset") == (g.growthX == "LEFT" and -1 or 1) * (g.size + g.spacing)
+        and h:GetAttribute("wrapYOffset") == (g.growthY == "UP" and 1 or -1) * (g.size + g.rowSpacing),
+        ("the header lays its rows out from the %s, %s and %s"):format(corner, g.growthX:lower(), g.growthY:lower()))
+    check(h:GetAttribute("initialConfigFunction") ~= nil and h:GetAttribute("config-width") == g.size,
+        "a button born in combat is sized by the client's restricted code")
+    check(ns.Auras.debuffs:GetAttribute("filter") == "HARMFUL" and ns.Auras.debuffs:GetAttribute("includeWeapons") == nil,
+        "the debuff header takes HARMFUL and no weapons")
+    -- A button as the header would make it from our template.
+    local b = CreateFrame("Button", "WicksUI_buffsHeaderAuraButton1", h, "WicksUI_AuraButtonTemplate")
+    WicksUI_AuraButtonMixin.OnLoad(b)
+    local st = ns.Auras:StateOf(b)
+    check(st and st.art and st.art.Icon and st.art.Time and st.art.Count, "a header button gets our icon, time and count on a frame of its own")
+    WicksUI_AuraButtonMixin.OnAttributeChanged(b, "index", 1)
+    check(st and st.index == 1 and st.art.Icon.__tex == 136051 and st.art.Count.__text == 3 and st.expires == 1000,
+        "and reads its aura by index from C_UnitAuras: " .. tostring(st and st.art.Icon.__tex))
+    check(st and type(st.art.Time.__text) == "string" and st.art.Time.__text ~= "", "with the time left written on it: " .. tostring(st and st.art.Time.__text))
+    check(rawget(b, "Icon") == nil and rawget(b, "Time") == nil, "nothing of ours is written onto the client's button")
+    -- The plain-frame element still serves the unit frames' auras.
+    local a
+    for _, n in ipairs({ "WicksUI_Target", "WicksUI_Player", "WicksUI_Focus" }) do
+        local uf = rawget(_G, n)
+        a = a or (uf and (uf.wuibuffs or uf.wuidebuffs))
+    end
+    check(a and a.sources ~= nil, "the plain-frame element serves the unit frames' auras without the intrinsic")
+    if a then
+        a:ForceUpdate()
+        local shown = a.activeButtons or {}
+        check(#shown == 2, "two auras drawn from C_UnitAuras on a unit frame: " .. #shown)
+        local ab = shown[1]
+        check(ab and ab.Icon and ab.Time and ab.Cooldown, "a classic aura button has icon, time and cooldown")
+        check(ab and ab.auraData and ab.auraData.name == "Lightning Shield", "and carries its aura: " .. tostring(ab and ab.auraData and ab.auraData.name))
+    end
 end
 check(ns.Movers.list.auras_buffs ~= nil, "buffs have a mover")
 
