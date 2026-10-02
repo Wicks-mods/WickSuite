@@ -1721,6 +1721,54 @@ do
         "page names in sentence case")
 end
 
+io.write("== a page of a window ==\n")
+do
+    -- The group finder's Listing page fills LFGParentFrame. Dragging the
+    -- page used to pull it out of the window and keep it at a spot of its
+    -- own, leaving the window standing empty beside it.
+    local PS = ns.PanelSkins
+    local win = CreateFrame("Frame", "LFGParentFrame", UIParent)
+    win:SetSize(458, 535)
+    local page = CreateFrame("Frame", "LFGListingFrame", win)
+    local d = PS:db()
+    local was = d.moveWindows
+    d.moveWindows = true
+    d.windowPos = { LFGListingFrame = { 30, 667 }, LFGParentFrame = { 452, 658 } }
+    -- As an earlier version left it: out of the window, at its own spot.
+    page:ClearAllPoints()
+    page:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 30, 667)
+    local ok, err = pcall(PS.holdWindow, "LFGListingFrame", page)
+    check(ok, "holding a page runs: " .. tostring(err or ""))
+    local _, rel = page:GetPoint(1)
+    check(page:GetNumPoints() == 2 and rel == win, "a page pulled out of its window goes back into it")
+    check(d.windowPos.LFGListingFrame == nil and d.windowPos.LFGParentFrame ~= nil,
+        "the page's own spot is dropped and the window's kept")
+    local _, wrel, _, wx, wy = win:GetPoint(1)
+    check(wrel == UIParent and math.abs((wx or 0) - 452) < 0.5 and math.abs((wy or 0) - 658) < 0.5,
+        "the window goes to its saved spot")
+    local e = PS.extrasOf(page)
+    local m = e and e.mover
+    local moved
+    rawset(win, "StartMoving", function() moved = "window" end)
+    rawset(page, "StartMoving", function() moved = "page" end)
+    rawset(win, "GetLeft", function() return 100 end)
+    rawset(win, "GetTop", function() return 600 end)
+    if m then
+        m:GetScript("OnMouseDown")(m, "LeftButton")
+        m:GetScript("OnMouseUp")(m)
+    end
+    check(moved == "window", "the page's title bar drags the window")
+    check(d.windowPos.LFGParentFrame and d.windowPos.LFGParentFrame[1] == 100 and d.windowPos.LFGListingFrame == nil,
+        "and the spot is kept under the window's name")
+    -- restoreWindows never lays a page's spot on the page.
+    d.windowPos.LFGListingFrame = { 30, 667 }
+    rawset(page, "IsShown", function() return true end)
+    PS.restoreWindows()
+    local _, prel = page:GetPoint(1)
+    check(prel == win, "restoring windows leaves the page in its window")
+    d.moveWindows, d.windowPos = was, {}
+end
+
 io.write("== slash ==\n")
 check(type(SlashCmdList.WICK_WICKSUI) == "function", "/wui registered")
 local okS, errS = pcall(SlashCmdList.WICK_WICKSUI, "help")

@@ -237,7 +237,18 @@ local function newMock(kind, name)
                 t.__points = t.__points or {}
                 t.__points[#t.__points + 1] = { point, rel, relPoint, x, y }
             end
-        elseif k == "GetNumPoints" then return function() return 1 end
+        -- SetAllPoints is two anchors, which is how a page that fills its
+        -- window is held; GetNumPoints counts what is stored, so a check
+        -- can tell a page in its window from one pulled out of it. A frame
+        -- never anchored still answers 1, as it always did.
+        elseif k == "SetAllPoints" then return function(_, rel)
+                rel = rel or t.__parent
+                t.__points = { { "TOPLEFT", rel, "TOPLEFT", 0, 0 }, { "BOTTOMRIGHT", rel, "BOTTOMRIGHT", 0, 0 } }
+            end
+        elseif k == "GetNumPoints" then return function()
+                local n = t.__points and #t.__points or 0
+                return n > 0 and n or 1
+            end
         elseif k == "SetText" then return function(_, s, r, g, b, a, wrap)
                 -- Retail tooltips: SetText(text [, r, g, b, a, wrap]) or a color
                 -- object; argument five must be a number. TBC accepted the wrap
