@@ -550,7 +550,7 @@ function UnitName(unit)
     return "Wick"
 end
 CLASS = "SHAMAN"
-local CLASS_NAMES = { SHAMAN = { "Shaman", 7 }, WARLOCK = { "Warlock", 9 }, DRUID = { "Druid", 11 }, HUNTER = { "Hunter", 3 }, ROGUE = { "Rogue", 4 } }
+local CLASS_NAMES = { SHAMAN = { "Shaman", 7 }, WARLOCK = { "Warlock", 9 }, DRUID = { "Druid", 11 }, HUNTER = { "Hunter", 3 }, ROGUE = { "Rogue", 4 }, PALADIN = { "Paladin", 2 } }
 function UnitClass() local c = CLASS_NAMES[CLASS] or { CLASS, 0 } return c[1], CLASS, c[2] end
 function UnitRace() return "Orc", "Orc", 2 end
 function UnitExists(u) return u == "player" or u == "pet" or (S.HAS_TARGET and u == "target") or (S.UNITS and S.UNITS[u]) or false end
@@ -1310,11 +1310,22 @@ if MODERN then
     C_UnitAuras = {
         GetAuraDataByIndex = function(unit, i, filter)
             if COMBAT and SECRETS then error("GetAuraDataByIndex(): Auras cannot be accessed when secret while tainted") end
+            -- S.AURAS lets a test say what is on the player; without
+            -- it, a shaman's two shields.
+            if S.AURAS then
+                local n = S.AURAS[i]
+                if not n then return nil end
+                return { name = n, icon = 136051, applications = 1, duration = 600, expirationTime = 1000, spellId = 324 }
+            end
             if i > 2 then return nil end
             return { name = i == 1 and "Lightning Shield" or "Water Shield", icon = 136051, applications = 3, duration = 600, expirationTime = 1000, spellId = 324 }
         end,
         GetAuraDataBySpellName = function(unit, name)
             if COMBAT and SECRETS then error("GetAuraDataBySpellName(): Auras cannot be accessed when secret while tainted") end
+            if S.AURAS then
+                for _, n in ipairs(S.AURAS) do if n == name then return { name = name, spellId = 324 } end end
+                return nil
+            end
             return { name = name, spellId = 324 }
         end,
     }
@@ -1503,6 +1514,11 @@ if not MODERN or TBC then
     function GetHonorCurrency() return 120 end
     function GetArenaCurrency() return 0 end
     function UnitAura(unit, i, filter)
+        if S.AURAS then
+            local n = S.AURAS[i]
+            if not n then return nil end
+        return n, "Interface\\Icons\\x", 1, nil, 600, 1000, "player", false, false, 324
+        end
         if i > 2 then return nil end
         return i == 1 and "Lightning Shield" or "Water Shield", "Interface\\Icons\\x", 3, nil, 600, 1000, "player", false, false, 324
     end

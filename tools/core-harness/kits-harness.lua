@@ -1,4 +1,4 @@
--- Offline load test for the three Forever class kits on WickCore.
+-- Offline load test for the Forever class kits on WickCore.
 --   args: coreDir, addonsDir, mode, stubPath
 -- Loads WickCore, then each kit as the matching class, and drives the kit
 -- panel, checklist, talents, racials and the kit-specific bars.
@@ -1359,6 +1359,134 @@ if SA then
     check(SA.cooldowns ~= nil, "stances has a cooldown bar")
 end
 S.STANCE, S.STANCE_COUNT = 0, 0
+
+io.write("== Seals and Things ==\n")
+CLASS = "PALADIN"
+S.STANCE, S.STANCE_COUNT = 0, 0
+local keepBook = S.SPELLBOOK
+-- A paladin in the thirties: three seals, Judgement, one blessing, one
+-- aura. The order is the book's order, which is learning order.
+S.SPELLBOOK = {
+    { "Holy Light", "Rank 4", "Interface\\Icons\\HolyLight", 1026 },
+    { "Seal of Righteousness", "Rank 3", "Interface\\Icons\\SoR", 20154 },
+    { "Seal of the Crusader", "Rank 2", "Interface\\Icons\\SotC", 21082 },
+    { "Judgement", "", "Interface\\Icons\\Judgement", 20271 },
+    { "Blessing of Might", "Rank 2", "Interface\\Icons\\BoM", 19835 },
+    { "Devotion Aura", "Rank 3", "Interface\\Icons\\Devo", 10290 },
+    { "Seal of Command", "Rank 1", "Interface\\Icons\\SoC", 20375 },
+}
+S.AURAS = { "Seal of Righteousness", "Blessing of Might", "Devotion Aura" }
+-- A two-hander in hand, a mace and a shield in the first bag.
+local HAMMER, MACE, SHIELD, BIG = 11684, 2080, 1203, 17182
+S.ITEMS = S.ITEMS or {}
+S.ITEMS[HAMMER] = { equipLoc = "INVTYPE_2HWEAPON", classID = 2, subClassID = 5, name = "Ironfoe" }
+S.ITEMS[MACE]   = { equipLoc = "INVTYPE_WEAPON",   classID = 2, subClassID = 4, name = "Verigan's Fist" }
+S.ITEMS[SHIELD] = { equipLoc = "INVTYPE_SHIELD",   classID = 4, subClassID = 6, name = "Aegis of the Scarlet Commander" }
+S.ITEMS[BIG]    = { equipLoc = "INVTYPE_2HWEAPON", classID = 2, subClassID = 8, name = "Sulfuras" }
+S.EQUIPPED_IDS = { [16] = HAMMER }
+S.SLOT_ITEMS[1] = { { id = MACE, count = 1 }, { id = SHIELD, count = 1 } }
+
+local SNS = S.loadAddon(ADDONS_DIR .. "/WicksSealsAndThings", "WicksSealsAndThings")
+S.fire("ADDON_LOADED", "WicksSealsAndThings")
+S.fire("PLAYER_LOGIN")
+dumpErrors()
+local LENTRY = WickCore.Launcher.entries.WicksSealsAndThings
+local LA = LENTRY and LENTRY.addon
+check(LA ~= nil, "seals launcher registered")
+local lstrip = _G.WicksSealsStrip
+check(lstrip ~= nil and lstrip:IsShown(), "seal strip shown for a paladin")
+check(_G.WicksSealsButton1:IsShown() and _G.WicksSealsButton3:IsShown() and not _G.WicksSealsButton4:IsShown(),
+    "three seals known: three keys shown, the fourth hidden")
+check(_G.WicksSealsButton1:GetAttribute("spell") == "Seal of Righteousness",
+    "the first key casts the first seal in the book: " .. tostring(_G.WicksSealsButton1:GetAttribute("spell")))
+local function judgeText() return tostring(_G.WicksSealsJudgeButton:GetAttribute("macrotext")) end
+local function cycleText() return tostring(_G.WicksSealsCycleButton:GetAttribute("macrotext")) end
+check(judgeText():find("/cast Judgement", 1, true) ~= nil and judgeText():find("/cast Seal of Righteousness", 1, true) ~= nil,
+    "Judgement reseals with the seal that is on you: " .. judgeText():gsub("\n", " | "))
+check(cycleText():find("/castsequence reset=target/15 Seal of the Crusader, Judgement, Seal of Righteousness", 1, true) ~= nil,
+    "the cycle key dances Crusader, Judgement, fighting seal: " .. cycleText():gsub("\n", " | "))
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal command")
+check(judgeText():find("Seal of Command", 1, true) ~= nil, "/wsl seal picks the fighting seal by hand")
+check(cycleText():find("Judgement, Seal of Command", 1, true) ~= nil, "and the cycle ends on it")
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("reseal off")
+check(judgeText():find("Seal of", 1, true) == nil, "reseal off judges alone: " .. judgeText():gsub("\n", " | "))
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("reseal on")
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal auto")
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle Seal of Command, Judgement")
+check(cycleText():find("Seal of Command, Judgement", 1, true) ~= nil, "a cycle of your own: " .. cycleText():gsub("\n", " | "))
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle off")
+check(cycleText() == "", "cycle off empties the key")
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle auto")
+
+io.write("== the two swap keys ==\n")
+local function twoText() return tostring(_G.WicksSealsTwoHandButton:GetAttribute("macrotext")) end
+local function boardText() return tostring(_G.WicksSealsShieldButton:GetAttribute("macrotext")) end
+check(twoText() == "/equipslot 16 item:" .. HAMMER, "the two-hander key names the hammer: " .. twoText())
+check(boardText() == ("/equipslot 16 item:%d\n/equipslot 17 item:%d"):format(MACE, SHIELD),
+    "the shield key names the mace then the shield: " .. boardText():gsub("\n", " | "))
+local faces = SNS.swap:Faces()
+check(faces.twoHand and faces.twoHand.live == true, "the two-hander is marked as on")
+check(faces.shield and faces.shield.live == false, "and the shield set is not")
+
+-- The shield key pressed: the hands change and the hammer goes to a bag.
+S.EQUIPPED_IDS = { [16] = MACE, [17] = SHIELD }
+S.SLOT_ITEMS[1] = { { id = HAMMER, count = 1 } }
+S.fire("PLAYER_EQUIPMENT_CHANGED")
+faces = SNS.swap:Faces()
+check(faces.shield.live == true and faces.twoHand.live == false, "after the swap the shield set is the live one")
+local sets = LA.db.char.sets
+check(sets.oneHand == MACE and sets.shield == SHIELD and sets.twoHand == HAMMER, "every piece worn is remembered")
+
+-- A bigger two-hander turns up in the bag. The one you chose by wearing
+-- it still wins, until you pin the new one.
+S.SLOT_ITEMS[1] = { { id = HAMMER, count = 1 }, { id = BIG, count = 1 } }
+S.fire("BAG_UPDATE_DELAYED")
+check(twoText():find("item:" .. HAMMER, 1, true) ~= nil, "the remembered two-hander wins over a stranger in the bag: " .. twoText())
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("pin 2h " .. BIG)
+check(twoText():find("item:" .. BIG, 1, true) ~= nil, "a pin wins over the memory: " .. twoText())
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("pin 2h clear")
+check(twoText():find("item:" .. HAMMER, 1, true) ~= nil, "and clearing the pin goes back to the memory")
+
+-- Nothing is written to a secure button in combat, and the strip
+-- catches up the moment the fight ends.
+COMBAT = true
+S.EQUIPPED_IDS = { [16] = HAMMER }
+S.SLOT_ITEMS[1] = { { id = MACE, count = 1 }, { id = SHIELD, count = 1 }, { id = BIG, count = 1 } }
+S.fire("PLAYER_EQUIPMENT_CHANGED")
+check(SNS.swap:Faces().twoHand.live == true, "the mark follows your hands even in combat")
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal command")
+check(judgeText():find("Seal of Command", 1, true) == nil, "nothing is written to a secure button in combat")
+COMBAT = false
+S.fire("PLAYER_REGEN_ENABLED")
+check(judgeText():find("Seal of Command", 1, true) ~= nil, "and it catches up when combat ends: " .. judgeText():gsub("\n", " | "))
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal auto")
+
+-- The checklist grows as the spells that need a row are learned.
+local lrows = LA.kit.checklist:Evaluate()
+check(#lrows == 3, "seals checklist: three rows before Greater Blessings and Divine Intervention, got " .. #lrows)
+check(lrows[1].state == "ok" and lrows[2].state == "ok" and lrows[3].state == "ok",
+    ("seal, blessing and aura read ok: %s %s %s"):format(lrows[1].state, lrows[2].state, lrows[3].state))
+LA.db.profile.wantFury = true
+S.SPELLBOOK[#S.SPELLBOOK + 1] = { "Righteous Fury", "", "Interface\\Icons\\RF", 25780 }
+S.SPELLBOOK[#S.SPELLBOOK + 1] = { "Greater Blessing of Might", "Rank 1", "Interface\\Icons\\GBoM", 25782 }
+S.fire("SPELLS_CHANGED")
+lrows = LA.kit.checklist:Evaluate()
+check(#lrows == 5, "Symbols of Kings and Righteous Fury join once their spells are known: " .. #lrows)
+LA.db.profile.wantFury = false
+
+S.CHAT = {}
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("status")
+local lline = table.concat(S.CHAT, " | ")
+check(#S.CHAT >= 5, "/wsl status prints")
+check(lline:find("Seal of Righteousness", 1, true) ~= nil, "and names the seal on you: " .. lline:sub(1, 120))
+try("seals strip toggle", function() WicksSealsAndThings_Toggle(); WicksSealsAndThings_Toggle() end)
+try("seals kit", function() SlashCmdList.WICK_WICKSSEALSANDTHINGS("kit") end)
+check(LA.cooldowns ~= nil, "seals has a cooldown bar")
+
+S.AURAS = nil
+S.SPELLBOOK = keepBook
+S.EQUIPPED_IDS = nil
+S.SLOT_ITEMS[1] = nil
 
 io.write("== Trade Hall ==\n")
 CLASS = "HUNTER"

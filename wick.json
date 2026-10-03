@@ -33,7 +33,7 @@
       "cf_slug": "wicks-tbc-bis-tracker",
       "cf_project_id": 1502804,
       "features": [
-        "Every class \u00b7 every spec",
+        "Every class · every spec",
         "All TBC phases",
         "SoftRes integration"
       ],
@@ -45,14 +45,14 @@
       "title": "Wick's CD Tracker",
       "short": "CD Tracker",
       "slash": "/wcdt",
-      "tagline": "Live party and raid cooldown tracker. Kicks, saves, offensives, utility \u2014 all in one tight panel.",
+      "tagline": "Live party and raid cooldown tracker. Kicks, saves, offensives, utility — all in one tight panel.",
       "short_tagline": "Live party and raid cooldown tracker",
       "accent": "#4FC778",
       "accent_name": "fel-green",
       "cf_slug": "wicks-cd-tracker",
       "cf_project_id": 1519243,
       "features": [
-        "Kicks \u00b7 saves \u00b7 offensives",
+        "Kicks · saves · offensives",
         "Class-colored rows",
         "Per-spell settings"
       ],
@@ -225,14 +225,14 @@
       "title": "Wick's Travel Form",
       "short": "Travel Form",
       "slash": "/wstf",
-      "tagline": "One druid keybind. Flight, Travel, Aquatic, or Cat \u2014 picked by where you are right now. Works around the broken TBC IsFlyableArea API.",
+      "tagline": "One druid keybind. Flight, Travel, Aquatic, or Cat — picked by where you are right now. Works around the broken TBC IsFlyableArea API.",
       "short_tagline": "Smart shapeshift binding for druids",
       "accent": "#4FC778",
       "accent_name": "fel-green",
       "cf_slug": "wicks-travel-form",
       "cf_project_id": 1538543,
       "features": [
-        "Flight \u00b7 Travel \u00b7 Aquatic \u00b7 Cat",
+        "Flight · Travel · Aquatic · Cat",
         "Outland flyable-zone whitelist",
         "Contextual icon preview"
       ],
@@ -265,7 +265,7 @@
       "title": "Wick's Wardrobe",
       "short": "Wardrobe",
       "slash": "/wwd",
-      "tagline": "Browse every TBC tier set and weapon on your own character. Click any item to preview it inline \u2014 no vendor required.",
+      "tagline": "Browse every TBC tier set and weapon on your own character. Click any item to preview it inline — no vendor required.",
       "short_tagline": "Tier set and weapon preview browser",
       "accent": "#4FC778",
       "accent_name": "fel-green",
@@ -375,7 +375,10 @@
       "title": "WickCore",
       "short": "Core",
       "client": "both",
-      "cf_game_versions": [16533, 17053],
+      "cf_game_versions": [
+        16533,
+        17053
+      ],
       "slash": "/wickcore",
       "tagline": "The floor everything else stands on.",
       "short_tagline": "The floor everything else stands on.",
@@ -397,7 +400,10 @@
       "title": "Wick's Comforts",
       "short": "Comforts",
       "client": "both",
-      "cf_game_versions": [16533, 17053],
+      "cf_game_versions": [
+        16533,
+        17053
+      ],
       "slash": "/wcomfort",
       "tagline": "Small comforts, each one off until you turn it on.",
       "short_tagline": "Small comforts, each one off until you turn it on.",
@@ -454,6 +460,27 @@
         "Talents, racials and a cooldown bar"
       ],
       "repo": "WicksStancesAndThings"
+    },
+    {
+      "folder": "WicksSealsAndThings",
+      "title": "Wick's Seals and Things",
+      "short": "Seals",
+      "client": "forever",
+      "slash": "/wsl",
+      "tagline": "The paladin kit: seals, a Judgement that reseals, and two-hander or shield on a key.",
+      "short_tagline": "The paladin kit: seals, Judgement and weapon swaps.",
+      "accent": "#4FC778",
+      "accent_name": "Fel Green",
+      "cf_slug": "wicks-seals-and-things",
+      "cf_project_id": null,
+      "features": [
+        "Every seal you know in one strip, the live one lit",
+        "A Judgement key that puts the seal back",
+        "A seal cycle key: Crusader, judge, fighting seal",
+        "Two-hander and sword-and-board swap keys",
+        "Talents, checklist and racials"
+      ],
+      "repo": "WicksSealsAndThings"
     },
     {
       "folder": "WicksConjuresAndThings",
@@ -581,7 +608,10 @@
       "title": "Wick's UI",
       "short": "UI",
       "client": "both",
-      "cf_game_versions": [16533, 17053],
+      "cf_game_versions": [
+        16533,
+        17053
+      ],
       "slash": "/wui",
       "tagline": "The whole interface, in one look.",
       "short_tagline": "The whole interface, in one look.",
