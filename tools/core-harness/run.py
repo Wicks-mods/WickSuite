@@ -9,6 +9,7 @@
     python WickSuite/tools/core-harness/run.py --kits --both   # Totems, Demons, Forms kits, both
     python WickSuite/tools/core-harness/run.py --probe        # Wick's Probe, aura-route watcher
     python WickSuite/tools/core-harness/run.py --ui           # Wick's UI, Forever only
+    python WickSuite/tools/core-harness/run.py --suite        # the TBC addons on WickCore (Quest Key, Concession Stand, Demons, Ledger, Bags)
 
 Exits non-zero on any failed check.
 """
@@ -23,6 +24,7 @@ except ImportError:
     sys.exit("lupa is not installed. pip install lupa")
 
 BETA_ADDONS = r"C:/Program Files (x86)/World of Warcraft/_classic_beta_/Interface/AddOns"
+ANNIV_ADDONS = r"C:/Program Files (x86)/World of Warcraft/_anniversary_/Interface/AddOns"
 HERE = os.path.dirname(os.path.abspath(__file__)).replace("\\", "/")
 
 
@@ -33,6 +35,7 @@ def run(harness, mode, *args, lua51=False):
         import lupa.lua51 as runtime
         lua = runtime.LuaRuntime(unpack_returned_tuples=True)
     else:
+        runtime = lupa
         lua = lupa.LuaRuntime(unpack_returned_tuples=True)
     runner = lua.eval(
         "function(harness, ...)"
@@ -43,7 +46,7 @@ def run(harness, mode, *args, lua51=False):
     try:
         runner(harness, *args)
         return True
-    except lupa.LuaError as e:
+    except (lupa.LuaError, runtime.LuaError) as e:
         print(f"harness failed ({mode}):\n{e}")
         return False
 
@@ -56,6 +59,7 @@ def main():
     ap.add_argument("--kits", action="store_true", help="run the class kits harness (Totems, Demons, Forms)")
     ap.add_argument("--gear", action="store_true", help="run the Wick's Gear harness")
     ap.add_argument("--ui", action="store_true", help="run the Wick's UI harness")
+    ap.add_argument("--suite", action="store_true", help="run the TBC suite harness (the addons on WickCore in _anniversary_)")
     ap.add_argument("--probe", action="store_true",
                     help="run the Wick's Probe harness (aura-route watcher)")
     ap.add_argument("--legacy", action="store_true", help="Era-shaped stub client, none of the modern API")
@@ -90,6 +94,10 @@ def main():
     # clients; the Era-shaped stub has nothing to say about it.
     if args.ui:
         modes = ["modern", "tbc"] if args.all else (["tbc"] if args.tbc else ["modern"])
+    # The TBC addons ship to one client; the stub shaped like it is the
+    # only pass that says anything about them.
+    if args.suite:
+        modes = ["tbc"]
     ok = True
     for mode in modes:
         if args.bags:
@@ -102,6 +110,8 @@ def main():
                 if style:
                     print(f"-- style {style}")
                 ok = run(HERE + "/ui-harness.lua", mode, args.core, BETA_ADDONS + "/WicksUI", mode, stub, lua51=True) and ok
+        elif args.suite:
+            ok = run(HERE + "/suite-harness.lua", mode, args.core, ANNIV_ADDONS, mode, stub) and ok
         elif args.gear:
             ok = run(HERE + "/gear-harness.lua", mode, args.core, BETA_ADDONS, mode, stub) and ok
         elif args.probe:

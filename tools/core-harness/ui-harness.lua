@@ -49,6 +49,14 @@ for _, k in ipairs({ "Stagger", "Totems", "Runes", "AlternativePower", "Addition
     -- Aura element overrides a layout may set; invented, they would win the
     -- "options.X or self.X or default" chain and swallow the real builder.
     "CreateButton", "PostCreateButton", "PostUpdateButton" }) do OUF_KEYS[k] = true end
+-- The window skin tells a button's kind by the named pieces it carries
+-- (a filter's ResetButton, a tab's Left and Right, a heading's StateIcon).
+-- Invented, every button would pass for every kind at once; a fixture that
+-- wants one sets it.
+for _, k in ipairs({ "ResetButton", "FilterDropdown", "FilterButton", "StateIcon", "Left", "Right", "Middle", "Center",
+    "Track", "Back", "Forward", "Arrow", "Slider", "Fill", "Mask", "CollapseButton", "SkillUps", "Label", "Thumb" }) do
+    OUF_KEYS[k] = true
+end
 
 function CreateFrame(kind, name, parent, template)
     local f = realCreateFrame(kind, name, parent, template)
@@ -58,11 +66,8 @@ function CreateFrame(kind, name, parent, template)
         if fn then rawset(f, m, fn) end
     end
     rawset(f, "GetName", function() return name end)
-    rawset(f, "GetChildren", function() return end)
+    -- Children, regions and parents are the stub's own bookkeeping now.
     rawset(f, "IsForbidden", function() return false end)
-    rawset(f, "GetRegions", function() return end)
-    rawset(f, "GetParent", function() return f.__parent end)
-    rawset(f, "SetParent", function(_, p) f.__parent = p end)
     rawset(f, "IsProtected", function() return (template or ""):find("Secure") ~= nil end)
     rawset(f, "GetSize", function() return f.__w or 0, f.__h or 0 end)
     rawset(f, "SetSize", function(_, w, h) f.__w, f.__h = w, h end)
@@ -972,6 +977,30 @@ do
         check(classy and mineC and otherC and mineC[1] == f[1] and math.abs(otherC[1] - (f[1] * 0.55 + v[1] * 0.45)) < 1e-6,
             "meter bars keep class colours on a class theme, else the accent for you and a darker shade for others")
     end
+    do
+        -- Class colours on the threat meter whatever the look, unless
+        -- switched off (Wick asked for them on a themed setup).
+        local Ch, d = ns.Core.Chrome, TH:db()
+        local wasTheme, wasShow, wasCC = Ch.themeSetting, d.meterShow, d.classColors
+        Ch.themeSetting, d.meterShow = "frost", "always"
+        local function party2Colour()
+            local l = TH.Read()
+            TH.Draw(l)
+            for i, e in ipairs(l) do if e.unit == "party2" then return TH.Meter().rows[i].__color end end
+        end
+        local mage
+        if Ch.ClassColor then local r, g, b = Ch:ClassColor("MAGE"); if r then mage = { r, g, b } end end
+        mage = mage or { RAID_CLASS_COLORS.MAGE.r, RAID_CLASS_COLORS.MAGE.g, RAID_CLASS_COLORS.MAGE.b }
+        d.classColors = true
+        local on = party2Colour()
+        d.classColors = false
+        local off = party2Colour()
+        local shade = ns:MeterBarColor(false)
+        Ch.themeSetting, d.meterShow, d.classColors = wasTheme, wasShow, wasCC
+        local function same(a, b) return a and b and math.abs(a[1] - b[1]) < 1e-6 and math.abs(a[2] - b[2]) < 1e-6 and math.abs(a[3] - b[3]) < 1e-6 end
+        check(same(on, mage), "with class colours on, a themed meter still paints each bar in its class colour")
+        check(same(off, shade), "and off, the bars take the look's shade")
+    end
     T.player = { false, 0, 60, 66, 600 }
     list = TH.Read()
     check(TH.Warning(list[2]) == false, "and not below it")
@@ -1008,6 +1037,49 @@ end
 
 io.write("== extras and installer ==\n")
 check(ns.Extras.initialized and _G.WicksUI_MarkerBar ~= nil, "raid marker bar built")
+do
+    -- The need/greed popups: Blizzard's bottom frame manager keeps laying
+    -- GroupLootContainer out; ours puts it back on a mover of its own.
+    local EX = ns.Extras
+    local anchor = _G.WicksUI_LootRollAnchor
+    check(anchor and ns.Movers.list.lootrolls and ns.Movers.list.lootrolls.target == anchor,
+        "the loot rolls have a mover, on a frame of ours")
+    local manager = CreateFrame("Frame", "BottomManagedFrameContainer", UIParent)
+    local c = CreateFrame("Frame", "GroupLootContainer", UIParent)
+    rawset(c, "IsProtected", function() return false end)
+    c:SetPoint("BOTTOM", manager, "TOP", 0, 10)      -- where the manager lays it
+    c:Show()
+    local before = {}
+    for k in pairs(c) do before[k] = true end
+    EX.PinLootRolls()
+    local p, rel, rp, x, y = c:GetPoint(1)
+    check(p == "BOTTOM" and rel == anchor and rp == "BOTTOM" and x == 0 and y == 0,
+        "a shown roll popup is pinned to the mover's anchor")
+    c:ClearAllPoints(); c:SetPoint("BOTTOM", manager, "TOP", 0, 10)   -- laid out again
+    EX.PinLootRolls()
+    check(select(2, c:GetPoint(1)) == anchor, "and put back when Blizzard lays it out again")
+    local wrote = {}
+    for k in pairs(c) do if not before[k] and type(k) == "string" and not k:find("^__") then wrote[#wrote + 1] = k end end
+    check(#wrote == 0, "nothing is written onto Blizzard's container: " .. table.concat(wrote, ","))
+    -- Protected mid-fight: left alone until the fight ends.
+    rawset(c, "IsProtected", function() return true end)
+    c:ClearAllPoints(); c:SetPoint("BOTTOM", manager, "TOP", 0, 10)
+    COMBAT = true
+    EX.PinLootRolls()
+    local heldOff = select(2, c:GetPoint(1)) == manager
+    COMBAT = false
+    EX.PinLootRolls()
+    check(heldOff and select(2, c:GetPoint(1)) == anchor, "a protected container waits for the fight to end, then moves")
+    -- Switched off: Blizzard keeps it.
+    rawset(c, "IsProtected", function() return false end)
+    EX:db().lootRolls = false
+    c:ClearAllPoints(); c:SetPoint("BOTTOM", manager, "TOP", 0, 10)
+    EX.PinLootRolls()
+    check(select(2, c:GetPoint(1)) == manager, "with the option off the popups stay where Blizzard puts them")
+    EX:db().lootRolls = true
+    c:Hide()
+    _G.GroupLootContainer, _G.BottomManagedFrameContainer = nil, nil
+end
 check(_G.WicksUI_Marker1:GetAttribute("macrotext1") == "/tm 1", "marker 1 marks the target")
 -- The setup: another nameplate addon and Wick's Bags on.
 local okI, errI = pcall(function()
@@ -1140,6 +1212,84 @@ do
     check(kids == 0, "and gets no panel of ours")
 end
 
+io.write("== forbidden children ==\n")
+-- The trade window's gold input is out of reach on Forever: IsForbidden is
+-- the only call it answers, everything else raises. The window scans run
+-- every frame, so one unchecked child was an error per frame (207 in one
+-- trade).
+do
+    local PS = ns.PanelSkins
+    local function forbidden() error("Attempt to access forbidden object from code tainted by an AddOn", 2) end
+    local trade = CreateFrame("Frame", "TradeFrame", UIParent)
+    trade:SetSize(338, 424)
+    local gold = CreateFrame("Frame", "TradePlayerInputMoneyFrame", trade)
+    for _, m in ipairs({ "GetObjectType", "IsShown", "IsVisible", "GetSize", "GetWidth", "GetHeight",
+        "GetChildren", "GetRegions", "GetParent", "GetName", "GetPoint", "GetNumChildren" }) do
+        rawset(gold, m, forbidden)
+    end
+    rawset(gold, "IsForbidden", function() return true end)
+    local tradeBtn = CreateFrame("Button", "TradeFrameTradeButton", trade)
+    tradeBtn:SetSize(80, 22)
+    rawset(trade, "GetChildren", function() return gold, tradeBtn end)
+    check(PS.reachable(gold) == false and PS.reachable(tradeBtn) == true,
+        "a forbidden child is recognised as out of reach")
+    local okScan, errScan = pcall(PS.scanButtons, trade, 1)
+    check(okScan, "the window scan steps over a forbidden child " .. tostring(errScan or ""))
+    -- Locked away without IsForbidden saying so (aura buttons in combat).
+    local quiet = CreateFrame("Frame", nil, trade)
+    rawset(quiet, "GetObjectType", forbidden)
+    check(PS.reachable(quiet) == false, "and so is one that is locked without saying so")
+    _G.TradeFrame, _G.TradePlayerInputMoneyFrame, _G.TradeFrameTradeButton = nil, nil, nil
+end
+
+io.write("== loot roll buttons ==\n")
+-- Need, greed and pass are 32 by 32 with no text, which the arrow rule
+-- took for arrows: their atlases end in -up, so they wore up chevrons.
+do
+    local PS = ns.PanelSkins
+    local function atlasTex(atlas)
+        local t = S.newMock("Texture")
+        rawset(t, "GetAtlas", function() return atlas end)
+        return t
+    end
+    -- The stub invents any Capitalised field on first read; a roll button
+    -- has none of the keyed pieces the scan asks about, so they stay nil.
+    local NOKEYS = {}
+    for _, k in ipairs({ "Icon", "Left", "Right", "Middle", "Center", "Name", "Track", "Arrow", "Background", "Text",
+        "Slider", "Back", "Forward", "Fill", "Mask", "StateIcon", "ResetButton", "SkillUps", "Button", "ScrollTarget",
+        "CollapseButton", "NineSlice", "FilterDropdown", "FilterButton", "LootButtons", "Label" }) do NOKEYS[k] = true end
+    local function button(parent, atlas)
+        local b = CreateFrame("Button", nil, parent)
+        rawset(b, "__nokeys", NOKEYS)
+        b:SetSize(32, 32)
+        local n = atlasTex(atlas)
+        rawset(b, "GetNormalTexture", function() return n end)
+        rawset(b, "GetPushedTexture", function() return atlasTex(atlas and atlas:gsub("%-up$", "-down")) end)
+        rawset(b, "GetText", function() return nil end)
+        return b
+    end
+    local roll = CreateFrame("Frame", "GroupLootFrame1", UIParent)
+    roll:SetSize(277, 67)
+    local box = CreateFrame("Frame", nil, roll)
+    rawset(roll, "__nokeys", NOKEYS)
+    local need = button(box, "lootroll-toast-icon-need-up")
+    local greed = button(box, "lootroll-toast-icon-greed-up")
+    local loose = button(box, "lootroll-toast-icon-pass-up")      -- not in the array: caught by its atlas
+    rawset(box, "LootButtons", { need, greed })
+    local arrow = button(box, "common-dropdown-icon-next")
+    rawset(box, "GetChildren", function() return need, greed, loose, arrow end)
+    rawset(roll, "GetChildren", function() return box end)
+    local glyphed = {}
+    local realGlyph = ns.Glyph
+    ns.Glyph = function(self, b, ...) glyphed[b] = true return realGlyph(self, b, ...) end
+    local ok, err = pcall(PS.scanButtons, roll, 1)
+    ns.Glyph = realGlyph
+    check(ok, "a loot roll frame scans " .. tostring(err or ""))
+    check(PS.isRollButton(need) and PS.isRollButton(loose) and not PS.isRollButton(arrow), "roll buttons are told apart from arrows")
+    check(not glyphed[need] and not glyphed[greed] and not glyphed[loose], "need, greed and pass keep their own pictures, no chevrons")
+    _G.GroupLootFrame1 = nil
+end
+
 io.write("== windows of the Classic kind ==\n")
 do
     local PS = ns.PanelSkins
@@ -1177,6 +1327,7 @@ do
         end
         local function regions(f, list) rawset(f, "GetRegions", function() return unpack(list) end) end
         local function children(f, list) rawset(f, "GetChildren", function() return unpack(list) end) end
+
 
         -- The character window as Blizzard_CharacterFrame/TBC builds it.
         local cf = mock("Frame", "CharacterFrame", UIParent, 384, 512)
@@ -1720,6 +1871,48 @@ ns.Movers:Reset("bar1")
 check(A.db.profile.movers.bar1 == nil, "reset clears it")
 ns.Movers:Lock()
 check(not ns.Movers:IsUnlocked(), "lock")
+
+io.write("== minimap buttons ==\n")
+do
+    local MM = ns.Minimap
+    check(MM and MM.Collect and MM.chrome, "the minimap module is up")
+    local function mkButton(name, kind)
+        local b = CreateFrame(kind or "Button", name, Minimap)
+        b.__w, b.__h = 32, 32
+        local ring = b:CreateTexture(nil, "OVERLAY"); ring:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+        local bg = b:CreateTexture(nil, "BACKGROUND"); bg:SetTexture(136467)
+        local icon = b:CreateTexture(nil, "ARTWORK"); icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+        b.icon = icon
+        b:Show()
+        return b, ring, icon
+    end
+    local dbi, dbiRing, dbiIcon = mkButton("LibDBIcon10_Test")
+    local own, ownRing = mkButton("WicksTestMinimapButton")
+    local pin = mkButton("QuestieFrame1")
+    local blizz = mkButton("MiniMapTracking")
+    dbi:SetScript("OnDragStart", function() end)
+    MM:Collect()
+    local bar = rawget(_G, "WicksUI_MinimapButtons")
+    check(bar ~= nil, "the flyout exists")
+    check(dbi:GetParent() == bar and own:GetParent() == bar, "a LibDBIcon button and a hand-made one are gathered")
+    check(pin:GetParent() == Minimap and blizz:GetParent() == Minimap, "a map pin and Blizzard's tracking button are left on the map")
+    check(dbiRing:GetAlpha() == 0 and ownRing:GetAlpha() == 0, "the round borders go")
+    check(dbiIcon:GetNumPoints() == 2 and dbi:GetWidth() == 24, "the icon fills a square tile")
+    check(dbi:GetScript("OnDragStart") == nil, "the addon's own drag stands down")
+    dbi:ClearAllPoints()
+    dbi:SetPoint("CENTER", Minimap, "CENTER", 80, 0)
+    local _, rel = dbi:GetPoint(1)
+    check(rel == bar, "a button put back on the map's edge returns to its cell")
+    check(MM.toggle and MM.toggle:IsShown(), "the + toggle shows with buttons gathered")
+    local late = mkButton("LibDBIcon10_Late")
+    S.LOADED = S.LOADED or {}
+    S.LOADED.MBB = true
+    MM:Collect()
+    S.LOADED.MBB = nil
+    check(late:GetParent() == Minimap, "with MBB loaded the collector stands down")
+    MM:Collect()
+    check(late:GetParent() == bar, "and gathers again without it")
+end
 
 io.write("== keybinds ==\n")
 local okK, errK = pcall(function() ns.Keybind:Activate(); ns.Keybind:Deactivate(false) end)

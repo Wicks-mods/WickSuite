@@ -109,7 +109,7 @@ S.regions = {}
 
 local function newMock(kind, name)
     local self = { __kind = kind, __name = name, __scripts = {}, __events = {}, __w = 100, __h = 100,
-                   __shown = false, __text = "", __children = {} }
+                   __shown = false, __text = "", __children = {}, __regions = {} }
     local mt = {}
     mt.__index = function(t, k)
         if k == "RegisterEvent" then
@@ -139,8 +139,12 @@ local function newMock(kind, name)
         -- about what a theme repaints had nothing to look at: the
         -- things that carry a colour are textures and font strings.
         elseif k == "CreateTexture" or k == "CreateFontString" or k == "CreateLine" then
-            return function()
+            return function(_, _, layer)
                 local r = newMock(k)
+                -- Kept on the frame that made it, as GetRegions reports.
+                r.__parent = t
+                r.__layer = type(layer) == "string" and layer or nil
+                t.__regions[#t.__regions + 1] = r
                 -- Which file painted it, so a check can ask about one
                 -- addon rather than about every region at once.
                 local info = debug.getinfo(2, "S")
@@ -280,9 +284,43 @@ local function newMock(kind, name)
                 return math.max(1, lines) * 13
             end
         elseif k == "GetName" then return function() return t.__name end
-        elseif k == "GetObjectType" then return function() return t.__kind end
+        -- A region made by CreateTexture is a Texture to the client; the
+        -- mock keeps the maker's name in __kind for the checks that read it.
+        elseif k == "GetObjectType" then return function()
+                local kind = t.__kind
+                if kind == "CreateTexture" then return "Texture" end
+                if kind == "CreateFontString" then return "FontString" end
+                if kind == "CreateLine" then return "Line" end
+                return kind
+            end
         elseif k == "GetParent" then return function() return t.__parent end
-        elseif k == "SetParent" then return function(_, p) t.__parent = p end
+        elseif k == "SetParent" then return function(_, p)
+                local old = t.__parent
+                if type(old) == "table" and rawget(old, "__children") then
+                    for i, c in ipairs(old.__children) do
+                        if c == t then table.remove(old.__children, i) break end
+                    end
+                end
+                t.__parent = p
+                if type(p) == "table" and rawget(p, "__children") then
+                    p.__children[#p.__children + 1] = t
+                end
+            end
+        -- The frame tree, as the client reports it.
+        elseif k == "GetChildren" then return function() return unpack(t.__children) end
+        elseif k == "GetNumChildren" then return function() return #t.__children end
+        elseif k == "GetRegions" then return function() return unpack(t.__regions) end
+        elseif k == "GetNumRegions" then return function() return #t.__regions end
+        elseif k == "GetDrawLayer" then return function() return t.__layer or "ARTWORK", 0 end
+        elseif k == "IsForbidden" then return function() return false end
+        elseif k == "IsProtected" then return function() return false, false end
+        elseif k == "RegisterForDrag" then return function(_, ...) t.__drag = { ... } end
+        -- Texture coordinates, the four-value and eight-value forms.
+        elseif k == "SetTexCoord" then return function(_, a, b, c, d, e, f, g, h)
+                if e == nil then t.__coords = { a, c, a, d, b, c, b, d }
+                else t.__coords = { a, b, c, d, e, f, g, h } end
+            end
+        elseif k == "GetTexCoord" then return function() return unpack(t.__coords or { 0, 0, 0, 1, 1, 0, 1, 1 }) end
         elseif k == "GetItem" then return function() return "Hearthstone", "|Hitem:6948|h[Hearthstone]|h" end
         elseif k == "GetChecked" then return function() return t.__checked end
         elseif k == "SetChecked" then return function(_, v) t.__checked = v end
@@ -296,6 +334,10 @@ local function newMock(kind, name)
         elseif k == "GetFrameStrata" then return function() return "MEDIUM" end
         elseif k == "SetAlpha" then return function(_, a) t.__alpha = a end
         elseif k == "GetAlpha" then return function() return t.__alpha or 1 end
+        -- An atlas is nil until set; a texture that answers with an invented
+        -- table would send every skin that reads it down the wrong path.
+        elseif k == "SetAtlas" then return function(_, a) t.__atlas = a end
+        elseif k == "GetAtlas" then return function() return t.__atlas end
         elseif k == "GetTexture" then return function() return t.__tex end
         elseif k == "SetTexture" then return function(_, v) t.__tex = v end
         elseif k == "SetDesaturated" then return function(_, v) t.__desaturated = v and true or false end
@@ -385,9 +427,14 @@ function CreateFrame(kind, name, parent, template)
     end
     local f = newMock(kind, name)
     f.__parent = parent
+    if type(parent) == "table" and rawget(parent, "__children") then
+        parent.__children[#parent.__children + 1] = f
+    end
     f.__template = template
     if name then _G[name] = f end
-    if MODERN and (kind == "ItemButton" or (template and ITEM_BUTTON_TEMPLATES[template])) then
+    -- TBC Anniversary keeps the XML item button, whose regions are globals
+    -- named after the button; the intrinsic is Forever's.
+    if MODERN and not TBC and (kind == "ItemButton" or (template and ITEM_BUTTON_TEMPLATES[template])) then
         if kind == "ItemButton" then
             -- Intrinsic regions, keyed and named the way the XML does it.
             f.icon = newMock("Texture", name and (name .. "IconTexture"))
@@ -1031,7 +1078,7 @@ C_AddOns = {
     -- Load on demand: S.LOADED[name] marks one as having loaded.
     IsAddOnLoaded = function(name) return (S.LOADED and S.LOADED[name]) and true or false end,
     LoadAddOn = function() return false end,
-    GetAddOnMetadata = function() return nil end,
+    GetAddOnMetadata = function(name, field) local m = S.META[name]; return m and m[field] end,
     EnableAddOn = function() end,
 }
 
@@ -1576,7 +1623,26 @@ function S.tocFiles(dir, name)
     return files
 end
 
+-- The TOC header, as C_AddOns.GetAddOnMetadata hands it out.
+S.META = {}
+function S.tocMeta(dir, name)
+    local meta = {}
+    for _, suffix in ipairs({ "", "_TBC", "_Mainline", "_Classic", "_Vanilla" }) do
+        local fh = io.open(dir .. "/" .. name .. suffix .. ".toc", "r")
+        if fh then
+            for line in fh:lines() do
+                local k, v = line:match("^##%s*([%w%-]+):%s*(.-)%s*$")
+                if k then meta[k] = v end
+            end
+            fh:close()
+            break
+        end
+    end
+    return meta
+end
+
 function S.loadAddon(dir, name, files)
+    S.META[name] = S.tocMeta(dir, name)
     files = files or S.tocFiles(dir, name)
         or error("no file list and no readable toc for " .. name, 0)
     local ns = {}
