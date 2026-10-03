@@ -1577,23 +1577,40 @@ SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle off")
 check(cycleText() == "", "cycle off empties the key")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle auto")
 check(cycleText():find("Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil, "auto brings the default back")
--- The reported case: Seal of Fury learned and first in the book, so the
--- key ends on Fury. Casting Righteousness has to rewrite the key, not
--- only the picture.
+-- The reported case: Seal of Fury learned and first in the book. The
+-- key follows the seal you fight under, and keeps it once it fades.
 do
     table.insert(S.SPELLBOOK, 2, { "Seal of Fury", "Rank 1", "Interface\\Icons\\SoF", 20164 })
     local keepAuras = S.AURAS
+    SNS.Seals.fighting = nil
+    LA.db.char.fightingSeal = nil
     S.AURAS = { "Blessing of Might", "Devotion Aura" }
-    S.fire("UNIT_AURA", "player")
     S.fire("SPELLS_CHANGED")
+    S.fire("UNIT_AURA", "player")
+    check(cycleText():find("Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil,
+        "with nothing cast yet, Righteousness beats the spellbook order: " .. cycleText():gsub("\n", " | "))
+    S.AURAS = { "Seal of Fury", "Blessing of Might", "Devotion Aura" }
+    S.fire("UNIT_AURA", "player")
     check(cycleText():find("Seal of the Crusader, Seal of Fury", 1, true) ~= nil,
-        "with nothing cast, the first seal in the book is the fighting seal: " .. cycleText():gsub("\n", " | "))
+        "casting Fury moves the key to Fury: " .. cycleText():gsub("\n", " | "))
     S.AURAS = { "Seal of Righteousness", "Blessing of Might", "Devotion Aura" }
     S.fire("UNIT_AURA", "player")
     check(cycleText():find("Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil,
-        "casting Righteousness rewrites the key, not only the picture: " .. cycleText():gsub("\n", " | "))
-    -- In combat the client withholds auras and secure text is frozen, so
-    -- nothing moves until the fight ends.
+        "casting Righteousness moves it back: " .. cycleText():gsub("\n", " | "))
+    -- The bug: thirty seconds later the seal fades, and the key used to
+    -- fall back to the first seal in the book.
+    S.AURAS = { "Blessing of Might", "Devotion Aura" }
+    S.fire("UNIT_AURA", "player")
+    check(cycleText():find("Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil,
+        "and stays on Righteousness after it fades: " .. cycleText():gsub("\n", " | "))
+    -- The Crusader is the opener, so wearing it does not move the key.
+    S.AURAS = { "Seal of the Crusader", "Blessing of Might", "Devotion Aura" }
+    S.fire("UNIT_AURA", "player")
+    check(cycleText():find("Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil,
+        "wearing the Crusader leaves the fighting seal alone")
+    check(LA.db.char.fightingSeal == "Seal of Righteousness",
+        "the fighting seal is kept for the next session: " .. tostring(LA.db.char.fightingSeal))
+    -- In combat the client withholds auras and secure text is frozen.
     COMBAT = true
     S.AURAS = { "Seal of Fury", "Blessing of Might", "Devotion Aura" }
     S.fire("UNIT_AURA", "player")
