@@ -321,7 +321,11 @@ local function newMock(kind, name)
             end
         elseif k == "GetAttribute" then return function(_, a) return t.__attr and t.__attr[a] end
         elseif k == "SetStatusBarColor" then return function(_, r, g, b, a) t.__color = { r, g, b, a } end
-        elseif k == "SetStatusBarTexture" then return function(_, tex) t.__statusTex = tex end
+        elseif k == "SetStatusBarTexture" then return function(_, tex)
+                t.__statusTex = tex
+                -- A bar is its own texture object here, so its texture reads back.
+                if not t.__statusTexObj then t.__tex = tex end
+            end
         elseif k == "GetStatusBarTexture" then return function() return t.__statusTexObj or t end
         elseif k == "SetColorTexture" then return function(_, r, g, b, a) t.__color = { r, g, b, a } end
         elseif k == "SetTextColor" then return function(_, r, g, b, a) t.__textColor = { r, g, b, a } end

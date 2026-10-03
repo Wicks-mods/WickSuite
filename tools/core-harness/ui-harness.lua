@@ -780,11 +780,20 @@ do
     local sb = f.StatusBar
     sb.TypeLabel, sb.TimeLabel = sb:CreateFontString(), sb:CreateFontString()
     sb.TypeLabelShadow = sb:CreateTexture()
-    f.InitializeBarPresentation = function() end
-    f.ApplyRangePresentation = function() end
+    local init, range = function() end, function() end
+    f.InitializeBarPresentation, f.ApplyRangePresentation = init, range
     local ok, err = pcall(ns.Skins.SwingTimers, ns.Skins)
     check(ok and ns:BackdropOf(sb) ~= nil, "the swing timers skin: a panel of ours behind the bar: " .. tostring(err or ""))
     check(rawget(sb, "backdrop") == nil, "and kept beside Blizzard's bar, never written onto it")
+    check(f.InitializeBarPresentation == init and f.ApplyRangePresentation == range,
+        "the bar's own methods are left as they are, never hooked")
+    -- Blizzard lays the bar out again and dims it out of range: ours follow.
+    settle(f)
+    sb:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+    sb:SetAlpha(0.5)
+    settle(f)
+    check(sb.__statusTex == ns.Media:Statusbar() and ns:BackdropOf(sb):GetAlpha() == 0.5,
+        "our texture comes back when the game sets its own, and the panel dims with the bar")
     SwingTimerMainHandFrame = nil
 end
 
@@ -1351,8 +1360,12 @@ do
     check(empty.Icon:GetTexture() == plus, "the empty slot shows our plus, not Blizzard's green one")
     empty:Init({ icon = 134331 })
     spell:Init({ atlas = "clickcast-icon-add" })
+    settle(empty)
+    settle(spell)
     check(empty.Icon:GetTexture() == 134331 and spell.Icon:GetTexture() == plus,
-        "a row filled again is redrawn at once: a picture shows as itself, an empty slot as our plus")
+        "a row filled again is redrawn by the next frame: a picture shows as itself, an empty slot as our plus")
+    settle(spell)
+    check(spell.Icon:GetTexture() == plus and spell.Icon:GetAtlas() == nil, "and our plus stays our plus on the frames after")
     check(E(talents).ring:IsShown() and not E(macros).ring:IsShown(), "the open one of the corner buttons wears the accent ring")
     macros.UnselectedFrame:Hide(); talents.UnselectedFrame:Show()
     PS.clickBindingPass(cf)
@@ -1652,8 +1665,10 @@ do
         sf[k] = b
     end
     local chose = 0
-    rawset(sf, "ChooseFrameType", function(self, n) self.isMultiStack = n > 1; chose = chose + 1 end)
+    local choose = function(self, n) self.isMultiStack = n > 1; chose = chose + 1 end
+    rawset(sf, "ChooseFrameType", choose)
     local ok, err = pcall(PS.Skin, PS, sf)
+    check(rawget(sf, "ChooseFrameType") == choose, "the game's own layout method is left as it is, never hooked")
     local e = PS.extrasOf(sf)
     check(ok and e and e.backdrop and e.well, "the stack split skins, with a well for the number: " .. tostring(err or ""))
     check(sf.SingleItemSplitBackground:GetAlpha() == 0 and sf.MultiItemSplitBackground:GetAlpha() == 0,
@@ -1662,8 +1677,10 @@ do
     check(ok1 and ok1.backdrop and ok2 and ok2.backdrop and ns.glyphs[sf.LeftButton] and ns.glyphs[sf.RightButton],
         "Okay and Cancel are pills, the arrows our marks")
     sf:ChooseFrameType(1)
+    settle(sf)
     local single = e.well.__points[1][5]
     sf:ChooseFrameType(5)
+    settle(sf)
     local multi = e.well.__points[1][5]
     check(chose == 2 and single == 3 and multi == 15, "the well follows the game's two layouts: one number, or the stacks over a total")
     sf.LeftButton:Disable()
