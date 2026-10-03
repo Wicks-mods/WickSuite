@@ -1414,29 +1414,22 @@ local LA = LENTRY and LENTRY.addon
 check(LA ~= nil, "seals launcher registered")
 local lstrip = _G.WicksSealsStrip
 check(lstrip ~= nil and lstrip:IsShown(), "seal strip shown for a paladin")
-check(_G.WicksSealsButton1:IsShown() and _G.WicksSealsButton3:IsShown() and not _G.WicksSealsButton4:IsShown(),
-    "three seals known: three keys shown, the fourth hidden")
-check(_G.WicksSealsButton1:GetAttribute("spell") == "Seal of Righteousness",
-    "the first key casts the first seal in the book: " .. tostring(_G.WicksSealsButton1:GetAttribute("spell")))
-local function judgeText() return tostring(_G.WicksSealsJudgeButton:GetAttribute("macrotext")) end
+check(_G.WicksSealsButton1 == nil and _G.WicksSealsJudgeButton == nil, "no key per seal and no Judgement key: one seal key")
 local function cycleText() return tostring(_G.WicksSealsCycleButton:GetAttribute("macrotext")) end
-check(judgeText():find("/cast Judgement", 1, true) ~= nil and judgeText():find("/cast Seal of Righteousness", 1, true) ~= nil,
-    "Judgement falls back to the seal on you: " .. judgeText():gsub("\n", " | "))
-SlashCmdList.WICK_WICKSSEALSANDTHINGS("reseal off")
-check(judgeText():find("Seal of", 1, true) == nil, "reseal off judges alone: " .. judgeText():gsub("\n", " | "))
-SlashCmdList.WICK_WICKSSEALSANDTHINGS("reseal on")
-check(judgeText():find("/cast Seal of Righteousness", 1, true) ~= nil, "and reseal on puts the line back")
-check(cycleText():find("/castsequence reset=target/30 Seal of the Crusader, Judgement, Seal of Righteousness", 1, true) ~= nil,
-    "the cycle key dances Crusader, Judgement, fighting seal, over every thirty seconds: " .. cycleText():gsub("\n", " | "))
+check(cycleText():find("/castsequence reset=27/combat Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil,
+    "the seal key goes Crusader, fighting seal, back to the Crusader after 27 quiet seconds or combat: " .. cycleText():gsub("\n", " | "))
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal command")
-check(cycleText():find("Judgement, Seal of Command", 1, true) ~= nil, "/wsl seal picks the seal the cycle ends on")
-check(judgeText():find("/cast Seal of Command", 1, true) ~= nil, "and the Judgement key falls back to it")
+check(cycleText():find("Seal of the Crusader, Seal of Command", 1, true) ~= nil, "/wsl seal picks the fighting seal")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal auto")
-SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle Seal of Command, Judgement")
-check(cycleText():find("Seal of Command, Judgement", 1, true) ~= nil, "a cycle of your own: " .. cycleText():gsub("\n", " | "))
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle Seal of Command, Seal of Righteousness")
+check(cycleText():find("Seal of Command, Seal of Righteousness", 1, true) ~= nil, "a cycle of your own: " .. cycleText():gsub("\n", " | "))
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle reset 20")
+check(cycleText():find("reset=20/combat", 1, true) ~= nil, "and your own quiet time")
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle reset 27")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle off")
 check(cycleText() == "", "cycle off empties the key")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle auto")
+check(cycleText():find("Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil, "auto brings the default back")
 
 local function blessText() return tostring(_G.WicksSealsBlessButton:GetAttribute("macrotext")) end
 check(blessText():find("/cast [help,nodead][@player] Blessing of Might", 1, true) ~= nil,
