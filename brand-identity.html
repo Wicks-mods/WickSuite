@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wick — Brand Identity</title>
+<title>Wick · Brand Identity</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -301,6 +301,191 @@
     line-height: 1.4;
   }
 
+  /* ─── CHROME FAMILIES ───────────────────────────────────── */
+  .family-section {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    position: relative;
+  }
+
+  .family-intro {
+    font-size: 12px;
+    color: var(--text-dim);
+    max-width: 760px;
+    margin-bottom: 24px;
+  }
+
+  .family-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .family-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* the stage is lighter than the void so the modern lift reads */
+  .family-stage {
+    background: var(--header);
+    border: 1px solid var(--border);
+    height: 220px;
+    padding: 0 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .family-name {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .family-key {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--green);
+  }
+
+  .family-spec {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .family-spec li {
+    position: relative;
+    padding-left: 12px;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .family-spec li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 7px;
+    width: 4px; height: 4px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+
+  .family-looks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .family-looks .lockup-tag { margin-top: 0; }
+
+  .family-note {
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* sample window: header, a row of slots, a rule, two buttons */
+  .fp {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .fp-header {
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+  }
+
+  .fp-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+  .fp-title b { font-weight: 600; color: var(--green); }
+
+  .fp-close {
+    font-size: 13px;
+    line-height: 1;
+    color: var(--text);
+    cursor: default;
+  }
+  .fp-close:hover { color: var(--green); }
+
+  .fp-body {
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .fp-slots { display: flex; gap: 4px; }
+
+  .fp-slot {
+    width: 30px; height: 30px;
+    background: var(--header);
+  }
+
+  .fp-rule { height: 1px; background: var(--border); }
+
+  .fp-buttons { display: flex; gap: 6px; }
+
+  .fp-btn {
+    font-size: 11px;
+    color: var(--text);
+    background: var(--header);
+    padding: 3px 16px;
+    cursor: default;
+  }
+
+  /* OG family: the .panel brackets above, a flat void fill, the 1px border */
+  .panel.fp-og { padding: 0; background: var(--bg); }
+  .fp-og .fp-header { background: var(--header); border-bottom: 1px solid var(--border); }
+  .fp-og .fp-slot,
+  .fp-og .fp-btn { border: 1px solid var(--border); }
+  .fp-og .fp-slot.on,
+  .fp-og .fp-btn:hover { border-color: var(--green); }
+
+  /* Modern family: rounded glass on a soft lift, a ring in place of the border, no brackets */
+  .fp-modern {
+    position: relative;
+    background: var(--bg);
+    background: color-mix(in srgb, var(--bg) 95%, transparent);
+    border-radius: 8px;
+    box-shadow: 0 4px 26px 6px rgba(0, 0, 0, 0.6);
+  }
+  .fp-modern .fp-header { position: relative; }
+  .fp-modern .fp-header::after {
+    content: '';
+    position: absolute;
+    left: 7px; right: 7px; bottom: -1px;
+    height: 1px;
+    background: var(--green);
+    opacity: 0.5;
+  }
+  .fp-modern .fp-slot,
+  .fp-modern .fp-btn { border-radius: 6px; }
+  .fp-modern .fp-slot.on,
+  .fp-modern .fp-btn:hover { box-shadow: inset 0 0 0 1.5px var(--green); }
+  .fp-modern .fp-rule { background: var(--green); opacity: 0.5; }
+
+  @media (max-width: 900px) {
+    .family-grid,
+    .family-section .naming-rules { grid-template-columns: 1fr; }
+  }
+
   /* ─── TYPOGRAPHY ────────────────────────────────────────── */
   .type-section {
     background: var(--bg);
@@ -585,8 +770,8 @@
 <!-- PAGE HEADER -->
 <div class="page-header with-chrome">
   <div class="bl"></div>
-  <span class="page-header-label"><span>Wick</span> — Brand Identity System · v1.0 · TBC Classic Addon Suite</span>
-  <span class="page-header-label">April 2026</span>
+  <span class="page-header-label"><span>Wick</span> · Brand Identity System · v1.1 · TBC Anniversary and Forever</span>
+  <span class="page-header-label">October 2026</span>
 </div>
 
 <div style="height:2px"></div>
@@ -597,10 +782,10 @@
   <!-- Wordmark panel -->
   <div class="hero-wordmark with-chrome">
     <div class="bl"></div>
-    <div class="section-label">01 — Wordmark</div>
+    <div class="section-label">01 · Wordmark</div>
 
     <div class="wordmark-text">Wick</div>
-    <div class="wordmark-tagline">TBC Classic Addon Suite</div>
+    <div class="wordmark-tagline">Addons for TBC Anniversary and Forever</div>
 
     <div class="divider" style="width:100%"></div>
 
@@ -641,16 +826,16 @@
     </div>
 
     <div style="margin-top:8px; display:flex; gap:12px">
-      <span style="font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim)">— On dark</span>
-      <span style="font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim)">— On light</span>
-      <span style="font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim)">— Accent</span>
+      <span style="font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim)">On dark</span>
+      <span style="font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim)">On light</span>
+      <span style="font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim)">Accent</span>
     </div>
   </div>
 
   <!-- Logomark panel -->
   <div class="hero-logomark with-chrome">
     <div class="bl"></div>
-    <div class="section-label" style="width:100%; align-self:flex-start">02 — Logomark</div>
+    <div class="section-label" style="width:100%; align-self:flex-start">02 · Logomark</div>
 
     <div class="logomark-grid">
 
@@ -729,7 +914,7 @@
 <!-- COLOR SWATCHES -->
 <div class="swatch-section with-chrome" style="margin-bottom:2px">
   <div class="bl"></div>
-  <div class="section-label">03 — Color System</div>
+  <div class="section-label">03 · Color System</div>
   <div class="swatch-grid">
 
     <div class="swatch-item">
@@ -770,10 +955,107 @@
   </div>
 </div>
 
+<!-- CHROME FAMILIES -->
+<div class="family-section with-chrome" style="margin-bottom:2px">
+  <div class="bl"></div>
+  <div class="section-label">04 · Chrome Families</div>
+
+  <p class="family-intro">Every addon on WickCore draws in a look the player picks under Options, Wick's Mods. Looks are data in WickCore, and each one belongs to one of two families. Both families are current parts of the brand. The five palette values above stay locked.</p>
+
+  <div class="family-grid">
+
+    <!-- OG family -->
+    <div class="family-col">
+      <div class="family-stage">
+        <div class="panel fp fp-og">
+          <div class="br"></div>
+          <div class="fp-header">
+            <span class="fp-title">Wick's <b>Bags</b></span>
+            <span class="fp-close">x</span>
+          </div>
+          <div class="fp-body">
+            <div class="fp-slots">
+              <span class="fp-slot"></span><span class="fp-slot on"></span><span class="fp-slot"></span><span class="fp-slot"></span><span class="fp-slot"></span><span class="fp-slot"></span>
+            </div>
+            <div class="fp-rule"></div>
+            <div class="fp-buttons"><span class="fp-btn">Sort</span><span class="fp-btn">Bank</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="family-name">OG family <span class="family-key">family = "og"</span></div>
+      <ul class="family-spec">
+        <li>Flat void panel. No gradients, no Blizzard dialog textures.</li>
+        <li>A single 1px muted-purple border on every panel.</li>
+        <li>Fel L-brackets: 10px arms, 2px thick, flush to the corners.</li>
+        <li>A Shadow header strip with a 1px rule under it.</li>
+        <li>The bottom-right bracket doubles as the resize grip.</li>
+      </ul>
+      <div class="family-looks">
+        <span class="lockup-tag">Wick OG</span>
+        <span class="lockup-tag">Rebel</span>
+        <span class="lockup-tag">Crisp</span>
+      </div>
+      <div class="family-note">Wick OG is the reference shown here. Rebel and Crisp keep the flat fill and the border line, draw no brackets, and bring their own palettes.</div>
+    </div>
+
+    <!-- Modern family -->
+    <div class="family-col">
+      <div class="family-stage">
+        <div class="fp fp-modern">
+          <div class="fp-header">
+            <span class="fp-title">Wick's <b>Bags</b></span>
+            <span class="fp-close">&times;</span>
+          </div>
+          <div class="fp-body">
+            <div class="fp-slots">
+              <span class="fp-slot"></span><span class="fp-slot on"></span><span class="fp-slot"></span><span class="fp-slot"></span><span class="fp-slot"></span><span class="fp-slot"></span>
+            </div>
+            <div class="fp-rule"></div>
+            <div class="fp-buttons"><span class="fp-btn">Sort</span><span class="fp-btn">Bank</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="family-name">Modern family <span class="family-key">family = "modern"</span></div>
+      <ul class="family-spec">
+        <li>9-sliced glass panel with rounded corners.</li>
+        <li>A soft lift shadow that reaches past the edges.</li>
+        <li>No border line. A ring lights in the accent for hover and selection.</li>
+        <li>No L-brackets. A resizable panel keeps a soft grip mark.</li>
+        <li>The title sits on the glass over a half-strength accent rule.</li>
+      </ul>
+      <div class="family-looks">
+        <span class="lockup-tag">Wick Modern</span>
+        <span class="lockup-tag">Hologram</span>
+        <span class="lockup-tag">Gilded</span>
+        <span class="lockup-tag">Arena</span>
+        <span class="lockup-tag">Foundry</span>
+        <span class="lockup-tag">Frost</span>
+      </div>
+      <div class="family-note">Wick Modern is the reference shown here. The other modern looks bring their own panel shape, ring, shadow and palette.</div>
+    </div>
+
+  </div>
+
+  <div class="naming-rules">
+    <div class="naming-rule">
+      <div class="nr-label"><span class="dot"></span>Defaults</div>
+      <div class="nr-text">TBC Classic Anniversary starts on Wick OG with the Fel theme. WoW Forever starts on Wick Modern with the player's class theme. Wick Modern and Wick OG draw in the Wick palette: Fel, a class theme or Custom.</div>
+    </div>
+    <div class="naming-rule">
+      <div class="nr-label"><span class="dot"></span>Colour by reference</div>
+      <div class="nr-text">Addons take every colour by reference from Chrome.Colors, so a theme change repaints the whole suite. A copied colour never repaints. Changing the look reloads the interface.</div>
+    </div>
+    <div class="naming-rule">
+      <div class="nr-label"><span class="dot"></span>Marketing art</div>
+      <div class="nr-text">Thumbnails, banners, social cards and the website keep the OG chrome: void ground, 1px border, fel L-brackets. Kit cards spell the full name, as in DEMONS AND THINGS.</div>
+    </div>
+  </div>
+</div>
+
 <!-- TYPOGRAPHY -->
 <div class="type-section with-chrome" style="margin-bottom:2px">
   <div class="bl"></div>
-  <div class="section-label">04 — Typography</div>
+  <div class="section-label">05 · Typography</div>
 
   <div class="type-specimen">
 
@@ -782,20 +1064,20 @@
       <div class="type-name">Display</div>
       <div class="type-spec">
         Cinzel · Bold 700<br>
-        32–96px · -0.02em<br>
+        32 to 96px · -0.02em<br>
         Wordmark, headlines
       </div>
     </div>
     <div class="type-preview">
-      <span style="font-family:'Cinzel',serif; font-size:36px; font-weight:700; letter-spacing:-0.02em; color:var(--text)">Wick's BIS Tracker</span>
+      <span style="font-family:'Cinzel',serif; font-size:36px; font-weight:700; letter-spacing:-0.02em; color:var(--text)">Wick's TBC BIS Tracker</span>
     </div>
 
     <!-- UI Body -->
     <div class="type-meta">
       <div class="type-name">UI / Body</div>
       <div class="type-spec">
-        Space Grotesk · 400–600<br>
-        12–16px · 0em<br>
+        Space Grotesk · 400 to 600<br>
+        12 to 16px · 0em<br>
         Labels, descriptions
       </div>
     </div>
@@ -811,7 +1093,7 @@
       <div class="type-name">Mono</div>
       <div class="type-spec">
         Space Mono · 400<br>
-        8–11px · 0.15–0.25em<br>
+        8 to 11px · 0.15 to 0.25em<br>
         Labels, hex values, tags
       </div>
     </div>
@@ -829,7 +1111,7 @@
 <!-- ADDON LOCKUPS -->
 <div class="lockup-section with-chrome" style="margin-bottom:2px">
   <div class="bl"></div>
-  <div class="section-label">05 — Addon Lockups</div>
+  <div class="section-label">06 · Addon Lockups</div>
 
   <div class="lockup-grid">
 
@@ -848,10 +1130,10 @@
           <line x1="20" y1="14" x2="23" y2="14" stroke="#4FC778" stroke-width="1" opacity="0.5"/>
         </svg>
         <div>
-          <div class="lockup-name"><span class="lockup-name-bold">Wick's</span> BIS Tracker</div>
+          <div class="lockup-name"><span class="lockup-name-bold">Wick's</span> TBC BIS Tracker</div>
         </div>
       </div>
-      <div class="lockup-desc">Best-in-slot gear tracking for TBC Classic. Compare items across phases, track acquisition status per slot, export list to guild.</div>
+      <div class="lockup-desc">Best-in-slot gear tracking for every class, every spec and every phase of TBC Classic, with SoftRes integration.</div>
       <div style="display:flex; gap:6px; flex-wrap:wrap">
         <span class="lockup-tag">Gear</span>
         <span class="lockup-tag">Raiding</span>
@@ -875,7 +1157,7 @@
           <div class="lockup-name"><span class="lockup-name-bold">Wick's</span> CD Tracker</div>
         </div>
       </div>
-      <div class="lockup-desc">Raid-wide cooldown tracker. Monitor trinkets, battle res, bloodlust, and class abilities across your entire raid in real time.</div>
+      <div class="lockup-desc">Live party and raid cooldown tracker. Kicks, saves, offensives and utility in one tight panel, in class-coloured rows.</div>
       <div style="display:flex; gap:6px; flex-wrap:wrap">
         <span class="lockup-tag">Cooldowns</span>
         <span class="lockup-tag">Raid</span>
@@ -900,7 +1182,7 @@
           <div class="lockup-name"><span class="lockup-name-bold">Wick's</span> Trade Hall</div>
         </div>
       </div>
-      <div class="lockup-desc">Streamlined trade window replacement. Log trades, flag disputed items, surface AH prices inline. Built for guild crafting workflows.</div>
+      <div class="lockup-desc">The trade channel as a bulletin board: seven categories, listings that age out, item tooltips inline. On Forever it also tallies what a run earned.</div>
       <div style="display:flex; gap:6px; flex-wrap:wrap">
         <span class="lockup-tag">Economy</span>
         <span class="lockup-tag">Crafting</span>
@@ -908,28 +1190,28 @@
       </div>
     </div>
 
-    <!-- Poly Alert -->
+    <!-- Wick's UI -->
     <div class="lockup-card">
       <div class="lockup-header">
-        <!-- Poly icon: sheep silhouette hint / alert triangle -->
+        <!-- UI icon: a frame with bars -->
         <svg class="lockup-icon" viewBox="0 0 28 28" fill="none">
           <rect width="28" height="28" fill="#0D0A14"/>
-          <!-- alert triangle -->
-          <path d="M14 5 L24 22 L4 22 Z" stroke="#383058" stroke-width="1" fill="none"/>
-          <path d="M14 5 L24 22 L4 22 Z" stroke="#4FC778" stroke-width="1" fill="none" opacity="0.4"/>
-          <!-- ! mark -->
-          <rect x="13" y="11" width="2" height="6" rx="0" fill="#4FC778"/>
-          <rect x="13" y="19" width="2" height="2" rx="0" fill="#4FC778"/>
+          <rect x="4" y="5" width="20" height="18" stroke="#383058" stroke-width="1" fill="none"/>
+          <rect x="7" y="8" width="10" height="3" fill="#4FC778" opacity="0.8"/>
+          <rect x="7" y="13" width="14" height="2" fill="#D4C8A1" opacity="0.35"/>
+          <rect x="7" y="18" width="3" height="3" fill="#4FC778" opacity="0.5"/>
+          <rect x="11" y="18" width="3" height="3" fill="#4FC778" opacity="0.5"/>
+          <rect x="15" y="18" width="3" height="3" fill="#4FC778" opacity="0.5"/>
         </svg>
         <div>
-          <div class="lockup-name"><span class="lockup-name-bold">Wick's</span> Poly Alert</div>
+          <div class="lockup-name"><span class="lockup-name-bold">Wick's</span> UI</div>
         </div>
       </div>
-      <div class="lockup-desc">Crowd control alert system. Audible and visual warnings when polymorphed targets are about to break. Configurable thresholds per fight.</div>
+      <div class="lockup-desc">The whole interface, in one look: bars, unit and group frames, nameplates, chat, minimap and tooltips, with the game's own windows dressed to match. TBC Anniversary and Forever.</div>
       <div style="display:flex; gap:6px; flex-wrap:wrap">
-        <span class="lockup-tag">CC</span>
-        <span class="lockup-tag">Alerts</span>
-        <span class="lockup-tag">Combat</span>
+        <span class="lockup-tag">Interface</span>
+        <span class="lockup-tag">Looks</span>
+        <span class="lockup-tag">Both clients</span>
       </div>
     </div>
 
@@ -939,7 +1221,7 @@
 <!-- NAMING CONVENTION -->
 <div class="naming-section with-chrome" style="margin-bottom:2px">
   <div class="bl"></div>
-  <div class="section-label">06 — Naming Convention</div>
+  <div class="section-label">07 · Naming Convention</div>
 
   <div class="naming-formula">
     <div class="nf-part accent">Wick's</div>
@@ -952,7 +1234,7 @@
   <div class="naming-rules">
     <div class="naming-rule">
       <div class="nr-label"><span class="dot"></span>Possessive prefix</div>
-      <div class="nr-text">Always "Wick's" — not "Wick" alone. Possessive signals authorship and creates a consistent family across the suite.</div>
+      <div class="nr-text">Always "Wick's", never "Wick" alone. Possessive signals authorship and creates a consistent family across the suite.</div>
     </div>
     <div class="naming-rule">
       <div class="nr-label"><span class="dot"></span>Functional noun</div>
@@ -968,7 +1250,7 @@
 <!-- FOOTER -->
 <div class="footer with-chrome">
   <div class="bl"></div>
-  <span class="footer-sig"><span>Wick</span> · TBC Classic Addon Suite · Brand Identity v1.0</span>
+  <span class="footer-sig"><span>Wick</span> · TBC Anniversary and Forever · Brand Identity v1.1</span>
   <span class="footer-sig">Cinzel + Space Grotesk + Space Mono · <span>#4FC778</span></span>
 </div>
 
