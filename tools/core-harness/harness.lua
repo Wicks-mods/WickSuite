@@ -316,6 +316,25 @@ else
         and Chrome.activeTheme == Chrome.ThemeByClass[select(2, UnitClass("player"))].id, "a new install follows the class")
     check(Chrome:StyleID() == "modern", "and starts on Wick Modern")
 end
+-- Wick Modern and Wick OG draw in the Wick palette and keep the theme in
+-- use; a look with its own palette brings it, and coming back from that
+-- look restores the Wick theme from before it.
+do
+    local styleWas, themeWas = Chrome:StyleID(), Chrome:ThemeSetting()
+    Chrome:SetTheme("fel")
+    Chrome:SetStyle("modern")
+    Chrome:SetStyle("og")
+    check(Chrome:ThemeSetting() == "fel" and Chrome.activeTheme == "fel",
+        "Wick Modern and Wick OG keep the theme in use: " .. tostring(Chrome:ThemeSetting()))
+    Chrome:SetTheme("mage")
+    Chrome:SetStyle("rebel")
+    local tookLook = Chrome.activeTheme == "rebel"
+    Chrome:SetStyle("og")
+    check(tookLook and Chrome:ThemeSetting() == "mage" and Chrome.activeTheme == "mage",
+        "a look brings its palette, and Wick OG after it has the Wick theme from before: " .. tostring(Chrome:ThemeSetting()))
+    Chrome:SetStyle(styleWas)
+    Chrome:SetTheme(themeWas)
+end
 -- The rest of this section starts from Fel.
 Chrome:SetTheme("fel")
 local felBefore = Chrome.Colors.fel[3]
