@@ -1577,6 +1577,37 @@ SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle off")
 check(cycleText() == "", "cycle off empties the key")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle auto")
 check(cycleText():find("Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil, "auto brings the default back")
+-- The reported case: Seal of Fury learned and first in the book, so the
+-- key ends on Fury. Casting Righteousness has to rewrite the key, not
+-- only the picture.
+do
+    table.insert(S.SPELLBOOK, 2, { "Seal of Fury", "Rank 1", "Interface\\Icons\\SoF", 20164 })
+    local keepAuras = S.AURAS
+    S.AURAS = { "Blessing of Might", "Devotion Aura" }
+    S.fire("UNIT_AURA", "player")
+    S.fire("SPELLS_CHANGED")
+    check(cycleText():find("Seal of the Crusader, Seal of Fury", 1, true) ~= nil,
+        "with nothing cast, the first seal in the book is the fighting seal: " .. cycleText():gsub("\n", " | "))
+    S.AURAS = { "Seal of Righteousness", "Blessing of Might", "Devotion Aura" }
+    S.fire("UNIT_AURA", "player")
+    check(cycleText():find("Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil,
+        "casting Righteousness rewrites the key, not only the picture: " .. cycleText():gsub("\n", " | "))
+    -- In combat the client withholds auras and secure text is frozen, so
+    -- nothing moves until the fight ends.
+    COMBAT = true
+    S.AURAS = { "Seal of Fury", "Blessing of Might", "Devotion Aura" }
+    S.fire("UNIT_AURA", "player")
+    check(cycleText():find("Seal of Righteousness", 1, true) ~= nil, "nothing is rewritten in combat")
+    COMBAT = false
+    S.fire("PLAYER_REGEN_ENABLED")
+    S.fire("UNIT_AURA", "player")
+    check(cycleText():find("Seal of the Crusader, Seal of Fury", 1, true) ~= nil,
+        "and the key catches up after the fight: " .. cycleText():gsub("\n", " | "))
+    table.remove(S.SPELLBOOK, 2)
+    S.AURAS = keepAuras
+    S.fire("SPELLS_CHANGED")
+    S.fire("UNIT_AURA", "player")
+end
 
 -- The seal key wears the seal that is on you, and a faded Crusader
 -- with none up.
