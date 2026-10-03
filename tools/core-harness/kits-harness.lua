@@ -1357,6 +1357,25 @@ if SA then
     check(#srows == 4, "stances checklist 4 rows, got " .. #srows)
     check(srows[2].state == "ok", "in a stance reads ok while in one: " .. tostring(srows[2].state))
     check(SA.cooldowns ~= nil, "stances has a cooldown bar")
+
+    -- The shield row reads the Dialect table, not the client's bare
+    -- returns, so a shield in the off hand has to read ok. A dagger
+    -- there is not a tank, and the row says nothing.
+    local BUCKLER, OFFDAGGER = 1203, 2092
+    S.ITEMS = S.ITEMS or {}
+    S.ITEMS[BUCKLER]   = { equipLoc = "INVTYPE_SHIELD",          classID = 4, subClassID = 6, name = "Aegis of the Scarlet Commander" }
+    S.ITEMS[OFFDAGGER] = { equipLoc = "INVTYPE_WEAPONOFFHAND",   classID = 2, subClassID = 15, name = "Worn Dagger" }
+    S.EQUIPPED_IDS = S.EQUIPPED_IDS or {}
+    local keep16, keep17 = S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17]
+    S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = 2092, BUCKLER
+    srows = SA.kit.checklist:Evaluate()
+    check(srows[4].label == "Shield for Defensive", "fourth row is the shield row: " .. tostring(srows[4].label))
+    check(srows[4].state == "ok", "a shield in the off hand reads ok: " .. tostring(srows[4].state))
+    S.EQUIPPED_IDS[17] = OFFDAGGER
+    srows = SA.kit.checklist:Evaluate()
+    check(srows[4].state == "unknown", "a dagger there does not apply: " .. tostring(srows[4].state))
+    S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = keep16, keep17
+    S.ITEMS[BUCKLER], S.ITEMS[OFFDAGGER] = nil, nil
 end
 S.STANCE, S.STANCE_COUNT = 0, 0
 
