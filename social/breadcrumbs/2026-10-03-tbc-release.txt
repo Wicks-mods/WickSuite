@@ -1,0 +1,17 @@
+== facebook ==
+Wick's UI is out on TBC Classic Anniversary.
+
+Bars, unit frames, nameplates, threat, chat, minimap and tooltips in one look, with the game's windows drawn to match and every part optional. It is the same UI as on WoW Forever, on the same core, so it changes looks with the rest of the Wick suite, and your other Wick addons keep their places and move with it.
+
+Also out today for TBC: Wick's Demons and Things, a new warlock kit with your stones, rituals, demons, cooldowns and soul shards on one set of bars. Wick's Comforts now loads on TBC too, and Wick's Quest Key and Wick's Ledger take on the suite's look.
+
+Free on CurseForge: https://www.curseforge.com/wow/addons/wicks-ui
+
+The tour is at https://wicksmods.com/ui
+
+== x ==
+Wick's UI is out on TBC Classic Anniversary: bars, frames, nameplates, threat and every window in one look. Plus Wick's Demons and Things, a new warlock kit. Free on CurseForge.
+
+https://wicksmods.com/ui
+
+#WoWClassic #TBCClassic
