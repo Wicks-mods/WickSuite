@@ -1418,6 +1418,16 @@ SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle off")
 check(cycleText() == "", "cycle off empties the key")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle auto")
 
+local function blessText() return tostring(_G.WicksSealsBlessButton:GetAttribute("macrotext")) end
+check(blessText():find("/cast [help,nodead][@player] Blessing of Might", 1, true) ~= nil,
+    "the blessing key casts the blessing on you, friend first: " .. blessText():gsub("\n", " | "))
+S.SPELLBOOK[#S.SPELLBOOK + 1] = { "Blessing of Wisdom", "Rank 1", "Interface\\Icons\\BoW", 19742 }
+S.fire("SPELLS_CHANGED")
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("bless wisdom")
+check(blessText():find("Blessing of Wisdom", 1, true) ~= nil, "/wsl bless picks a blessing by part of its name")
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("bless auto")
+check(blessText():find("Blessing of Might", 1, true) ~= nil, "and auto follows the one on you again")
+
 io.write("== the two swap keys ==\n")
 local function twoText() return tostring(_G.WicksSealsTwoHandButton:GetAttribute("macrotext")) end
 local function boardText() return tostring(_G.WicksSealsShieldButton:GetAttribute("macrotext")) end
