@@ -1,6 +1,6 @@
 {
   "source": "wowhead.com/forever, zone drop listviews",
-  "collected": "2026-09-21",
+  "collected": "2026-10-03",
   "note": "Coverage is uneven, because Wowhead's Forever data grows from what players actually see: the early dungeons are well filled in and the later ones are thin. Re-run as the beta goes on.",
   "dungeons": {
     "The Hall of Thanes": {
@@ -3528,6 +3528,513 @@
           }
         }
       ]
+    },
+    "Excavation Site: Wetlands": {
+      "zoneId": 16732,
+      "levels": "24-28",
+      "drops": [
+        {
+          "id": 273026,
+          "name": "Garb of Florid Feathers",
+          "ilvl": 31,
+          "reqLevel": 26,
+          "quality": "rare",
+          "slot": "Chest",
+          "slotId": 5,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Shadetooth"
+          ],
+          "stats": {
+            "agility": 6,
+            "stamina": 6,
+            "intellect": 13,
+            "armor": 105
+          }
+        },
+        {
+          "id": 273024,
+          "name": "Glinteye Slippers",
+          "ilvl": 31,
+          "reqLevel": 26,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Saltspine"
+          ],
+          "stats": {
+            "stamina": 9,
+            "intellect": 6,
+            "spirit": 6,
+            "armor": 33
+          }
+        },
+        {
+          "id": 273025,
+          "name": "Raptorclaw Greaves",
+          "ilvl": 31,
+          "reqLevel": 26,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Shadetooth"
+          ],
+          "stats": {
+            "strength": 7,
+            "stamina": 7,
+            "intellect": 6,
+            "armor": 152
+          }
+        },
+        {
+          "id": 273030,
+          "name": "Ring of Power Regulation",
+          "ilvl": 33,
+          "reqLevel": 28,
+          "quality": "rare",
+          "slot": "Finger",
+          "slotId": 11,
+          "itemClass": 4,
+          "itemSubclass": -2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Relic Guardian"
+          ],
+          "stats": {
+            "stamina": 8
+          }
+        },
+        {
+          "id": 273027,
+          "name": "Raptor's Gaze",
+          "ilvl": 31,
+          "reqLevel": 26,
+          "quality": "rare",
+          "slot": "Held in Off-hand",
+          "slotId": 23,
+          "itemClass": 4,
+          "itemSubclass": -5,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Shadetooth"
+          ],
+          "stats": {
+            "stamina": 7,
+            "intellect": 4,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 5."
+            ]
+          }
+        },
+        {
+          "id": 273022,
+          "name": "Supple Bellyskin Leggings",
+          "ilvl": 31,
+          "reqLevel": 26,
+          "quality": "rare",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Saltspine"
+          ],
+          "stats": {
+            "strength": 6,
+            "stamina": 14,
+            "armor": 92
+          }
+        },
+        {
+          "id": 273029,
+          "name": "Golemsight Long Gun",
+          "ilvl": 33,
+          "reqLevel": 28,
+          "quality": "rare",
+          "slot": "Ranged",
+          "slotId": 15,
+          "itemClass": 2,
+          "itemSubclass": 3,
+          "dps": 16.6,
+          "speed": 2.5,
+          "droppedBy": [
+            "Relic Guardian"
+          ],
+          "stats": {
+            "agility": 6,
+            "minDamage": 29,
+            "maxDamage": 54,
+            "speed": 2.5,
+            "dps": 16.6
+          }
+        },
+        {
+          "id": 273028,
+          "name": "Reliquary Mantle",
+          "ilvl": 33,
+          "reqLevel": 28,
+          "quality": "rare",
+          "slot": "Shoulder",
+          "slotId": 3,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Relic Guardian"
+          ],
+          "stats": {
+            "stamina": 12,
+            "spirit": 4,
+            "armor": 171
+          }
+        },
+        {
+          "id": 273023,
+          "name": "Saltscale Girdle",
+          "ilvl": 31,
+          "reqLevel": 26,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Saltspine"
+          ],
+          "stats": {
+            "strength": 9,
+            "stamina": 9,
+            "armor": 124
+          }
+        }
+      ],
+      "questRewards": [
+        {
+          "id": 271716,
+          "name": "Explorer's League Dustcover",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Back",
+          "slotId": 16,
+          "itemClass": 4,
+          "itemSubclass": -6,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Prehistoric Prism"
+          ],
+          "stats": {
+            "strength": 4,
+            "agility": 4,
+            "intellect": 7,
+            "armor": 25
+          }
+        },
+        {
+          "id": 271719,
+          "name": "Furs of the Earthen Ring",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Back",
+          "slotId": 16,
+          "itemClass": 4,
+          "itemSubclass": -6,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Earthen Echo"
+          ],
+          "stats": {
+            "strength": 4,
+            "stamina": 3,
+            "intellect": 5,
+            "spirit": 4,
+            "armor": 25
+          }
+        },
+        {
+          "id": 271670,
+          "name": "Curl of Life",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Finger",
+          "slotId": 11,
+          "itemClass": 4,
+          "itemSubclass": -2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Horrors in the Highland"
+          ],
+          "stats": {
+            "stamina": 7,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 5."
+            ]
+          }
+        },
+        {
+          "id": 271664,
+          "name": "Hornbeam Heft",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 0,
+          "dps": 21.46,
+          "speed": 2.4,
+          "droppedBy": [
+            "Horrors in the Highland"
+          ],
+          "stats": {
+            "strength": 3,
+            "stamina": 6,
+            "spirit": 3,
+            "minDamage": 36,
+            "maxDamage": 67,
+            "speed": 2.4,
+            "dps": 21.46
+          }
+        },
+        {
+          "id": 280805,
+          "name": "Serrated Raptor Claw",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 15,
+          "dps": 21.56,
+          "speed": 1.6,
+          "droppedBy": [
+            "Changing Tastes"
+          ],
+          "stats": {
+            "agility": 5,
+            "minDamage": 24,
+            "maxDamage": 45,
+            "speed": 1.6,
+            "dps": 21.56,
+            "equip": [
+              "Equip: +10 Attack Power."
+            ]
+          }
+        },
+        {
+          "id": 280766,
+          "name": "Satchel of Potions",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {}
+        },
+        {
+          "id": 271767,
+          "name": "Healer's Staff",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Two-Hand",
+          "slotId": 17,
+          "itemClass": 2,
+          "itemSubclass": 10,
+          "dps": 20.77,
+          "speed": 2.6,
+          "droppedBy": [],
+          "stats": {
+            "stamina": 12,
+            "minDamage": 43,
+            "maxDamage": 65,
+            "speed": 2.6,
+            "dps": 20.77,
+            "equip": [
+              "Equip: Increases healing done by up to 67 and damage done by up to 22 for all magical spells and effects."
+            ]
+          }
+        },
+        {
+          "id": 271766,
+          "name": "Heavehammer",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Two-Hand",
+          "slotId": 17,
+          "itemClass": 2,
+          "itemSubclass": 5,
+          "dps": 27.73,
+          "speed": 3.3,
+          "droppedBy": [],
+          "stats": {
+            "agility": 7,
+            "armor": 70,
+            "minDamage": 73,
+            "maxDamage": 110,
+            "speed": 3.3,
+            "dps": 27.73,
+            "equip": [
+              "Equip: +26 Attack Power."
+            ]
+          }
+        },
+        {
+          "id": 271667,
+          "name": "Ironwood Destroyer",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Two-Hand",
+          "slotId": 17,
+          "itemClass": 2,
+          "itemSubclass": 5,
+          "dps": 27.79,
+          "speed": 3.4,
+          "droppedBy": [
+            "Horrors in the Highland"
+          ],
+          "stats": {
+            "stamina": 9,
+            "spirit": 7,
+            "minDamage": 75,
+            "maxDamage": 114,
+            "speed": 3.4,
+            "dps": 27.79,
+            "equip": [
+              "Equip: +24 Attack Power."
+            ]
+          }
+        },
+        {
+          "id": 271769,
+          "name": "Daewyn's Girdle",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Fallen in the Fen"
+          ],
+          "stats": {
+            "spirit": 9,
+            "armor": 28,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 6."
+            ]
+          }
+        },
+        {
+          "id": 271768,
+          "name": "Songblade Stabilizer",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Fallen in the Fen"
+          ],
+          "stats": {
+            "stamina": 10,
+            "armor": 128,
+            "equip": [
+              "Equip: Increases your chance to Dodge an attack by 0.7%."
+            ]
+          }
+        },
+        {
+          "id": 271732,
+          "name": "Dirt-Heavy Bracers",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Open the Maw"
+          ],
+          "stats": {
+            "stamina": 4,
+            "spirit": 7,
+            "armor": 47,
+            "equip": [
+              "Equip: +8 Attack Power."
+            ]
+          }
+        },
+        {
+          "id": 271740,
+          "name": "Knife-Polishing Rag",
+          "ilvl": 33,
+          "reqLevel": 24,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Open the Maw"
+          ],
+          "stats": {
+            "intellect": 4,
+            "spirit": 7,
+            "armor": 22,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 4."
+            ]
+          }
+        }
+      ],
+      "levelsDerived": true,
+      "dropsNote": "Wowhead's zone page carried no drops on 2026-10-03. Ids and boss attribution came from foreverchanges.pro and were checked one by one against nether.wowhead.com/forever/tooltip/item/<id>, which names Saltspine, Shadetooth and Relic Guardian for three of them itself."
     },
     "Gnomeregan": {
       "zoneId": 721,
@@ -8932,12 +9439,6 @@
       "drops": [],
       "questRewards": []
     },
-    "Excavation Site: Wetlands": {
-      "zoneId": 16732,
-      "levels": "",
-      "drops": [],
-      "questRewards": []
-    },
     "The Burning of Andorhal": {
       "zoneId": 15828,
       "levels": "",
@@ -8969,5 +9470,5 @@
       "questRewards": []
     }
   },
-  "statsCollected": "2026-09-21"
+  "statsCollected": "2026-10-03"
 }

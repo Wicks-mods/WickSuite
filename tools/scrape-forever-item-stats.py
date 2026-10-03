@@ -47,7 +47,14 @@ def parse(tip):
     header. Anything it does not recognise is left out rather than
     guessed at.
     """
-    text = re.sub(r"<[^>]+>", "\n", tip.get("tooltip") or "")
+    # Comments and inline spans sit mid-sentence: a rating is written
+    # "+<!--rtg38-->10 Attack Power" and a spell power value is wrapped in
+    # its own span. Those vanish and only the block tags break a line,
+    # or every Equip line loses its number.
+    text = tip.get("tooltip") or ""
+    text = re.sub(r"<!--.*?-->", "", text)
+    text = re.sub(r"<(?:br|/?(?:div|table|tr|td|p))\b[^>]*>", "\n", text)
+    text = re.sub(r"<[^>]+>", "", text)
     text = htmllib.unescape(text)
     stats = {}
 

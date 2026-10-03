@@ -240,6 +240,16 @@ def main():
                     it["stats"] = known[it["id"]]
 
         d, q = gear_only(drops), gear_only(quests)
+        # An empty answer never erases what is on file. A new dungeon's
+        # bosses can be known from their own tooltips before Wowhead's
+        # zone page lists a single drop (Excavation Site, 2026-10-03), and
+        # a re-run must not throw that away because the page is still bare.
+        was = previous.get(name) or {}
+        if not d and was.get("drops"):
+            d = was["drops"]
+            print("  %-24s zone page has no drops; keeping the %d on file" % (name, len(d)))
+        if not q and was.get("questRewards"):
+            q = was["questRewards"]
         # Nothing published, so say what the loot itself asks for rather
         # than leaving the column blank.
         derived = False
@@ -250,6 +260,8 @@ def main():
         entry = { "zoneId": zone, "levels": levels or "", "drops": d, "questRewards": q }
         if derived:
             entry["levelsDerived"] = True
+        if was.get("dropsNote"):
+            entry["dropsNote"] = was["dropsNote"]
         out[name] = entry
         total += len(drops) + len(quests)
         equippable += len(d) + len(q)
