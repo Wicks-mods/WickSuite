@@ -755,7 +755,8 @@ function IsSwimming() return false end
 function IsOutdoors() return true end
 function GetRealZoneText() return "Elwynn Forest" end
 function IsFlyableArea() return false end
-function GetBindingKey() return nil end
+-- S.BINDINGS[command] = key lets a test bind something.
+function GetBindingKey(cmd) return S.BINDINGS and S.BINDINGS[cmd] or nil end
 function SetBindingClick() return true end
 
 -- The chat edit boxes. This client brings them up in the old alt arrow

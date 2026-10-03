@@ -1580,6 +1580,19 @@ do
     S.AURAS = { "Seal of Righteousness", "Blessing of Might", "Devotion Aura" }
     S.fire("UNIT_AURA", "player")
 end
+-- Each key shows its binding, shortened, and follows a rebind.
+do
+    local key = _G.WicksSealsCycleButton
+    check(key.hotkey ~= nil and (key.hotkey.__text or "") == "", "an unbound key shows no hotkey")
+    S.BINDINGS = { ["CLICK WicksSealsCycleButton:LeftButton"] = "SHIFT-1",
+                   ["CLICK WicksSealsTwoHandButton:LeftButton"] = "BUTTON4" }
+    S.fire("UPDATE_BINDINGS")
+    check(key.hotkey.__text == "S1", "the seal key shows SHIFT-1 as S1: " .. tostring(key.hotkey.__text))
+    check(_G.WicksSealsTwoHandButton.hotkey.__text == "M4", "a mouse button reads M4: " .. tostring(_G.WicksSealsTwoHandButton.hotkey.__text))
+    S.BINDINGS = nil
+    S.fire("UPDATE_BINDINGS")
+    check(key.hotkey.__text == "", "and unbinding clears it")
+end
 local function blessText() return tostring(_G.WicksSealsBlessButton:GetAttribute("macrotext")) end
 check(blessText():find("/cast [help,nodead][@player] Blessing of Might", 1, true) ~= nil,
     "the blessing key casts the blessing on you, friend first: " .. blessText():gsub("\n", " | "))
