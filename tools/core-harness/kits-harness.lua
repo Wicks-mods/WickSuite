@@ -1420,16 +1420,12 @@ check(_G.WicksSealsButton1:GetAttribute("spell") == "Seal of Righteousness",
     "the first key casts the first seal in the book: " .. tostring(_G.WicksSealsButton1:GetAttribute("spell")))
 local function judgeText() return tostring(_G.WicksSealsJudgeButton:GetAttribute("macrotext")) end
 local function cycleText() return tostring(_G.WicksSealsCycleButton:GetAttribute("macrotext")) end
-check(judgeText():find("/cast Judgement", 1, true) ~= nil and judgeText():find("/cast Seal of Righteousness", 1, true) ~= nil,
-    "Judgement reseals with the seal that is on you: " .. judgeText():gsub("\n", " | "))
-check(cycleText():find("/castsequence reset=target/15 Seal of the Crusader, Judgement, Seal of Righteousness", 1, true) ~= nil,
-    "the cycle key dances Crusader, Judgement, fighting seal: " .. cycleText():gsub("\n", " | "))
+check(judgeText():find("/cast Judgement", 1, true) ~= nil and judgeText():find("Seal of", 1, true) == nil,
+    "Judgement judges alone, since the seal stays on: " .. judgeText():gsub("\n", " | "))
+check(cycleText():find("/castsequence reset=target/30 Seal of the Crusader, Judgement, Seal of Righteousness", 1, true) ~= nil,
+    "the cycle key dances Crusader, Judgement, fighting seal, over every thirty seconds: " .. cycleText():gsub("\n", " | "))
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal command")
-check(judgeText():find("Seal of Command", 1, true) ~= nil, "/wsl seal picks the fighting seal by hand")
-check(cycleText():find("Judgement, Seal of Command", 1, true) ~= nil, "and the cycle ends on it")
-SlashCmdList.WICK_WICKSSEALSANDTHINGS("reseal off")
-check(judgeText():find("Seal of", 1, true) == nil, "reseal off judges alone: " .. judgeText():gsub("\n", " | "))
-SlashCmdList.WICK_WICKSSEALSANDTHINGS("reseal on")
+check(cycleText():find("Judgement, Seal of Command", 1, true) ~= nil, "/wsl seal picks the seal the cycle ends on")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal auto")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle Seal of Command, Judgement")
 check(cycleText():find("Seal of Command, Judgement", 1, true) ~= nil, "a cycle of your own: " .. cycleText():gsub("\n", " | "))
@@ -1484,10 +1480,10 @@ S.SLOT_ITEMS[1] = { { id = MACE, count = 1 }, { id = SHIELD, count = 1 }, { id =
 S.fire("PLAYER_EQUIPMENT_CHANGED")
 check(SNS.swap:Faces().twoHand.live == true, "the mark follows your hands even in combat")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal command")
-check(judgeText():find("Seal of Command", 1, true) == nil, "nothing is written to a secure button in combat")
+check(cycleText():find("Seal of Command", 1, true) == nil, "nothing is written to a secure button in combat")
 COMBAT = false
 S.fire("PLAYER_REGEN_ENABLED")
-check(judgeText():find("Seal of Command", 1, true) ~= nil, "and it catches up when combat ends: " .. judgeText():gsub("\n", " | "))
+check(cycleText():find("Seal of Command", 1, true) ~= nil, "and it catches up when combat ends: " .. cycleText():gsub("\n", " | "))
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal auto")
 
 -- The checklist grows as the spells that need a row are learned.
