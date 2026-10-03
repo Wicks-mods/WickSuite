@@ -134,8 +134,10 @@ if MODERN then
     _G.BankFrame = S.newMock("Frame", "BankFrame")
     S.BANK_TABS = 0
     BankFrame:Show()   -- the real one is up while you stand at the banker
+    S.NEXT_TAB_ASKED = 0
     S.fire("BANKFRAME_OPENED")
     check(BankFrame._wicksHooked == nil, "with no tabs yet, Blizzard's bank frame is not hooked")
+    check(WB.Bank.panel and not WB.Bank.panel:IsShown(), "and our own bank panel stays hidden until the tab lands")
     check(BankFrame:GetAlpha() == 1, "and not hidden")
     check(BankFrame._wicksAnchor == nil, "and not moved")
     check(WB.Bank.GrantPending() == true, "the addon knows the grant is still pending")
@@ -147,6 +149,11 @@ if MODERN then
     check(BankFrame._wicksHooked == true, "once the tab is granted the frame is taken over")
     check(BankFrame:GetAlpha() == 0, "and put out of the way")
     check(WB.Bank.GrantPending() == false, "and the grant is no longer pending")
+    check(WB.Bank.panel:IsShown(), "and our panel opens")
+    -- The next tab's cost is what the grant reads; hovering Buy must not ask for it.
+    local buy = WB.Bank.panel._buyBtn
+    local okBuy, errBuy = pcall(buy.__scripts.OnEnter, buy)
+    check(okBuy and S.NEXT_TAB_ASKED == 0, "the next tab's cost is never asked for, not even for the Buy tooltip: " .. tostring(errBuy or ""))
     S.BANK_TABS = nil
 end
 -- Tab/bag slot tooltip

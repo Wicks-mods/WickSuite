@@ -1301,7 +1301,9 @@ if MODERN then
         FetchNumPurchasedBankTabs = function() return S.BANK_TABS or 2 end,
         FetchMaxNumBankTabs = function() return 9 end,
         FetchPurchasedBankTabData = function() return { { ID = 6, name = "Consumables", icon = 133633 }, { ID = 7, name = "Gear", icon = 133634 } } end,
-        FetchNextPurchasableBankTabData = function() return { tabCost = 100000 } end,
+        -- Counted: the game's free first tab grant reads this, and a call from
+        -- an addon taints what it reads (taint.log 2026-10-03).
+        FetchNextPurchasableBankTabData = function() S.NEXT_TAB_ASKED = (S.NEXT_TAB_ASKED or 0) + 1; return { tabCost = 100000 } end,
         PurchaseBankTab = function() S.PURCHASED_TAB = true end,
         CloseBankFrame = function() BANK_OPEN = false end,
     }
