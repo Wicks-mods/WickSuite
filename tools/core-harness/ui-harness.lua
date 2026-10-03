@@ -597,6 +597,26 @@ do
         d.castbar = true
         NP:Configure(p)
         check(p:IsElementEnabled("Castbar") and p.Castbar == p.wuiCastbar, "and back on")
+        if S.tbc then
+            -- A cast on this client: UnitCastingInfo has no interrupt flag
+            -- (nil), and the client's SetAlphaFromBoolean takes a boolean only.
+            local uci = UnitCastingInfo
+            UnitCastingInfo = function()
+                return "Summon Charger", "Summon Charger", 132226, 1480956, 1483956, false, "Cast-3-0", nil, 23214, 1
+            end
+            local shield, took = p.wuiCastbar.Shield, "none"
+            rawset(shield, "SetAlphaFromBoolean", function(_, v)
+                if type(v) ~= "boolean" then error("Usage: self:SetAlphaFromBoolean(value [, alphaIfTrue, alphaIfFalse])", 2) end
+                took = v
+            end)
+            -- The stub's frames register no events (IsEventless answers
+            -- truthy), so the cast is started through ForceUpdate, which
+            -- runs the same CastStart as UNIT_SPELLCAST_START.
+            local okC, errC = pcall(function() p.wuiCastbar:ForceUpdate() end)
+            UnitCastingInfo = uci
+            rawset(shield, "SetAlphaFromBoolean", nil)
+            check(okC and took == false, "a cast with no interrupt flag starts, its shield hidden: " .. tostring(errC or took))
+        end
         local oc = UnitClassification
         UnitClassification = function() return "elite" end
         NP:Refresh(p)
@@ -732,6 +752,14 @@ if not S.forever then
         "and reads its aura by index from C_UnitAuras: " .. tostring(st and st.art.Icon.__tex))
     check(st and type(st.art.Time.__text) == "string" and st.art.Time.__text ~= "", "with the time left written on it: " .. tostring(st and st.art.Time.__text))
     check(rawget(b, "Icon") == nil and rawget(b, "Time") == nil, "nothing of ours is written onto the client's button")
+    -- A secure button acts on the press when ActionButtonUseKeyDown is on
+    -- (the default), so a button that hears only the release never cancels.
+    local fx = io.open(UI_DIR .. "/Modules/Auras/AuraButton.xml", "r")
+    local xml = fx and fx:read("*a") or ""
+    if fx then fx:close() end
+    local clicks = xml:match('registerForClicks="([^"]*)"') or ""
+    check(clicks:find("RightButtonDown", 1, true) and clicks:find("RightButtonUp", 1, true),
+        "a right-click cancels whether the game acts on the press or the release: " .. clicks)
     -- The plain-frame element still serves the unit frames' auras.
     local a
     for _, n in ipairs({ "WicksUI_Target", "WicksUI_Player", "WicksUI_Focus" }) do
@@ -1079,6 +1107,37 @@ do
     EX:db().lootRolls = true
     c:Hide()
     _G.GroupLootContainer, _G.BottomManagedFrameContainer = nil, nil
+
+    -- The quest tracker where Edit Mode cannot move it (TBC Anniversary):
+    -- Blizzard hangs QuestWatchFrame under the minimap; ours holds it.
+    if S.tbc then
+        local cluster = CreateFrame("Frame", "WuiTestCluster", UIParent)
+        local q = CreateFrame("Frame", "QuestWatchFrame", UIParent)
+        rawset(q, "IsProtected", function() return false end)
+        q:SetPoint("TOPRIGHT", cluster, "BOTTOMRIGHT", 0, -10)
+        local qBefore = {}
+        for k in pairs(q) do qBefore[k] = true end
+        if not EX.questAnchor then EX:BuildQuestAnchor() end
+        local qa = _G.WicksUI_QuestTrackerAnchor
+        check(qa and ns.Movers.list.questtracker and ns.Movers.list.questtracker.target == qa,
+            "the quest tracker has a mover, on a frame of ours")
+        EX.PinQuestTracker()
+        local p, rel, rp, x, y = q:GetPoint(1)
+        check(p == "TOPRIGHT" and rel == qa and rp == "TOPRIGHT" and x == 0 and y == 0,
+            "the quest tracker is pinned to the mover's anchor, growing down from it")
+        q:ClearAllPoints(); q:SetPoint("TOPRIGHT", cluster, "BOTTOMRIGHT", 0, -10)
+        EX.PinQuestTracker()
+        check(select(2, q:GetPoint(1)) == qa, "and put back when Blizzard places it again")
+        local qWrote = {}
+        for k in pairs(q) do if not qBefore[k] and type(k) == "string" and not k:find("^__") then qWrote[#qWrote + 1] = k end end
+        check(#qWrote == 0, "nothing is written onto Blizzard's tracker: " .. table.concat(qWrote, ","))
+        EX:db().questTracker = false
+        q:ClearAllPoints(); q:SetPoint("TOPRIGHT", cluster, "BOTTOMRIGHT", 0, -10)
+        EX.PinQuestTracker()
+        check(select(2, q:GetPoint(1)) == cluster, "with the option off the tracker stays where Blizzard puts it")
+        EX:db().questTracker = true
+        _G.QuestWatchFrame = nil
+    end
 end
 check(_G.WicksUI_Marker1:GetAttribute("macrotext1") == "/tm 1", "marker 1 marks the target")
 -- The setup: another nameplate addon and Wick's Bags on.
@@ -1419,6 +1478,30 @@ do
         check(okM, "a portrait window on this client skins: " .. tostring(errM or ""))
         check(_G.MerchantFrameTab1Left.__alpha == 0 and PS.extrasOf(mtab) and PS.extrasOf(mtab).backdrop ~= nil,
             "and the old tab pieces inside it go too")
+
+        -- A check box in the settings: its box and tick are atlases, and on
+        -- this engine every texture answers GetTexture with a file id. The
+        -- Classic pass once took it for an icon, kept the empty box as the
+        -- picture and drew the tick as a ring round it.
+        local sw = mock("Frame", "WuiTestSettings", UIParent, 600, 500)
+        sw.NineSlice = CreateFrame("Frame", nil, sw)
+        sw.TitleContainer = { TitleText = S.newMock("FontString") }
+        local box = mock("CheckButton", nil, sw, 30, 29)
+        local boxArt = tex(box, nil, 30, 29)
+        boxArt.__tex = 4614723
+        rawset(boxArt, "GetAtlas", function() return "checkbox-minimal" end)
+        local tick = tex(box, nil, 30, 29)
+        tick.__tex = 4614723
+        rawset(tick, "GetAtlas", function() return "checkmark-minimal" end)
+        rawset(box, "GetNormalTexture", function() return boxArt end)
+        rawset(box, "GetCheckedTexture", function() return tick end)
+        rawset(box, "GetFontString", function() return nil end)
+        regions(box, { boxArt, tick })
+        children(sw, { box })
+        local okB, errB = pcall(function() PS:Skin(sw) end)
+        local tp = rawget(tick, "__points")
+        check(okB and boxArt.__alpha == 0 and tp and tp[1] and tp[1][4] == 6 and tp[1][5] == -6,
+            "a settings check box is a check box, not an icon: its box goes and its tick is our fill: " .. tostring(errB or ""))
     end
 end
 
@@ -1912,6 +1995,43 @@ do
     check(late:GetParent() == Minimap, "with MBB loaded the collector stands down")
     MM:Collect()
     check(late:GetParent() == bar, "and gathers again without it")
+
+    -- The game's own buttons where the map has the Classic layout: a row of
+    -- tiles under the square map, the buttons placed but left the game's.
+    local dial, dialRing, dialIcon = mkButton("GameTimeFrame")
+    local menu = CreateFrame("Frame", "MiniMapTrackingDropDown", blizz)
+    local before = {}
+    for k in pairs(blizz) do before[k] = true end
+    -- Frames start hidden in the stub; the launcher shows in the game.
+    local launcher = rawget(_G, "WickCoreMinimapButton")
+    if launcher then launcher:Show() end
+    local d = MM:db()
+    d.square, d.strip = true, true
+    local okS, errS = pcall(function() MM:Shape() end)
+    local strip = rawget(_G, "WicksUI_MinimapStrip")
+    check(okS and strip and strip:IsShown(), "the game's buttons get a row under the square map: " .. tostring(errS or ""))
+    local _, r1, _, x1 = blizz:GetPoint(1)
+    local _, r2, _, x2 = dial:GetPoint(1)
+    check(r1 == strip and r2 == strip and (x2 or 0) > (x1 or 0) and blizz:GetWidth() == 24,
+        "tracking and the day and night dial sit in it side by side, as tiles")
+    check(blizz:GetParent() == Minimap and dialRing:GetAlpha() == 0 and dialIcon:GetNumPoints() == 2,
+        "they stay on the map, lose their round borders, and their pictures fill the tile")
+    check(rawget(menu, "__points") == nil, "the tracking menu hung on the button keeps its own place")
+    local wrote = {}
+    for k in pairs(blizz) do if not before[k] and type(k) == "string" and not k:find("^__") then wrote[#wrote + 1] = k end end
+    check(#wrote == 0, "nothing is written onto the game's button: " .. table.concat(wrote, ","))
+    if launcher then
+        check(select(2, launcher:GetPoint(1)) == strip, "WickCore's launcher joins the row")
+    end
+    local mp, mrel = MM.mail:GetPoint(1)
+    check(mp == "RIGHT" and mrel == strip, "new mail takes the row's right end")
+    d.strip = false
+    MM:Shape()
+    check(not strip:IsShown() and select(2, MM.mail:GetPoint(1)) == Minimap,
+        "switched off, the row goes and the mail mark returns to the map's corner")
+    d.strip = true
+    MM:Shape()
+    _G.GameTimeFrame, _G.MiniMapTrackingDropDown = nil, nil
 end
 
 io.write("== keybinds ==\n")
