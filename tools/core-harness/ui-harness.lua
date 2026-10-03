@@ -1123,8 +1123,9 @@ do
             "the quest tracker has a mover, on a frame of ours")
         EX.PinQuestTracker()
         local p, rel, rp, x, y = q:GetPoint(1)
-        check(p == "TOPRIGHT" and rel == qa and rp == "TOPRIGHT" and x == 0 and y == 0,
-            "the quest tracker is pinned to the mover's anchor, growing down from it")
+        local inset = ns.Skins:ClassicTrackerInset()
+        check(p == "TOPRIGHT" and rel == qa and rp == "TOPRIGHT" and x == 0 and y == -inset and inset > 0,
+            "the quest tracker is pinned to the mover's anchor, growing down from it, room left for its header: " .. tostring(y))
         q:ClearAllPoints(); q:SetPoint("TOPRIGHT", cluster, "BOTTOMRIGHT", 0, -10)
         EX.PinQuestTracker()
         check(select(2, q:GetPoint(1)) == qa, "and put back when Blizzard places it again")
@@ -1136,6 +1137,51 @@ do
         EX.PinQuestTracker()
         check(select(2, q:GetPoint(1)) == cluster, "with the option off the tracker stays where Blizzard puts it")
         EX:db().questTracker = true
+
+        -- The skin: QuestWatch_Update writes a title in gold and its
+        -- objectives, " - " first, in grey (white once done); the title of
+        -- a quest ready to hand in is the brighter gold.
+        local SK, C = ns.Skins, ns.Core.Chrome.Colors
+        local function line(i, text, r, g, b)
+            local fs = S.newMock("FontString", "QuestWatchLine" .. i)
+            fs.__parent = q
+            fs.__text, fs.__textColor, fs.__shown = text, { r, g, b, 1 }, true
+            rawset(fs, "SetFont", function(_, f, s) fs.__font = { f, s } end)
+            rawset(fs, "GetFont", function() return fs.__font and fs.__font[1], fs.__font and fs.__font[2] end)
+            _G["QuestWatchLine" .. i] = fs
+            return fs
+        end
+        local l1 = line(1, "Wanted: Boars", 0.75, 0.61, 0)
+        local l2 = line(2, " - Boar slain: 3/8", 0.8, 0.8, 0.8)
+        local l3 = line(3, "A Letter Home", 1, 0.82, 0)
+        local l4 = line(4, " - Letter delivered: 1/1", 1, 1, 1)
+        q.__w = 120
+        q:Show()
+        local qBefore2 = {}
+        for k in pairs(q) do qBefore2[k] = true end
+        local hooked = 0
+        _G.QuestWatch_Update = function() hooked = hooked + 1 end
+        local okT, errT = pcall(function() SK:Tracker() end)
+        local function is(fs, tok)
+            local c, t = C[tok], fs.__textColor
+            return t and math.abs(t[1] - c[1]) < 0.01 and math.abs(t[2] - c[2]) < 0.01 and math.abs(t[3] - c[3]) < 0.01
+        end
+        check(okT and is(l1, "text") and is(l2, "text") and is(l3, "fel") and is(l4, "muted"),
+            "tracker lines in the palette: a quest in progress in the text colour, one to hand in in the accent, a done objective muted: " .. tostring(errT or ""))
+        check(l1.__font and l1.__font[1] == ns.Media:Font() and l1.__font[2] == SK:db().trackerFontSize + 1
+            and l2.__font and l2.__font[2] == SK:db().trackerFontSize, "and in the look's font, a title a size up")
+        local hdr = SK.questHeader
+        check(hdr and hdr:IsShown() and hdr.text and hdr.text.__text ~= "", "a header of ours sits above the tracker")
+        check((q:GetWidth() or 0) >= l3:GetStringWidth() + 10, "the tracker is widened to its restyled lines: " .. tostring(q:GetWidth()))
+        SK:QuestWatch()
+        check(is(l4, "muted") and is(l1, "text"), "a second pass leaves its own colours alone")
+        l4.__textColor = { 1, 1, 1, 1 }
+        _G.QuestWatch_Update()
+        check(hooked == 1 and is(l4, "muted"), "the game's next update is followed at once, through a hook on its global function")
+        local qWrote2 = {}
+        for k in pairs(q) do if not qBefore2[k] and type(k) == "string" and not k:find("^__") then qWrote2[#qWrote2 + 1] = k end end
+        check(#qWrote2 == 0, "nothing is written onto the tracker by the skin: " .. table.concat(qWrote2, ","))
+        for i = 1, 4 do _G["QuestWatchLine" .. i] = nil end
         _G.QuestWatchFrame = nil
     end
 end
