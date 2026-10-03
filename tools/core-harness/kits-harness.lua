@@ -1420,12 +1420,17 @@ check(_G.WicksSealsButton1:GetAttribute("spell") == "Seal of Righteousness",
     "the first key casts the first seal in the book: " .. tostring(_G.WicksSealsButton1:GetAttribute("spell")))
 local function judgeText() return tostring(_G.WicksSealsJudgeButton:GetAttribute("macrotext")) end
 local function cycleText() return tostring(_G.WicksSealsCycleButton:GetAttribute("macrotext")) end
-check(judgeText():find("/cast Judgement", 1, true) ~= nil and judgeText():find("Seal of", 1, true) == nil,
-    "Judgement judges alone, since the seal stays on: " .. judgeText():gsub("\n", " | "))
+check(judgeText():find("/cast Judgement", 1, true) ~= nil and judgeText():find("/cast Seal of Righteousness", 1, true) ~= nil,
+    "Judgement falls back to the seal on you: " .. judgeText():gsub("\n", " | "))
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("reseal off")
+check(judgeText():find("Seal of", 1, true) == nil, "reseal off judges alone: " .. judgeText():gsub("\n", " | "))
+SlashCmdList.WICK_WICKSSEALSANDTHINGS("reseal on")
+check(judgeText():find("/cast Seal of Righteousness", 1, true) ~= nil, "and reseal on puts the line back")
 check(cycleText():find("/castsequence reset=target/30 Seal of the Crusader, Judgement, Seal of Righteousness", 1, true) ~= nil,
     "the cycle key dances Crusader, Judgement, fighting seal, over every thirty seconds: " .. cycleText():gsub("\n", " | "))
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal command")
 check(cycleText():find("Judgement, Seal of Command", 1, true) ~= nil, "/wsl seal picks the seal the cycle ends on")
+check(judgeText():find("/cast Seal of Command", 1, true) ~= nil, "and the Judgement key falls back to it")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("seal auto")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle Seal of Command, Judgement")
 check(cycleText():find("Seal of Command, Judgement", 1, true) ~= nil, "a cycle of your own: " .. cycleText():gsub("\n", " | "))
