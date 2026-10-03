@@ -1047,6 +1047,13 @@ async function cmdRelease(folder, newVer, ...flags) {
   const toc = path.join(dir, `${folder}.toc`);
   if (!fs.existsSync(toc)) die(`.toc not found: ${toc}`);
 
+  // The client reads Bindings.xml on its own. Listed in a TOC it is parsed a
+  // second time as UI XML, and every <Binding> raises an error at login.
+  for (const f of fs.readdirSync(dir).filter(n => n.toLowerCase().endsWith(".toc"))) {
+    if (/^\s*bindings\.xml\s*$/im.test(fs.readFileSync(path.join(dir, f), "utf8")))
+      die(`${f} lists Bindings.xml. Take that line out: the client loads it by itself.`);
+  }
+
   // 8 visible phases: bump → changelog → git → zip → CF upload → FB → Discord → X.
   const TOTAL = noAnnounce ? 5 : 8;
   const cmd   = `wick release ${folder} v${newVer}`;
@@ -1129,10 +1136,14 @@ async function cmdRelease(folder, newVer, ...flags) {
   // that are not ignored. A disk walk shipped everything on disk, including
   // git-ignored strays (a zip left in Trade Hall's folder, a draft page).
   // .wick-* are this tool's own markers (an announcement made); they sit in
-  // the addon folder but are never part of the addon.
+  // the addon folder but are never part of the addon. images/ is the README's
+  // and CurseForge's art (thumbnails, monograms, social cards), fetched from
+  // the repo; no addon loads it, and in the package it was up to 1.6 MB a
+  // player downloaded and never saw.
   const listed = runCapture(`git -C "${dir}" ls-files -z --cached --others --exclude-standard`)
     .split("\0").filter(Boolean)
-    .filter(rel => !(rel.startsWith(".git/") || rel.startsWith(".claude/") || rel === ".gitignore" || rel.startsWith(".wick-")))
+    .filter(rel => !(rel.startsWith(".git/") || rel.startsWith(".claude/") || rel === ".gitignore" || rel.startsWith(".wick-")
+      || rel.startsWith("images/")))
     .filter(rel => fs.existsSync(path.join(dir, rel)));
   if (listed.length === 0) die(`nothing to zip: git lists no files under ${dir}`);
   const listPath = path.join(zipDir, `.wick-zip-list-${folder}.txt`);

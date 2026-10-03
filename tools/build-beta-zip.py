@@ -325,7 +325,10 @@ def main():
             root = os.path.join(ADDONS, folder)
             assert os.path.isdir(root), folder
             for dirpath, dirnames, filenames in os.walk(root):
-                dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not d.startswith(".")]
+                # An addon's top-level images/ is its README and CurseForge
+                # art, the same as the marketing art below: none of it loads.
+                dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not d.startswith(".")
+                               and not (dirpath == root and d == "images")]
                 for f in filenames:
                     rel = os.path.relpath(os.path.join(dirpath, f), ADDONS).replace(os.sep, "/")
                     if not allowed(f):
