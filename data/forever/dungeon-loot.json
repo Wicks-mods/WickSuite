@@ -3531,7 +3531,7 @@
     },
     "Excavation Site: Wetlands": {
       "zoneId": 16732,
-      "levels": "24-28",
+      "levels": "24-29",
       "drops": [
         {
           "id": 273026,
@@ -4033,7 +4033,6 @@
           }
         }
       ],
-      "levelsDerived": true,
       "dropsNote": "Wowhead's zone page carried no drops on 2026-10-03. Ids and boss attribution came from foreverchanges.pro and were checked one by one against nether.wowhead.com/forever/tooltip/item/<id>, which names Saltspine, Shadetooth and Relic Guardian for three of them itself."
     },
     "Gnomeregan": {

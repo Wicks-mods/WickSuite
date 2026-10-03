@@ -69,7 +69,7 @@ DUNGEONS = [
     (16611, "Ruins of Lordaeron",      None),
     (16919, "The Hall of Thanes",      None),
     (16074, "Karazhan Crypts",         None),
-    (16732, "Excavation Site: Wetlands", None),
+    (16732, "Excavation Site: Wetlands", "24-29"),   # Wowhead's dungeon overview guide
     (15828, "The Burning of Andorhal", None),
     (17191, "Manor Mistmantle",        None),
     (16632, "Half-Pint Tavern",        None),
