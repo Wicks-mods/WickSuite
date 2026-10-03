@@ -325,6 +325,10 @@ local function newMock(kind, name)
         elseif k == "GetStatusBarTexture" then return function() return t.__statusTexObj or t end
         elseif k == "SetColorTexture" then return function(_, r, g, b, a) t.__color = { r, g, b, a } end
         elseif k == "SetTextColor" then return function(_, r, g, b, a) t.__textColor = { r, g, b, a } end
+        elseif k == "GetTextColor" then return function()
+                local c = t.__textColor or { 1, 1, 1, 1 }
+                return c[1], c[2], c[3], c[4] or 1
+            end
         elseif k == "SetTextHeight" then return function(_, h) t.__textHeight = h end
         -- Slider
         elseif k == "SetMinMaxValues" then return function(_, lo, hi) t.__min, t.__max = lo, hi end

@@ -370,6 +370,14 @@ if not okLoad then
 end
 local ns = WicksUI
 check(type(ns) == "table" and ns.A, "namespace and WickCore addon object")
+
+-- A widget the game switches is followed by ns:Follow's poll, not a hook,
+-- so a check runs the poll once, as the next frame would.
+local function settle(f)
+    local list = ns.follows and ns.follows[f]
+    local tick = list and list.poll and list.poll:GetScript("OnUpdate")
+    if tick then tick(list.poll, 1) end
+end
 check(ns.oUF ~= nil, "oUF embedded in the namespace")
 check(type(_G.WicksUI_oUF) == "table", "oUF published under the X-oUF name")
 check(ns.LAB ~= nil, "LibActionButton reachable")
@@ -1398,11 +1406,16 @@ do
     PS.styleButton(b)
     local pill = E(b) and E(b).backdrop
     check(pill and pill:GetAlpha() == 1 and b.Text:GetAlpha() == 1, "a working button is drawn at full strength")
+    check(rawget(b, "Disable") == nil and rawget(b, "SetEnabled") == nil,
+        "no hook is put on the button's own methods (Forever's code then calls nil)")
     b:Disable()
+    settle(b)
     check(pill:GetAlpha() < 1 and b.Text:GetAlpha() < 1, "a button the game switches off is dimmed, so it reads as off")
     b:Enable()
+    settle(b)
     check(pill:GetAlpha() == 1 and b.Text:GetAlpha() == 1, "and comes back when it is switched on")
     b:SetEnabled(false)
+    settle(b)
     check(pill:GetAlpha() < 1, "SetEnabled is followed too")
 end
 
@@ -1438,15 +1451,52 @@ do
     ns:G().combatTextFont = true
     check(CT and CT.initialized and CT.frame and ns.Movers.list.combattext, "your own combat text starts, with a mover")
     local d = CT:db()
-    -- The game's combat text loads on demand: its frame and the AddMessage
-    -- the hook follows.
+    -- The game's combat text loads on demand. Its AddMessage, as the game's
+    -- does it: the line on a font string, timed from 0, added to the active
+    -- list. Wick's UI reads that list each frame (no hook: on Forever the
+    -- game's call through a hook fails), so a check runs the read once.
     local bz = CreateFrame("Frame", "CombatText", UIParent)
     bz:Show()
+    bz.activeFontStrings, bz.textLocations = {}, { startX = 0, startY = 0, endY = 100 }
     local got = {}
-    rawset(bz, "AddMessage", function(_, message) got[#got + 1] = message end)
+    local gameAdd
+    gameAdd = function(self, message, _, r, g, b, displayType, isStaggered)
+        got[#got + 1] = message
+        local fs = self:CreateFontString()
+        fs:SetText(message)
+        fs:SetTextColor(r, g, b)
+        fs.scrollTime = 0
+        fs.isCrit = displayType == "crit" and 1 or nil
+        local held = displayType == "crit" or displayType == "sticky"
+        fs.endY = held and self.textLocations.startY or self.textLocations.endY
+        fs.startX = self.textLocations.startX + (isStaggered and 7 or 0)
+        table.insert(self.activeFontStrings, fs)
+        CT.ReadGame()
+    end
+    rawset(bz, "AddMessage", gameAdd)
     CombatText = bz
     S.fire("ADDON_LOADED", "Blizzard_CombatText")
     check(bz:GetAlpha() == 0 and bz:IsShown(), "once it loads, the game's own lines are faded, not hidden: hidden, it drops them all")
+    check(rawget(bz, "AddMessage") == gameAdd, "the game's AddMessage is left as it is, never hooked")
+    do
+        -- A font string the game takes back from its pool and uses again is a
+        -- new line: its time goes back to 0.
+        bz:AddMessage("-6", nil, 1, 0.1, 0.1)
+        local fs = bz.activeFontStrings[#bz.activeFontStrings]
+        CT:Clear()
+        fs.scrollTime = 3
+        CT.ReadGame()
+        local before = #CT.lines
+        fs.scrollTime = 0
+        fs:SetText("-7")
+        CT.ReadGame()
+        check(before == 0 and #CT.lines == 1 and CT.lines[1].fs.__text == "-7",
+            "a font string the game uses again is read as a new line, once")
+        CT.ReadGame()
+        check(#CT.lines == 1, "and not again on the next frame")
+        CT:Clear()
+        for k in pairs(got) do got[k] = nil end
+    end
 
     local tick = CT.frame:GetScript("OnUpdate")
     local function run(dt) tick(CT.frame, dt) end
@@ -1617,8 +1667,10 @@ do
     local multi = e.well.__points[1][5]
     check(chose == 2 and single == 3 and multi == 15, "the well follows the game's two layouts: one number, or the stacks over a total")
     sf.LeftButton:Disable()
+    settle(sf.LeftButton)
     check(ns.glyphs[sf.LeftButton].mark:GetAlpha() < 1, "an arrow the game switches off is faded")
     sf.LeftButton:Enable()
+    settle(sf.LeftButton)
     check(ns.glyphs[sf.LeftButton].mark:GetAlpha() == 1, "and comes back when the game switches it on")
     StackSplitFrame = nil
 end
