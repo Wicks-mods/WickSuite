@@ -1377,6 +1377,19 @@ if SA then
     S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = keep16, keep17
     S.ITEMS[BUCKLER], S.ITEMS[OFFDAGGER] = nil, nil
 end
+-- Every key on the stance strip shows its binding, shortened.
+do
+    check(_G.WicksStancesButton1.hotkey ~= nil and _G.WicksStancesKickButton.hotkey ~= nil,
+        "the stance, smart and kick keys all carry a hotkey label")
+    S.BINDINGS = { ["CLICK WicksStancesButton2:LeftButton"] = "CTRL-2",
+                   ["CLICK WicksStancesKickButton:LeftButton"] = "NUMPAD5" }
+    S.fire("UPDATE_BINDINGS")
+    check(_G.WicksStancesButton2.hotkey.__text == "C2", "Defensive shows CTRL-2 as C2: " .. tostring(_G.WicksStancesButton2.hotkey.__text))
+    check(_G.WicksStancesKickButton.hotkey.__text == "N5", "the kick key shows NUMPAD5 as N5: " .. tostring(_G.WicksStancesKickButton.hotkey.__text))
+    check(_G.WicksStancesButton1.hotkey.__text == "", "an unbound stance shows nothing")
+    S.BINDINGS = nil
+    S.fire("UPDATE_BINDINGS")
+end
 io.write("== the warrior's swap keys ==\n")
 do
     -- The paladin kit's two keys, on a warrior: a two-hander in hand, a
