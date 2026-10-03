@@ -1437,6 +1437,80 @@ do
     S.EQUIPPED_IDS = nil
     S.SLOT_ITEMS[1] = nil
 end
+io.write("== the warrior's kick key ==\n")
+do
+    -- One key for the interrupt that fits the stance and the hands: the
+    -- smart answer to a "kick everything" macro, inside what a key can do.
+    local kick = _G.WicksStancesKickButton
+    check(kick ~= nil and sstrip.kick == kick, "a kick key sits on the stance strip")
+    check(_G["BINDING_NAME_CLICK WicksStancesKickButton:LeftButton"] ~= nil, "and has a key binding of its own")
+    local m = tostring(kick and kick:GetAttribute("macrotext"))
+    local lines = {}
+    for l in m:gmatch("[^\n]+") do lines[#lines + 1] = l end
+    check(#lines == 3, "three lines: Pummel, Shield Bash, and the stance it falls back to: " .. m:gsub("\n", " | "))
+    check(lines[1] == "/cast [stance:3,@mouseover,harm,nodead][stance:3,@focus,harm,nodead][stance:3,harm,nodead][stance:3,@softenemy,harm,nodead] Pummel",
+        "Pummel in Berserker, at your mouseover, then focus, then target, then the enemy you face: " .. tostring(lines[1]))
+    check(lines[2] == "/cast [nostance:3,equipped:Shields,@mouseover,harm,nodead][nostance:3,equipped:Shields,@focus,harm,nodead][nostance:3,equipped:Shields,harm,nodead][nostance:3,equipped:Shields,@softenemy,harm,nodead] Shield Bash",
+        "Shield Bash outside Berserker with a shield on, in the same order: " .. tostring(lines[2]))
+    check(lines[3] == "/cast [nostance:3,noequipped:Shields] Berserker Stance",
+        "with no shield on, the first press goes to Berserker: " .. tostring(lines[3]))
+    check(not m:find("/target", 1, true) and not m:find("/focus", 1, true) and not m:find("/clear", 1, true),
+        "it never changes your target or your focus")
+    check(kick:GetAttribute("macrotext1") == m, "the left button and the binding carry the same text")
+
+    local C = WickCore.Chrome.Colors
+    local function face()
+        GameTooltip.__lines = {}
+        kick.__scripts.OnEnter(kick)
+        local fel = kick.ring[1].__color and kick.ring[1].__color[2] == C.fel[2]
+        return table.concat(GameTooltip.__lines, " | "), fel, kick.icon.__desaturated
+    end
+    local SHIELD = 2445
+    S.ITEMS = S.ITEMS or {}
+    S.ITEMS[SHIELD] = { equipLoc = "INVTYPE_SHIELD", classID = 4, subClassID = 6, name = "Test Shield" }
+
+    S.STANCE, S.STANCE_COUNT = 3, 3
+    S.EQUIPPED_IDS = {}
+    S.fire("UPDATE_SHAPESHIFT_FORM")
+    local tt, lit = face()
+    check(tt:find("One press: Pummel.", 1, true) and lit, "in Berserker the key reads Pummel, lit: " .. tt)
+
+    S.STANCE = 1
+    S.EQUIPPED_IDS = { [17] = SHIELD }
+    S.fire("PLAYER_EQUIPMENT_CHANGED")
+    S.fire("UPDATE_SHAPESHIFT_FORM")
+    tt, lit = face()
+    check(tt:find("One press: Shield Bash.", 1, true) and lit, "in Battle with a shield on it reads Shield Bash: " .. tt)
+
+    S.EQUIPPED_IDS = {}
+    S.fire("PLAYER_EQUIPMENT_CHANGED")
+    tt, lit = face()
+    check(tt:find("one press to Berserker, another to Pummel", 1, true) and not lit
+        and kick.icon.__tex == 132352, "with no shield on it shows Berserker, unlit, two presses: " .. tt)
+
+    S.STANCE_COUNT = 2
+    S.fire("UPDATE_SHAPESHIFT_FORMS")
+    local desat
+    tt, lit, desat = face()
+    check(tt:find("Needs a shield on, or Berserker Stance learned.", 1, true) and not lit and desat,
+        "without Berserker or a shield it says what it needs, greyed: " .. tt)
+    S.STANCE_COUNT = 3
+
+    -- The cooldown goes to the swipe unread, secret or not.
+    S.STANCE = 3
+    COMBAT = true
+    local keepSecrets = SECRETS
+    SECRETS = true
+    S.CHAT = {}
+    S.fire("SPELL_UPDATE_COOLDOWN")
+    S.fire("UPDATE_SHAPESHIFT_FORM")
+    check(not table.concat(S.CHAT, " "):find("error in", 1, true), "a secret cooldown in combat is passed to the swipe without an error: " .. table.concat(S.CHAT, " "))
+    SECRETS = keepSecrets
+    COMBAT = false
+
+    S.EQUIPPED_IDS = nil
+    S.ITEMS[SHIELD] = nil
+end
 S.STANCE, S.STANCE_COUNT = 0, 0
 
 io.write("== Seals and Things ==\n")
