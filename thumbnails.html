@@ -499,7 +499,7 @@ function TotemsThumb() {
         display:'flex',flexDirection:'column',justifyContent:'flex-start',gap:10}}>
         <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
           <WickWordmark size={22}/>
-          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>TOTEMS &amp; THINGS</div>
+          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>TOTEMS AND THINGS</div>
         </div>
         <div style={{height:1,width:'100%',background:BR}}/>
         <div style={{fontFamily:FU,fontSize:10,color:TX,lineHeight:1.35,fontWeight:500}}>Twist totems.<br/>Track procs.</div>
@@ -592,7 +592,7 @@ function PoisonsThumb() {
         display:'flex',flexDirection:'column',justifyContent:'flex-start',gap:10}}>
         <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
           <WickWordmark size={22}/>
-          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>POISONS</div>
+          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>POISONS AND THINGS</div>
         </div>
         <div style={{height:1,width:'100%',background:BR}}/>
         <div style={{fontFamily:FU,fontSize:10,color:TX,lineHeight:1.35,fontWeight:500}}>Rogue kit.<br/>Blades and points.</div>
@@ -623,7 +623,7 @@ function SealsThumb() {
         display:'flex',flexDirection:'column',justifyContent:'flex-start',gap:10}}>
         <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
           <WickWordmark size={22}/>
-          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>SEALS</div>
+          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>SEALS AND THINGS</div>
         </div>
         <div style={{height:1,width:'100%',background:BR}}/>
         <div style={{fontFamily:FU,fontSize:10,color:TX,lineHeight:1.35,fontWeight:500}}>Paladin kit.<br/>Seals and steel.</div>
@@ -654,7 +654,7 @@ function BeastsThumb() {
         display:'flex',flexDirection:'column',justifyContent:'flex-start',gap:10}}>
         <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
           <WickWordmark size={22}/>
-          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>BEASTS</div>
+          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>BEASTS AND THINGS</div>
         </div>
         <div style={{height:1,width:'100%',background:BR}}/>
         <div style={{fontFamily:FU,fontSize:10,color:TX,lineHeight:1.35,fontWeight:500}}>Hunter kit.<br/>Pet and quiver.</div>
@@ -685,7 +685,7 @@ function DemonsThumb() {
         display:'flex',flexDirection:'column',justifyContent:'flex-start',gap:10}}>
         <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
           <WickWordmark size={22}/>
-          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>DEMONS</div>
+          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>DEMONS AND THINGS</div>
         </div>
         <div style={{height:1,width:'100%',background:BR}}/>
         <div style={{fontFamily:FU,fontSize:10,color:TX,lineHeight:1.35,fontWeight:500}}>Warlock kit.<br/>Stones and demons.</div>
@@ -1066,13 +1066,13 @@ const FLAVOURS = {
 const SOCIAL = {
   core: { label: 'CORE', title: false, tagline: 'The floor everything else stands on.', features: ['Brand chrome, profiles and themes', 'One options panel for the suite', 'Client dialect shim and restriction guard', 'Minimap launcher and version broadcast'] },
   comforts: { label: 'COMFORTS', title: true, tagline: 'Small comforts, each one off until you turn it on.', features: ['Square minimap in Wick chrome', 'Richer unit tooltips', 'Auto loot, auto repair, junk selling', 'Auto quest accept and hand in'] },
-  beasts: { label: 'BEASTS', title: true, tagline: 'The hunter kit: pet care, ammo and a beast atlas.', features: ['Pet happiness, loyalty and training', 'One key feeding from your own bags', 'Ammo read as shots against the quiver', 'Atlas of what each beast family brings'] },
-  demons: { label: 'DEMONS', title: true, tagline: 'The warlock kit: stones, demons and shards.', features: ['Healthstone and Soulstone: use one, or make one', 'A summon key for every demon you know', 'Soul shards at a glance', 'Talents, checklist, racials and a cooldown bar'] },
+  beasts: { label: 'BEASTS AND THINGS', title: true, tagline: 'The hunter kit: pet care, ammo and a beast atlas.', features: ['Pet happiness, loyalty and training', 'One key feeding from your own bags', 'Ammo read as shots against the quiver', 'Atlas of what each beast family brings'] },
+  demons: { label: 'DEMONS AND THINGS', title: true, tagline: 'The warlock kit: stones, demons and shards.', features: ['Healthstone and Soulstone: use one, or make one', 'A summon key for every demon you know', 'Soul shards at a glance', 'A cooldown bar, and a talents kit on Forever'] },
   bags: { label: 'BAGS', title: true, tagline: 'Bags and bank in one window, sorted the way you say.', features: ['Auto-categorize by class + subclass', 'Masonry layout, resizable', 'Bank panel with buy-slot button'] },
   trade: { label: 'TRADE', title: true, tagline: 'What a run earned, and what trade chat is offering.', features: ['Session earnings with gold per hour', 'Loot valued at vendor price, marked when unknown', 'The trade channel as a board', 'Badges, item icons, filters and search'] },
   gear: { label: 'GEAR', title: true, tagline: 'What to chase while levelling, and where it drops.', features: ['Upgrades scored against what you wear', 'Dungeons, crafted, quest rewards and sets', 'Live set bonuses read from the client', 'Try on, dressing room, link in chat'] },
-  poisons: { label: 'POISONS', title: true, tagline: 'The rogue kit: coatings, combo points and weapon swaps.', features: ['What coats each blade, and how long is left', 'One key per hand to recoat', 'Combo points over your target, energy under them', 'Weapon swap keys for a dagger opener'] },
-  seals: { label: 'SEALS', title: true, tagline: 'The paladin kit: the seal key, blessings and weapon swaps.', features: ['One seal key: Crusader, fighting seal and back', 'A blessing key, friend first', 'Two-hander and sword-and-board swap keys', 'Talents, checklist and racials'] },
+  poisons: { label: 'POISONS AND THINGS', title: true, tagline: 'The rogue kit: coatings, combo points and weapon swaps.', features: ['What coats each blade, and how long is left', 'One key per hand to recoat', 'Combo points over your target, energy under them', 'Weapon swap keys for a dagger opener'] },
+  seals: { label: 'SEALS AND THINGS', title: true, tagline: 'The paladin kit: the seal key, blessings and weapon swaps.', features: ['One seal key: Crusader, fighting seal and back', 'A blessing key, friend first', 'Two-hander and sword-and-board swap keys', 'Talents, checklist and racials'] },
   ui: { label: 'UI', title: true, tagline: 'The whole interface, in one look.', features: ['Bars, frames, nameplates and chat', "The game's own windows, dressed to match", 'Nine looks, full customization', 'Take the tour at wicksmods.com/ui'] },
 };
 
