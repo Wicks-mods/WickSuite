@@ -15,7 +15,8 @@
 //
 // Options:
 //   --owner-id <USER_ID>   assign the @Wick role to this user after creation
-//   --dry-run              print the plan without making changes
+//   --dry-run              print the plan without making changes; with token +
+//                          guild, also read the server and list what would be created
 //   --yes                  skip the confirmation prompt
 //
 // How to get the prerequisites:
@@ -59,7 +60,8 @@ Usage:
 
 Options:
   --owner-id <USER_ID>   assign the @Wick role to this user after creation
-  --dry-run              print the plan without making changes (no creds needed)
+  --dry-run              print the plan without making changes (no creds needed);
+                         with token + guild, also list what exists and what would be created
   --yes                  skip the confirmation prompt
 
 Env fallbacks: DISCORD_BOT_TOKEN, DISCORD_GUILD_ID, DISCORD_OWNER_ID
@@ -178,6 +180,8 @@ const PLAN = {
           topic: "Welcome to Wick's Mods. Pinned: suite roster + landing page (https://wicksmods.com)." },
         { name: "announcements", type: T.TEXT,  readOnly: true,
           topic: "New addon releases, brand updates, suite-wide news. Members read-only." },
+        { name: "go-live",       type: T.TEXT,  readOnly: true,
+          topic: "When Wick goes live on stream. Members read-only." },
       ],
     },
     {
@@ -252,7 +256,10 @@ for (const cat of PLAN.categories) {
 }
 console.log();
 
-if (DRY) {
+// Without credentials a dry run stops at the plan. With them it carries on
+// read-only: it fetches the server and reports what exists and what would be
+// created, and writes nothing.
+if (DRY && (!TOKEN || !GUILD)) {
   process.exit(0);
 }
 
@@ -269,7 +276,7 @@ async function confirm() {
   });
 }
 
-if (!(await confirm())) {
+if (!DRY && !(await confirm())) {
   console.log("Aborted.");
   process.exit(0);
 }
@@ -298,14 +305,22 @@ const findRole = (name) =>
   existingRoles.find(r => r.name.toLowerCase() === name.toLowerCase());
 const findCategory = (name) =>
   existingChannels.find(c => c.type === T.CATEGORY && c.name.toLowerCase() === name.toLowerCase());
-const findChannel = (name, parentId) => {
+// Search the whole server, not just the planned category: a channel that was
+// moved elsewhere (the real #general sits under "Text Channels") still counts,
+// or a re-run creates a duplicate. Voice only matches voice; a planned text or
+// forum channel matches any text-like channel, since forums fall back to text
+// and #announcements may have become an Announcement channel.
+const isVoice = (type) => type === T.VOICE || type === 13; // 13 = stage
+const findChannel = (name, type) => {
   const slug = slugify(name);
   return existingChannels.find(c =>
     c.type !== T.CATEGORY &&
-    c.parent_id === parentId &&
-    (c.name.toLowerCase() === slug || c.name === name)
+    isVoice(c.type) === isVoice(type) &&
+    (c.name.toLowerCase() === slug || c.name.toLowerCase() === name.toLowerCase())
   );
 };
+const categoryName = (id) =>
+  existingChannels.find(c => c.id === id)?.name || "no category";
 
 // ── Create roles ──────────────────────────────────────────────────────────
 console.log();
@@ -316,6 +331,10 @@ for (const r of PLAN.roles) {
   if (existing) {
     roleIds[r.name] = existing.id;
     console.log(`  · @${r.name} already exists (${existing.id}) — skipping`);
+    continue;
+  }
+  if (DRY) {
+    console.log(`  + @${r.name} would be created`);
     continue;
   }
   const created = await discord("POST", `/guilds/${GUILD}/roles`, {
@@ -389,6 +408,9 @@ for (const cat of PLAN.categories) {
   if (existingCat) {
     parentId = existingCat.id;
     console.log(`  · [${cat.name}] already exists — skipping category`);
+  } else if (DRY) {
+    parentId = null;
+    console.log(`  + [${cat.name}] would be created`);
   } else {
     const created = await discord("POST", `/guilds/${GUILD}/channels`, {
       name: cat.name,
@@ -400,9 +422,14 @@ for (const cat of PLAN.categories) {
 
   for (const ch of cat.channels) {
     const slug = ch.type === T.VOICE ? ch.name : slugify(ch.name);
-    const existing = findChannel(slug, parentId);
+    const existing = findChannel(slug, ch.type);
     if (existing) {
-      console.log(`    · ${slug} already exists — skipping`);
+      const where = existing.parent_id === parentId ? "" : ` in [${categoryName(existing.parent_id)}]`;
+      console.log(`    · ${slug} already exists${where} — skipping`);
+      continue;
+    }
+    if (DRY) {
+      console.log(`    + ${slug} would be created`);
       continue;
     }
 
@@ -448,6 +475,12 @@ for (const cat of PLAN.categories) {
       }
     }
   }
+}
+
+if (DRY) {
+  console.log();
+  console.log("Dry run: nothing was changed.");
+  process.exit(0);
 }
 
 // ── Optionally assign @Wick to the owner ──────────────────────────────────
