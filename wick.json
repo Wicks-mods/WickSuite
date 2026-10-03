@@ -282,6 +282,7 @@
       "client": "tbc"
     },
     {
+      "benched": true,
       "folder": "WicksConcessionStand",
       "title": "Wick's Concession Stand",
       "short": "Concession Stand",
@@ -533,12 +534,32 @@
       "accent": "#4FC778",
       "accent_name": "Fel Green",
       "cf_slug": "wicks-demons-and-things",
-      "cf_project_id": null,
+      "cf_project_id": 1724608,
       "features": [
         "Healthstone and Soulstone: use one, or make one",
         "A summon key for every demon you know",
         "Soul shards at a glance",
         "Talents, checklist, racials and a cooldown bar"
+      ],
+      "repo": "WicksDemonsAndThings"
+    },
+    {
+      "folder": "WicksDemonsAndThings",
+      "title": "Wick's Demons and Things",
+      "short": "Demons",
+      "client": "tbc",
+      "slash": "/wdt",
+      "tagline": "Warlock bars: stones and rituals, demons, cooldowns and procs, and your shards.",
+      "short_tagline": "Warlock bars: stones, demons, cooldowns and shards.",
+      "accent": "#4FC778",
+      "accent_name": "Fel Green",
+      "cf_slug": "wicks-demons-and-things",
+      "cf_project_id": 1724608,
+      "features": [
+        "Healthstone and Soulstone in one click, rituals as you learn them",
+        "A summon button for every demon you know",
+        "Cooldowns and Shadow Trance at a glance",
+        "Soul shard counter"
       ],
       "repo": "WicksDemonsAndThings"
     },

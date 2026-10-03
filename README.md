@@ -31,6 +31,7 @@ This repo holds the **brand assets** for the Wick addon suite — not a WoW addo
 | **Wick's Seals and Things** | [repo](https://github.com/Wicksmods/WicksSealsAndThings) | [CurseForge](https://www.curseforge.com/wow/addons/wicks-seals-and-things) |
 | **Wick's Conjures and Things** | [repo](https://github.com/Wicksmods/WicksConjuresAndThings) | [CurseForge](https://www.curseforge.com/wow/addons/wicks-conjures-and-things) |
 | **Wick's Poisons and Things** | [repo](https://github.com/Wicksmods/WicksPoisonsAndThings) | [CurseForge](https://www.curseforge.com/wow/addons/wicks-poisons-and-things) |
+| **Wick's Demons and Things** | [repo](https://github.com/Wicksmods/WicksDemonsAndThings) | [CurseForge](https://www.curseforge.com/wow/addons/wicks-demons-and-things) |
 | **Wick's Gear** | [repo](https://github.com/Wicksmods/WicksGear) | [CurseForge](https://www.curseforge.com/wow/addons/wicks-gear) |
 | **Wick's UI** | [repo](https://github.com/Wicksmods/WicksUIForever) | [CurseForge](https://www.curseforge.com/wow/addons/wicks-ui) |
 
