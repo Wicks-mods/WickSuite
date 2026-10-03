@@ -1565,7 +1565,7 @@ check(cycleText() == "", "cycle off empties the key")
 SlashCmdList.WICK_WICKSSEALSANDTHINGS("cycle auto")
 check(cycleText():find("Seal of the Crusader, Seal of Righteousness", 1, true) ~= nil, "auto brings the default back")
 
--- The seal key wears the seal that is on you, and a faded Righteousness
+-- The seal key wears the seal that is on you, and a faded Crusader
 -- with none up.
 do
     local key = _G.WicksSealsCycleButton
@@ -1575,8 +1575,8 @@ do
         "the seal key wears the seal on you: " .. tostring(key.icon.__tex))
     S.AURAS = { "Blessing of Might", "Devotion Aura" }
     S.fire("UNIT_AURA", "player")
-    check(key.icon.__tex == "Interface\\Icons\\SoR" and key.icon.__desaturated == true,
-        "with no seal it shows Righteousness, faded: " .. tostring(key.icon.__tex) .. " " .. tostring(key.icon.__desaturated))
+    check(key.icon.__tex == "Interface\\Icons\\SotC" and key.icon.__desaturated == true,
+        "with no seal it shows the Crusader, faded: " .. tostring(key.icon.__tex) .. " " .. tostring(key.icon.__desaturated))
     S.AURAS = { "Seal of Righteousness", "Blessing of Might", "Devotion Aura" }
     S.fire("UNIT_AURA", "player")
 end
