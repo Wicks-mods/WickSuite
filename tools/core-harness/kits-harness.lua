@@ -1377,6 +1377,66 @@ if SA then
     S.EQUIPPED_IDS[16], S.EQUIPPED_IDS[17] = keep16, keep17
     S.ITEMS[BUCKLER], S.ITEMS[OFFDAGGER] = nil, nil
 end
+io.write("== the warrior's swap keys ==\n")
+do
+    -- The paladin kit's two keys, on a warrior: a two-hander in hand, a
+    -- sword and a shield in the first bag.
+    local AXE, SWORD, SHIELD, BIG = 12296, 1263, 2443, 17076
+    S.ITEMS = S.ITEMS or {}
+    S.ITEMS[AXE]    = { equipLoc = "INVTYPE_2HWEAPON", classID = 2, subClassID = 1, name = "Arcanite Reaper" }
+    S.ITEMS[SWORD]  = { equipLoc = "INVTYPE_WEAPON",   classID = 2, subClassID = 7, name = "Brain Hacker" }
+    S.ITEMS[SHIELD] = { equipLoc = "INVTYPE_SHIELD",   classID = 4, subClassID = 6, name = "Skullflame Shield" }
+    S.ITEMS[BIG]    = { equipLoc = "INVTYPE_2HWEAPON", classID = 2, subClassID = 8, name = "Sulfuras" }
+    S.EQUIPPED_IDS = { [16] = AXE }
+    S.SLOT_ITEMS[1] = { { id = SWORD, count = 1 }, { id = SHIELD, count = 1 } }
+    S.fire("PLAYER_EQUIPMENT_CHANGED")
+
+    check(sstrip.swapTwo ~= nil and sstrip.swapShield ~= nil, "both swap keys sit on the stance strip")
+    local function twoText() return tostring(_G.WicksStancesTwoHandButton:GetAttribute("macrotext")) end
+    local function boardText() return tostring(_G.WicksStancesShieldButton:GetAttribute("macrotext")) end
+    check(twoText() == "/equipslot 16 item:" .. AXE, "the two-hander key names the axe: " .. twoText())
+    check(boardText() == ("/equipslot 16 item:%d\n/equipslot 17 item:%d"):format(SWORD, SHIELD),
+        "the shield key names the sword then the shield: " .. boardText():gsub("\n", " | "))
+    check(sstrip.swapTwo.live:IsShown() and not sstrip.swapShield.live:IsShown(), "the two-hander is marked as on")
+
+    -- The shield key pressed: the hands change and the axe goes to a bag.
+    S.EQUIPPED_IDS = { [16] = SWORD, [17] = SHIELD }
+    S.SLOT_ITEMS[1] = { { id = AXE, count = 1 } }
+    S.fire("PLAYER_EQUIPMENT_CHANGED")
+    local sets = SA.db.char.sets
+    check(sets.oneHand == SWORD and sets.shield == SHIELD and sets.twoHand == AXE, "every piece worn is remembered")
+    check(sstrip.swapShield.live:IsShown() and not sstrip.swapTwo.live:IsShown(), "the shield set is marked as on")
+
+    -- A bigger two-hander in the bag does not beat the one you chose
+    -- by wearing it, until you pin it.
+    S.SLOT_ITEMS[1] = { { id = AXE, count = 1 }, { id = BIG, count = 1 } }
+    S.fire("BAG_UPDATE_DELAYED")
+    check(twoText():find("item:" .. AXE, 1, true) ~= nil, "the remembered two-hander wins: " .. twoText())
+    SlashCmdList.WICK_WICKSSTANCESANDTHINGS("pin 2h " .. BIG)
+    check(twoText():find("item:" .. BIG, 1, true) ~= nil, "a pin wins over the memory")
+    SlashCmdList.WICK_WICKSSTANCESANDTHINGS("pin 2h clear")
+    check(twoText():find("item:" .. AXE, 1, true) ~= nil, "and clearing the pin goes back")
+
+    -- The shield row and the swap keys agree about the shield.
+    local rows = SA.kit.checklist:Evaluate()
+    check(rows[4] and rows[4].state == "ok", "the shield row reads ok with the shield on: " .. tostring(rows[4] and rows[4].state))
+
+    COMBAT = true
+    S.EQUIPPED_IDS = { [16] = AXE }
+    S.SLOT_ITEMS[1] = { { id = SWORD, count = 1 }, { id = SHIELD, count = 1 }, { id = BIG, count = 1 } }
+    S.fire("PLAYER_EQUIPMENT_CHANGED")
+    check(sstrip.swapTwo.live:IsShown(), "the mark follows your hands even in combat")
+    SlashCmdList.WICK_WICKSSTANCESANDTHINGS("swap off")
+    check(twoText():find("item:", 1, true) ~= nil, "nothing is written to a secure button in combat")
+    COMBAT = false
+    S.fire("PLAYER_REGEN_ENABLED")
+    check(twoText() == "", "and swap off empties the keys once combat ends")
+    SlashCmdList.WICK_WICKSSTANCESANDTHINGS("swap on")
+    check(twoText():find("item:" .. AXE, 1, true) ~= nil, "swap on loads them again")
+
+    S.EQUIPPED_IDS = nil
+    S.SLOT_ITEMS[1] = nil
+end
 S.STANCE, S.STANCE_COUNT = 0, 0
 
 io.write("== Seals and Things ==\n")
