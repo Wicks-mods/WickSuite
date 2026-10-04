@@ -438,7 +438,7 @@ function composeDiscordEmbed(addon, version, changelogBody) {
       descLines.push("**What's new**");
       descLines.push(...headlines(cleaned, 10));
       descLines.push("");
-      descLines.push(`[Full changelog](https://github.com/Wicksmods/${addon.repo || addon.folder}/blob/main/CHANGELOG.md)`);
+      descLines.push(`[Full changelog](https://github.com/${config.github_user}/${addon.repo || addon.folder}/blob/main/CHANGELOG.md)`);
     }
   }
   // Parse accent hex → decimal int for Discord's color field.
