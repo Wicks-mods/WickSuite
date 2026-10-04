@@ -21,6 +21,14 @@ S.fire("ADDON_LOADED", "WickCore")
 WicksBagsDB = { options = { showJunk = false, sortMode = "name" }, bagPos = { posPoint = "CENTER", posRel = "CENTER", posX = 1, posY = 2, panelW = 500 } }
 WicksBagsAlts = { ["Classic Beta PvP-Altchar"] = { bags = { { itemID = 6948, count = 2 } }, bank = { { itemID = 6948, count = 5 } }, bagsLastSeen = 1 } }
 
+-- The game's own bag functions and one of its bag windows, there before
+-- Wick's Bags loads so its post-hooks take. CloseAllBags counts its calls:
+-- Wick's Bags must never make one.
+ContainerFrame1 = CreateFrame("Frame", "ContainerFrame1", UIParent)
+function OpenAllBags(frame) ContainerFrame1:Show() end
+function CloseAllBags(frame) S.CLOSE_ALL_CALLS = (S.CLOSE_ALL_CALLS or 0) + 1; ContainerFrame1:Hide() end
+function ToggleAllBags() if ContainerFrame1:IsShown() then ContainerFrame1:Hide() else ContainerFrame1:Show() end end
+
 S.loadAddon(BAGS_DIR, "WicksBags", { "Core.lua", "Categories.lua", "UI.lua", "Options.lua", "Bag.lua", "Bank.lua", "GuildBank.lua", "AltViewer.lua" })
 check(type(WicksBags) == "table" and WicksBags.A, "WicksBags namespace + WickCore addon object")
 
@@ -358,6 +366,30 @@ WB.Bag:Show()
 check(WB.Bag.panel:IsShown() and CloseSpecialWindows() == true, "Escape with the bags open closes them and stops there")
 check(not WB.Bag.panel:IsShown(), "the bags are hidden")
 check(CloseSpecialWindows() == false, "Escape with nothing of ours open falls through to the game menu")
+io.write("== the game's own bags ==\n")
+do
+    -- Shutting them with CloseAllBags from here wrote the game's record of
+    -- which window opened its bags as Wick's Bags; the bank then chose its
+    -- tab tainted, and every bag item clicked after (a hearthstone) was a
+    -- blocked action until a reload (taint.log 2026-10-04).
+    local before = S.CLOSE_ALL_CALLS or 0
+    S.fire("MERCHANT_SHOW")
+    S.fire("MAIL_SHOW")
+    check((S.CLOSE_ALL_CALLS or 0) == before, "Wick's Bags never shuts the game's bags itself")
+    local merchant = CreateFrame("Frame", "MerchantFrame", UIParent)
+    OpenAllBags(merchant)
+    check(ContainerFrame1:IsShown() and ContainerFrame1:GetParent() ~= UIParent, "bags a window opens for itself are kept out of sight")
+    CloseAllBags(merchant)
+    check(ContainerFrame1:GetParent() == UIParent, "and given back to their own parent once the game shuts them")
+    OpenAllBags(merchant)
+    OpenAllBags()
+    check(ContainerFrame1:IsShown() and ContainerFrame1:GetParent() == UIParent, "the player's own Open All Bags shows them")
+    OpenAllBags(merchant)
+    ToggleAllBags()
+    check(ContainerFrame1:GetParent() == UIParent, "and so does toggling them")
+    S.fire("MERCHANT_CLOSED")
+    S.fire("MAIL_CLOSED")
+end
 io.write("\n", MODE, ": ", passes, " passed, ", fails, " failed\n")
 if fails > 0 then error(MODE .. ": " .. fails .. " check(s) failed", 0) end
 io.write("PASS\n")
