@@ -2479,6 +2479,24 @@ do
     check(ns.groupLabels.suite ~= nil, "the group has a name in the mover panel's list")
 end
 
+io.write("== group finder member icons ==\n")
+do
+    -- A group's members show as role and class marks from the game's
+    -- atlases, under keys like Icon1 and TankIcon. The art pass keeps them
+    -- and still fades the row's own art.
+    local PS = ns.PanelSkins
+    local row = CreateFrame("Frame", nil, UIParent); row:Show()
+    local data = CreateFrame("Frame", nil, row); data:Show()
+    local list = CreateFrame("Frame", nil, data); list:Show()
+    local class = list:CreateTexture(nil, "ARTWORK"); class:SetAtlas("groupfinder-icon-class-mage"); list.Icon1 = class
+    local role = list:CreateTexture(nil, "ARTWORK"); role:SetAtlas("UI-LFG-RoleIcon-Tank-Micro-GroupFinder"); list.TankIcon = role
+    local art = list:CreateTexture(nil, "BACKGROUND"); art:SetAtlas("groupfinder-highlightbar")
+    local ok, err = pcall(PS.walkProfessions, row, 1)
+    check(ok, "the walk runs over a group row: " .. tostring(err or ""))
+    check(class:GetAlpha() == 1 and role:GetAlpha() == 1, "a group's class and role marks stay")
+    check(art:GetAlpha() == 0, "and the row's own art still goes")
+end
+
 io.write("== slash ==\n")
 check(type(SlashCmdList.WICK_WICKSUI) == "function", "/wui registered")
 local okS, errS = pcall(SlashCmdList.WICK_WICKSUI, "help")
