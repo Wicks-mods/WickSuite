@@ -2497,6 +2497,51 @@ do
     check(art:GetAlpha() == 0, "and the row's own art still goes")
 end
 
+io.write("== group finder browse list ==\n")
+do
+    -- Each group is a card of ours, the game's brown bar gone; the chosen
+    -- one is marked. The tooltip over a group is widened to its longest
+    -- member line, which the game never measures.
+    local PS = ns.PanelSkins
+    local bf = CreateFrame("Frame", "LFGBrowseFrame", UIParent); bf:Show()
+    bf.ScrollBox = CreateFrame("Frame", nil, bf); bf.ScrollBox:Show()
+    bf.ScrollBox.ScrollTarget = CreateFrame("Frame", nil, bf.ScrollBox); bf.ScrollBox.ScrollTarget:Show()
+    local row = CreateFrame("Button", nil, bf.ScrollBox.ScrollTarget); row:Show()
+    row.ResultBG = row:CreateTexture(nil, "BACKGROUND"); row.ResultBG:SetAtlas("common-button-list-mid2")
+    row.Highlight = row:CreateTexture(nil, "BACKGROUND")
+    row.Selected = row:CreateTexture(nil, "OVERLAY"); row.Selected:Show()
+    row.DataDisplay = CreateFrame("Frame", nil, row)
+    local ok, err = pcall(PS.styleBrowseRows)
+    local e = PS.extrasOf(row)
+    check(ok and row.ResultBG:GetAlpha() == 0 and e and e.browseCard, "a group in the list is a card of ours, the brown bar gone: " .. tostring(err or ""))
+    check(e and e.browseSel == true, "the chosen group is marked")
+    row.Selected:Hide()
+    PS.styleBrowseRows()
+    check(e and e.browseSel == false, "and unmarked when it is not")
+
+    local tip = CreateFrame("Frame", nil, UIParent); tip:Show(); tip:SetWidth(200)
+    local function member(roles)
+        local f = CreateFrame("Frame", nil, tip); f:Show()
+        f.Name = f:CreateFontString(); f.Name:SetWidth(150)
+        f.Level = f:CreateFontString(); f.Level:SetText("Lvl 13")
+        f.Roles = {}
+        for i = 1, roles do
+            local r = f:CreateTexture(); r:Show(); f.Roles[i] = r
+        end
+        return f
+    end
+    tip.Leader = member(3)
+    local m = member(1)
+    tip.memberPool = { EnumerateActive = function() return pairs({ [m] = true }) end }
+    local okT, errT = pcall(PS.fitGroupTooltip, tip)
+    local want = math.ceil(29 + 150 + 4 + #"Lvl 13" * 6 + 4 + 3 * 16 + 11 + 2)
+    check(okT and math.abs(tip:GetWidth() - want) < 0.5, "the group tooltip widens to its longest member line: "
+        .. tostring(errT or tip:GetWidth()) .. " / " .. want)
+    tip.Leader.Name:SetWidth(20); m.Name:SetWidth(20); tip:SetWidth(200)
+    PS.fitGroupTooltip(tip)
+    check(tip:GetWidth() == 200, "and is left as the game made it when everything fits")
+end
+
 io.write("== slash ==\n")
 check(type(SlashCmdList.WICK_WICKSUI) == "function", "/wui registered")
 local okS, errS = pcall(SlashCmdList.WICK_WICKSUI, "help")
