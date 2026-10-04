@@ -96,4 +96,13 @@ img, d = canvas()
 d.ellipse([5 * K, 5 * K, 27 * K, 27 * K], fill=(255, 255, 255, 255))
 d.ellipse([11.5 * K, 1.5 * K, 30.5 * K, 20.5 * K], fill=(255, 255, 255, 0))
 save(img, "rest")
+
+# Quest: an exclamation mark filling the canvas's height, the nameplates'
+# mark on a mob a quest of yours wants. A bar narrowing to its foot, and a
+# dot under it.
+img, d = canvas()
+d.polygon([(12.2 * K, 4 * K), (19.8 * K, 4 * K), (18.2 * K, 20 * K), (13.8 * K, 20 * K)], fill=(255, 255, 255, 255))
+d.ellipse([12.2 * K, 2.2 * K, 19.8 * K, 7.4 * K], fill=(255, 255, 255, 255))
+d.ellipse([12.6 * K, 23 * K, 19.4 * K, 29.8 * K], fill=(255, 255, 255, 255))
+save(img, "quest")
 print("ok")

@@ -627,6 +627,54 @@ do
         UnitClassification = oc
         check(mark and none, "a diamond on the bar for an elite, nothing for a normal mob")
         do
+            -- Quest mobs: a mark and how many more are wanted, from the
+            -- tooltip's quest lines; nothing once every line is done. An
+            -- answer the client will not give keeps the plate as it was
+            -- when only the quest log changed, and clears a fresh plate.
+            local tti, cql, uip = C_TooltipInfo, C_QuestLog, UnitIsPlayer
+            local lines, related
+            C_TooltipInfo = setmetatable({ GetUnit = function() return lines and { lines = lines } or nil end }, { __index = tti or {} })
+            C_QuestLog = setmetatable({ UnitIsRelatedToActiveQuest = function() return related end }, { __index = cql or {} })
+            UnitIsPlayer = function() return false end
+            local Q = (Enum and Enum.TooltipDataLineType and Enum.TooltipDataLineType.QuestObjective) or 8
+            local qm, qc = p.QuestIndicator, p.wuiQuestCount
+            local function run(ev) qm.Override(p, ev or "ForceUpdate", "nameplate1") end
+            local function rx() local _, _, _, x = p.wuiMarkR:GetPoint(); return x or 0 end
+            d.quest, d.questCount = true, true
+            lines = { { type = 17, leftText = "That Shadowvale Green Elixir" },
+                { type = Q, leftText = "3/8 Scarlet Zealot slain", completed = false } }
+            related = true
+            run()
+            local counted = qm:IsShown() and qc:IsShown() and tostring(qc:GetText()) == "5"
+            local withCount = rx()
+            lines = { { type = Q, leftText = "8/8 Scarlet Zealot slain", completed = true } }
+            run()
+            local done = not qm:IsShown() and not qc:IsShown()
+            lines = nil
+            run()
+            local bare = qm:IsShown() and not qc:IsShown()
+            local noCount = rx()
+            related = nil
+            run("WicksUI_Quests")
+            local kept = qm:IsShown()
+            run("ForceUpdate")
+            local cleared = not qm:IsShown()
+            related, lines = true, { { type = Q, leftText = "0/8 Bottle of Whispering Elixir", completed = false } }
+            d.questCount = false
+            run()
+            local markOnly = qm:IsShown() and not qc:IsShown()
+            d.quest, d.questCount = false, true
+            run()
+            local off = not qm:IsShown() and not qc:IsShown()
+            d.quest = true
+            C_TooltipInfo, C_QuestLog, UnitIsPlayer = tti, cql, uip
+            check(counted and done and bare, "a quest mob is marked with how many are left, and unmarked once the quest has them all: "
+                .. tostring(counted) .. " / " .. tostring(done) .. " / " .. tostring(bare))
+            check(kept and cleared, "a hidden answer keeps the mark when the quest log changed, and clears a fresh plate")
+            check(markOnly and off, "the count and the mark each have their switch")
+            check(withCount > noCount, "the target's right pointer makes room for the count: " .. withCount .. " / " .. noCount)
+        end
+        do
             local was, isTank = d.threat, ns.Threat.IsTank
             d.threat = true
             ns.Threat.IsTank = function() return false end
