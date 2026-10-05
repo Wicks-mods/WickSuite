@@ -5,8 +5,12 @@ DEFAULT_CHAT_FRAME = { AddMessage = function(_, m) S.CHAT[#S.CHAT + 1] = tostrin
 S.loadAddon(PROBE_DIR, "WicksProbe", { "Surface.lua", "Persist.lua", "UI.lua", "Core.lua" })
 S.fire("ADDON_LOADED", "WicksProbe")
 local fails = 0
-for _, v in ipairs({ "help", "show", "", "full", "threat watch", "threat report", "threat stop" }) do
+for _, v in ipairs({ "help", "show", "", "full", "threat watch", "threat report", "threat stop",
+    "hits watch", "hits report", "hits stop" }) do
     S.CHAT = {}
+    -- A hit on a nameplate between watching and reading, so the report has
+    -- an answer to describe.
+    if v == "hits report" then pcall(S.fire, "UNIT_COMBAT", "nameplate1", "WOUND", "", 120, 1) end
     local ok, err = pcall(function() SlashCmdList["WICKSPROBE"](v) end)
     io.write("/wp ", v == "" and "(sweep)" or v, ": ", ok and "ran" or ("THREW " .. tostring(err)), "\n")
     if not ok then fails = fails + 1 end
