@@ -1,0 +1,15 @@
+== facebook ==
+Nameplates now show your threat and what each mob is hit for.
+
+New in Wick's UI 0.10.3: your threat on each mob shows as a percent under its nameplate, in the game's threat colours, so you can see how close you are to pulling it, or 100 when it is yours. Numbers on the nameplates puts every hit right on the mob's plate, crits bigger; it starts off, so switch it on under Combat text.
+
+Also new: unit frames that can fade until combat, a target or your pointer brings them up (also off until you switch it on), an opacity setting for nameplates, as many info panels as you want, and other addons' feeds in any info slot. Plus fixes for the group finder, the map's quest log and keybinds.
+
+Free on CurseForge: https://www.curseforge.com/wow/addons/wicks-ui
+
+== x ==
+Wick's UI 0.10.3: your threat as a percent under every nameplate, and each hit rising off the mob's plate. Plus unit frame fade, more info panels and a round of fixes. Free on CurseForge.
+
+https://wicksmods.com/ui
+
+#WoWForever #TBCClassic
