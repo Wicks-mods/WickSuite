@@ -525,6 +525,39 @@ do
 end
 check(not ns.errors or #ns.errors == 0, "no module errors: " .. table.concat(ns.errors or {}, " | "))
 
+io.write("== unit frame fade ==\n")
+do
+    -- Frames that follow the fade go under the fader, which heads for the
+    -- faded opacity with no reason to come up and for full with one; off,
+    -- they are back under UIParent at full.
+    local UF = ns.UnitFrames
+    local g = UF:db()
+    local ue, uac = UnitExists, UnitAffectingCombat
+    UnitExists = function() return false end
+    UnitAffectingCombat = function() return false end
+    g.fade, g.fadeAlpha, g.fadeIn = true, 0.3, "combat,target"
+    UF:Update()
+    local player = UF.frames.player
+    local under = player and player:GetParent() == UF.fader
+    local faded = UF.fader.wuiWant == 0.3
+    UnitExists = function(u) return u == "target" end
+    UF:EvalFade()
+    local up = UF.fader.wuiWant == 1
+    UnitExists = function() return false end
+    UF:UnitDB("pet").fade = false
+    UF:Update()
+    local petOut = UF.frames.pet and UF.frames.pet:GetParent() ~= UF.fader
+    UF:UnitDB("pet").fade = true
+    g.fade = false
+    UF:Update()
+    local back = player and player:GetParent() == UIParent and UF.fader.wuiWant == 1
+    UnitExists, UnitAffectingCombat = ue, uac
+    check(under and faded, "a frame on the fade sits under the fader, faded with no reason to come up: " .. tostring(under) .. " / " .. tostring(faded))
+    check(up, "and comes up with a target")
+    check(petOut, "a frame told not to follow stays out of it")
+    check(back, "with the fade off, the frames are back under UIParent at full")
+end
+
 io.write("== nameplates ==\n")
 local NP = ns.Nameplates
 check(NP.initialized, "nameplates initialized")
@@ -673,6 +706,36 @@ do
             check(kept and cleared, "a hidden answer keeps the mark when the quest log changed, and clears a fresh plate")
             check(markOnly and off, "the count and the mark each have their switch")
             check(withCount > noCount, "the target's right pointer makes room for the count: " .. withCount .. " / " .. noCount)
+        end
+        do
+            -- Your threat on the mob, inside the bar's left end; nothing at
+            -- none, or with the switch off. And the plates' own opacity,
+            -- under the dimming of the rest.
+            local udts, gtsc, uip = UnitDetailedThreatSituation, GetThreatStatusColor, UnitIsPlayer
+            local pct = 85
+            UnitDetailedThreatSituation = function() return false, 1, pct, 60, 1000 end
+            GetThreatStatusColor = function() return 1, 1, 0 end
+            UnitIsPlayer = function() return false end
+            d.threatPercent = true
+            NP:Refresh(p)
+            local shows = p.wuiThreatText:IsShown() and tostring(p.wuiThreatText:GetText()) == "85%"
+            pct = 0
+            NP:Refresh(p)
+            local none = not p.wuiThreatText:IsShown()
+            pct = 85
+            d.threatPercent = false
+            NP:Refresh(p)
+            local off = not p.wuiThreatText:IsShown()
+            d.threatPercent = true
+            UnitDetailedThreatSituation, GetThreatStatusColor, UnitIsPlayer = udts, gtsc, uip
+            check(shows and none and off, "your threat shows as a percent on the plate, not at none or switched off: "
+                .. tostring(shows) .. " / " .. tostring(none) .. " / " .. tostring(off))
+            d.plateAlpha = 0.5
+            NP:Refresh(p)
+            local alpha = p:GetAlpha()
+            d.plateAlpha = 1
+            NP:Refresh(p)
+            check(math.abs(alpha - 0.5) < 1e-6 and p:GetAlpha() == 1, "the plates' opacity setting reaches the plate: " .. tostring(alpha))
         end
         do
             local was, isTank = d.threat, ns.Threat.IsTank
