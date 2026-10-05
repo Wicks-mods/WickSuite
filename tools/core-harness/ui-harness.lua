@@ -738,6 +738,47 @@ do
             check(math.abs(alpha - 0.5) < 1e-6 and p:GetAlpha() == 1, "the plates' opacity setting reaches the plate: " .. tostring(alpha))
         end
         do
+            -- Numbers off the plate, from what the client says the mob was
+            -- hit for: a crit larger and in its school's colour, misses and
+            -- heals by their switches, nothing with the feature off; a plate
+            -- that goes leaves its numbers where they were.
+            local CT = ns.CombatText
+            local cd = CT:db()
+            local uif = UnitIsFriend
+            UnitIsFriend = function() return false end
+            p:Show()
+            local lines = CT.plateLines
+            for i = #lines, 1, -1 do table.remove(lines, i) end
+            cd.plates, cd.platesTarget, cd.platesHeals, cd.platesMisses = false, false, false, true
+            CT.OnUnitCombat("UNIT_COMBAT", "nameplate1", "WOUND", "", 120, 1)
+            local offNone = #lines == 0
+            cd.plates = true
+            CT.OnUnitCombat("UNIT_COMBAT", "nameplate1", "WOUND", "CRITICAL", 3571, 4)
+            local hit = lines[1]
+            local crit = hit and hit.crit and tostring(hit.fs:GetText()) == "3571"
+            CT.OnUnitCombat("UNIT_COMBAT", "nameplate1", "WOUND", "", 12345, 1)
+            local big = lines[2] and tostring(lines[2].fs:GetText()) == "12.3k"
+            CT.OnUnitCombat("UNIT_COMBAT", "nameplate1", "DODGE", "", 0, 1)
+            local miss = #lines == 3
+            CT.OnUnitCombat("UNIT_COMBAT", "nameplate1", "HEAL", "", 500, 2)
+            local healOff = #lines == 3
+            cd.platesHeals = true
+            CT.OnUnitCombat("UNIT_COMBAT", "nameplate1", "HEAL", "", 500, 2)
+            local healOn = #lines == 4 and tostring(lines[4].fs:GetText()) == "+500"
+            CT.OnUnitCombat("UNIT_COMBAT", "player", "WOUND", "", 99, 1)
+            local onlyPlates = #lines == 4
+            local okR, errR = pcall(CT.OnPlateRemoved, "NAME_PLATE_UNIT_REMOVED", "nameplate1")
+            local frozen = okR and lines[1] and lines[1].anchor == nil
+            UnitIsFriend = uif
+            for i = #lines, 1, -1 do table.remove(lines, i) end
+            cd.plates, cd.platesHeals = false, false
+            check(offNone, "no numbers off the plates while it is off")
+            check(crit and big, "a hit rises off its mob's plate, a crit marked, big numbers shortened: " .. tostring(crit) .. " / " .. tostring(big))
+            check(miss and healOff and healOn, "misses show, heals only when switched on")
+            check(onlyPlates, "hits on units that are not plates make no numbers")
+            check(frozen, "a plate that goes leaves its numbers to finish where they were: " .. tostring(errR or ""))
+        end
+        do
             local was, isTank = d.threat, ns.Threat.IsTank
             d.threat = true
             ns.Threat.IsTank = function() return false end
