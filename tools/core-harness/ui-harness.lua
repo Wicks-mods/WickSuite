@@ -726,6 +726,21 @@ do
             if NP.ThreatAll then NP.ThreatAll() end
             local byEvent = p.wuiThreatText:IsShown()
             check(byEvent, "a threat event updates the plate whatever token it names")
+            if not S.tbc then
+                -- Forever can hide threat values for a unit: a hidden percent
+                -- is drawn as given, never compared, in the plain status's
+                -- colour.
+                local hiddenAs
+                rawset(p.wuiThreatText, "SetFormattedText", function(self, fmt, v) hiddenAs = v; self:SetText("hidden") end)
+                local was = UnitDetailedThreatSituation
+                UnitDetailedThreatSituation = function() return false, 3, S.SECRET, S.SECRET, S.SECRET end
+                p.wuiThreatText:Hide()
+                local okH, errH = pcall(NP.UpdateThreatText, p)
+                UnitDetailedThreatSituation = was
+                rawset(p.wuiThreatText, "SetFormattedText", nil)
+                check(okH and p.wuiThreatText:IsShown() and hiddenAs == S.SECRET,
+                    "a hidden threat percent is drawn as given, never read: " .. tostring(errH or ""))
+            end
             pct = 0
             NP:Refresh(p)
             local none = not p.wuiThreatText:IsShown()
