@@ -132,6 +132,33 @@ check(drows[6].state == "ok", "demon out (pet exists)")
 S.CHAT = {}
 SlashCmdList.WICK_WICKSDEMONSANDTHINGS("status")
 check(#S.CHAT >= 3, "/wdt status prints")
+do
+    -- A bar with nothing known at login (a new warlock, or a spellbook not
+    -- in yet) is built once the spells come: it used to count as built and
+    -- never came. Switching it on before then says why nothing shows.
+    for _, bar in ipairs({ WD.PetBar, WD.SoulBar }) do
+        if bar.host then bar.host:Hide() end
+        bar.host, bar.initialized, bar.icons = nil, false, nil
+    end
+    -- Unknown to the spellbook and to the cooldown lookup by name, which on
+    -- this client only resolves spells the player has.
+    local Dl = WickCore.Dialect
+    local gsc = Dl.GetSpellCooldown
+    Dl.GetSpellCooldown = function() return nil end
+    S.ALL_UNKNOWN = true
+    WD.PetBar:Init()
+    WD.SoulBar:Init()
+    local empty = WD.PetBar.host == nil and WD.SoulBar.host == nil
+    S.CHAT = {}
+    WD.PetBar:Show()
+    local said = #S.CHAT > 0
+    S.ALL_UNKNOWN = false
+    Dl.GetSpellCooldown = gsc
+    S.fire("SPELLS_CHANGED")
+    check(empty, "no bars while no spell of theirs is known")
+    check(said, "switching one on then says it has nothing to show yet")
+    check(WD.PetBar.host ~= nil and WD.SoulBar.host ~= nil, "both are built once the spells are known")
+end
 
 -- ---------- Forms and Things ---------------------------------------------
 io.write("== Forms and Things ==\n")
