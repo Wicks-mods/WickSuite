@@ -2028,6 +2028,57 @@ do
     d.colors.damage = nil
     CT:Clear()
 
+    do
+        -- An aura fading comes in the same colour as when it landed, and on
+        -- Forever its text is a secret. The event that made it says which,
+        -- and the line is drawn darker.
+        local wasInfo, wasEnd = rawget(_G, "CombatTextTypeInfo"), rawget(_G, "AURA_END")
+        CombatTextTypeInfo = {
+            SPELL_AURA_START = { r = 0.1, g = 1, b = 0.1, show = true },
+            SPELL_AURA_END = { r = 0.1, g = 1, b = 0.1, show = true },
+            SPELL_AURA_END_HARMFUL = { r = 1, g = 0.1, b = 0.1, show = true },
+            DAMAGE = { r = 1, g = 0.1, b = 0.1, show = true },
+            HEAL = { r = 0.1, g = 1, b = 0.1 },   -- switched off: no line comes
+        }
+        AURA_END = "<%s> fades"
+        local function lit(l) local c = l.fs.__textColor; return c and c[2] == 1 and (l.fs.__alpha or 1) == 1 end
+        local function dim(l) local c = l.fs.__textColor; return c and c[2] < 1 and l.fs.__alpha < 1 end
+        CT:Clear()
+        CT.NoteLine("COMBAT_TEXT_UPDATE", "SPELL_AURA_START")
+        bz:AddMessage(S.SECRET, nil, 0.1, 1, 0.1)
+        CT.NoteLine("COMBAT_TEXT_UPDATE", "HEAL")
+        CT.NoteLine("COMBAT_TEXT_UPDATE", "SPELL_AURA_END")
+        bz:AddMessage(S.SECRET, nil, 0.1, 1, 0.1)
+        check(CT.lines[1] and lit(CT.lines[1]) and CT.lines[2] and dim(CT.lines[2]),
+            "a hidden aura line is bright when it lands and darker when it fades, told by the event that made it")
+        CT:Clear()
+        CT.NoteLine("COMBAT_TEXT_UPDATE", "DAMAGE")
+        CT.NoteLine("COMBAT_TEXT_UPDATE", "SPELL_AURA_END_HARMFUL")
+        bz:AddMessage("-12", nil, 1, 0.1, 0.1)
+        bz:AddMessage(S.SECRET, nil, 1, 0.1, 0.1)
+        local c1, c2 = CT.lines[1].fs.__textColor, CT.lines[2].fs.__textColor
+        check(c1[1] == 1 and (CT.lines[1].fs.__alpha or 1) == 1 and c2[1] < 1 and CT.lines[2].fs.__alpha < 1,
+            "lines made together in one colour each take their own event, in order")
+        CT:Clear()
+        bz:AddMessage("<Renew>", nil, 0.1, 1, 0.1)
+        bz:AddMessage("<Renew> fades", nil, 0.1, 1, 0.1)
+        check(lit(CT.lines[1]) and dim(CT.lines[2]), "plain text says itself which line is a fade")
+        CT:Clear()
+        d.dimFades = false
+        bz:AddMessage("<Renew> fades", nil, 0.1, 1, 0.1)
+        check(lit(CT.lines[1]), "switched off, a fade is drawn like any other line")
+        d.dimFades = true
+        CT:Clear()
+        local okN, errN = pcall(CT.NoteLine, "COMBAT_TEXT_UPDATE", S.SECRET)
+        check(okN, "an event kind it cannot read is passed by: " .. tostring(errN or ""))
+        bz:AddMessage("<Renew> fades", nil, 0.1, 1, 0.1)
+        local fl = CT.lines[1]
+        run(1.6)
+        check(fl.fs.__alpha < fl.alpha and fl.fs.__alpha > 0, "a darker line fades out from its own brightness, not from full")
+        CT:Clear()
+        CombatTextTypeInfo, AURA_END = wasInfo, wasEnd
+    end
+
     local okS, errS = pcall(bz.AddMessage, bz, S.SECRET, nil, 1, 0.1, 0.1, nil, 1)
     check(okS and CT.lines[1] and CT.lines[1].fs.__text == S.SECRET, "a secret line is handed on as it is, never read: " .. tostring(errS or ""))
     CT:Clear()
@@ -2047,7 +2098,7 @@ do
     CT:Clear()
 
     CT:Sample()
-    check(#CT.lines == 8, "the sample shows a line of each kind: " .. #CT.lines)
+    check(#CT.lines == 10, "the sample shows a line of each kind, and an aura landing and fading: " .. #CT.lines)
     CT:Clear()
 
     d.enable = false
