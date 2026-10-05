@@ -726,6 +726,14 @@ do
             if NP.ThreatAll then NP.ThreatAll() end
             local byEvent = p.wuiThreatText:IsShown()
             check(byEvent, "a threat event updates the plate whatever token it names")
+            NP:Refresh(p)
+            local _, under = p.wuiThreatText:GetPoint()
+            p.wuiCastbar:Show()
+            local _, underCast = p.wuiThreatText:GetPoint()
+            p.wuiCastbar:Hide()
+            local _, back = p.wuiThreatText:GetPoint()
+            check(under == p.Health and underCast == p.wuiCastbar and back == p.Health,
+                "the threat percent sits under the bar, and under the cast bar while one shows")
             if not S.tbc then
                 -- Forever can hide threat values for a unit: a hidden percent
                 -- is drawn as given, never compared, in the plain status's
