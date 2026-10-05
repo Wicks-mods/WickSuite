@@ -2235,6 +2235,23 @@ end
 io.write("== keybinds ==\n")
 local okK, errK = pcall(function() ns.Keybind:Activate(); ns.Keybind:Deactivate(false) end)
 check(okK, "keybind mode opens and closes: " .. tostring(errK or ""))
+do
+    -- Save for this character only: a click ticks it and a second click
+    -- takes it back, whatever the game's current set is until Save.
+    local K = ns.Keybind
+    local gcbs = GetCurrentBindingSet
+    GetCurrentBindingSet = function() return 1 end
+    K:Activate()
+    local box = _G.WicksUIBindPanel and _G.WicksUIBindPanel.perChar
+    local click = box and box:GetScript("OnClick")
+    if click then click(box) end
+    local on = K.perChar == true
+    if click then click(box) end
+    local off = K.perChar == false
+    K:Deactivate(false)
+    GetCurrentBindingSet = gcbs
+    check(on and off, "Save for this character only ticks, and unticks: " .. tostring(on) .. " / " .. tostring(off))
+end
 
 -- The design system audit's first batch (2026-09-30), one check or two per fix.
 io.write("== audit fixes ==\n")
