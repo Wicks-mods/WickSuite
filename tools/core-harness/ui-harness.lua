@@ -2605,6 +2605,34 @@ do
     check(tip:GetWidth() == 200, "and is left as the game made it when everything fits")
 end
 
+io.write("== info panels: more of them, and other addons' feeds ==\n")
+do
+    local DT = ns.DataTexts
+    local ldb = LibStub and LibStub("LibDataBroker-1.1", true)
+    check(ldb ~= nil, "LibDataBroker is bundled and loaded")
+    local okA, key = pcall(DT.AddPanel, DT)
+    local p = okA and DT.panels[key]
+    check(p and p:IsShown() and DT:db().panels[key].label ~= nil, "a panel can be added, and shows: " .. tostring(not okA and key or ""))
+    if ldb and p then
+        local clicked
+        local obj = ldb:NewDataObject("WickTestFeed", { type = "data source", text = "42 things", label = "Test feed",
+            OnClick = function(frame) clicked = frame end })
+        check(DT.registry["ldb:WickTestFeed"] ~= nil, "a feed made after login is a slot choice")
+        DT:db().panels[key].slots = "ldb:WickTestFeed"
+        DT:Update()
+        local slot = p.slots[1]
+        check(slot and tostring(slot.text:GetText()) == "42 things", "the slot shows the feed's text: " .. tostring(slot and slot.text:GetText()))
+        obj.text = "43 things"
+        check(slot and tostring(slot.text:GetText()) == "43 things", "and follows it when it changes")
+        if slot then slot:GetScript("OnClick")(slot, "LeftButton") end
+        check(clicked == slot, "a click goes to the feed, with the slot as its frame")
+        DT:RemovePanel(key)
+        check(DT:db().panels[key] == nil and not p:IsShown(), "an added panel can be removed")
+    end
+    local okR = pcall(DT.RemovePanel, DT, "left")
+    check(okR and DT:db().panels.left ~= nil, "the three that come with it cannot be removed")
+end
+
 io.write("== slash ==\n")
 check(type(SlashCmdList.WICK_WICKSUI) == "function", "/wui registered")
 local okS, errS = pcall(SlashCmdList.WICK_WICKSUI, "help")
