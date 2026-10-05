@@ -719,6 +719,13 @@ do
             d.threatPercent = true
             NP:Refresh(p)
             local shows = p.wuiThreatText:IsShown() and tostring(p.wuiThreatText:GetText()) == "85%"
+            -- A threat event can name the mob by another token than its
+            -- plate's; every plate reads again, so this one shows.
+            p:Show()
+            p.wuiThreatText:Hide()
+            if NP.ThreatAll then NP.ThreatAll() end
+            local byEvent = p.wuiThreatText:IsShown()
+            check(byEvent, "a threat event updates the plate whatever token it names")
             pct = 0
             NP:Refresh(p)
             local none = not p.wuiThreatText:IsShown()
