@@ -43,6 +43,9 @@ local function stubGlobal(name, v) if rawget(_G, name) == nil then rawset(_G, na
 -- The shared stub has a class of its own; the warlock kit only builds
 -- its bars for a warlock, so the answer is forced here.
 rawset(_G, "UnitClass", function() return "Warlock", "WARLOCK" end)
+-- The stub knows every spell; this warlock starts knowing none, so the
+-- bars that wait for a spell are seen empty at login (checked below).
+rawset(_G, "GetSpellInfo", function() return nil end)
 stubGlobal("GetBindingKey", function() return nil end)
 stubGlobal("SetBindingClick", function() return true end)
 stubGlobal("GetQuestLogSpecialItemInfo", function() return nil end)
@@ -260,6 +263,26 @@ if loaded.WicksDemonsAndThings then
     clearSaid()
     SlashCmdList.WICKSDEMONS("reset")
     check(#have == 0 or saidAbout("/wui move"), "/wdt reset leaves a claimed bar to Wick's UI")
+end
+
+io.write("== warlock bars empty at login ==\n")
+if loaded.WicksDemonsAndThings then
+    -- A warlock who knows none of the bars' spells at login (a new one):
+    -- the soul and pet bars are not built, and come once a spell is learned.
+    local SB, PB = WicksDemons.SoulBar, WicksDemons.PetBar
+    check(SB.host == nil and PB.host == nil, "with no spells known the soul and pet bars are not built at login")
+    check(not SB.initialized and not PB.initialized, "and an empty bar does not count as built")
+    clearSaid()
+    SB:Show()
+    check(SB.host == nil and saidAbout("nothing to show yet"), "showing an empty soul bar says it has nothing yet")
+    local wasInfo, wasCD = GetSpellInfo, GetSpellCooldown
+    rawset(_G, "GetSpellInfo", function(name) return name, nil, 136116 end)
+    rawset(_G, "GetSpellCooldown", function() return 0, 0, 1 end)
+    local okS, errS = pcall(S.fire, "SPELLS_CHANGED")
+    check(okS, "a spellbook change runs: " .. tostring(errS or ""))
+    check(SB.host ~= nil and PB.host ~= nil, "learning the spells builds both bars")
+    rawset(_G, "GetSpellInfo", wasInfo)
+    rawset(_G, "GetSpellCooldown", wasCD)
 end
 
 io.write("== chat lines ==\n")
