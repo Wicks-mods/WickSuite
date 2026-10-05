@@ -427,7 +427,7 @@ function headlines(body, max) {
   return out.slice(0, max);
 }
 
-function composeDiscordEmbed(addon, version, changelogBody) {
+function composeDiscordEmbed(addon, version, changelogBody, config) {
   const cfUrl = `https://www.curseforge.com/wow/addons/${addon.cf_slug}`;
   const descLines = [];
   if (addon.tagline) descLines.push(addon.tagline);
@@ -458,7 +458,7 @@ function composeDiscordEmbed(addon, version, changelogBody) {
 function announceDiscord(addon, version, addonDir, config, { dry = false } = {}) {
   const marker = path.join(addonDir, `.wick-discord-announced-v${version}`);
   if (dry) {
-    const embed = composeDiscordEmbed(addon, version, extractChangelogEntry(path.join(addonDir, "CHANGELOG.md"), version));
+    const embed = composeDiscordEmbed(addon, version, extractChangelogEntry(path.join(addonDir, "CHANGELOG.md"), version), config);
     log(`
 ── Discord${fs.existsSync(marker) ? " (already announced, would skip)" : ""} ──
 ${embed.title}
@@ -483,7 +483,7 @@ ${embed.description || ""}`);
 
   const changelog = path.join(addonDir, "CHANGELOG.md");
   const body = extractChangelogEntry(changelog, version);
-  const embed = composeDiscordEmbed(addon, version, body);
+  const embed = composeDiscordEmbed(addon, version, body, config);
   const payload = JSON.stringify({ embeds: [embed] });
   const payloadPath = path.join(rootOf(config, addon), `.wick-discord-payload-${addon.folder}.json`);
   fs.writeFileSync(payloadPath, payload);
