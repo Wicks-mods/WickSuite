@@ -656,6 +656,24 @@ local clicked = false
 A:RegisterLauncher({ onClick = function() clicked = true end })
 check(Core.Launcher.entries.WicksTest ~= nil, "launcher registered")
 check(Core.Launcher.button ~= nil, "minimap button exists")
+do
+    -- A broker library that loads after WickCore (Wick's UI bundles one)
+    -- still gets the launchers registered before it: they are published
+    -- once every addon is in.
+    local made = 0
+    local lib = LibStub:NewLibrary("LibDataBroker-1.1", 9999)
+    local was = lib and lib.NewDataObject
+    if lib then lib.NewDataObject = function(_, name, tbl) made = made + 1 return tbl end end
+    check(Core.Launcher.entries.WicksTest.ldb == nil, "no broker yet, no feed")
+    local launchers = 0
+    for _ in pairs(Core.Launcher.entries) do launchers = launchers + 1 end
+    Core.Launcher:PublishBrokers()
+    check(made == launchers and Core.Launcher.entries.WicksTest.ldb ~= nil,
+        "launchers registered before the broker loaded get their feeds once it has: " .. made .. " / " .. launchers)
+    Core.Launcher:PublishBrokers()
+    check(made == launchers, "and only once")
+    if lib then lib.NewDataObject = was end
+end
 Core.Launcher:ToggleHub()
 check(Core.Launcher.hub and Core.Launcher.hub:IsShown() and #Core.Launcher.hub.rows == 1, "hub shows one product row")
 Core.Launcher.hub.rows[1].__scripts.OnClick(nil, "LeftButton")
