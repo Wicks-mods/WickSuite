@@ -590,6 +590,20 @@ do
         p.__unit = "nameplate1"
         check(ns:UnitOf(p) == "nameplate1", "a plate's unit is read from where oUF keeps it")
         NP:Refresh(p)
+        -- Asked of the plate, built in the look: a stand-in player name
+        -- elsewhere in this file reads another character's look.
+        local game = p.wuiGameNP ~= nil
+        if game then
+            -- Classic: the game's own mark on the target, no pointers.
+            local lit = (p.wuiGameHighlight and p.wuiGameHighlight:IsShown()) or (p.wuiGameSelected and p.wuiGameSelected:IsShown())
+            check(lit and not p.wuiMarkL:IsShown(), "Classic: your target's plate is marked as the game marks it, with no pointers")
+            local w, h = p.Health:GetSize()
+            check(p.Health.backdrop and not p.Health.backdrop:IsShown() and math.abs(w - p.wuiGameNP.health.w) < 0.01
+                and math.abs(h - p.wuiGameNP.health.h) < 0.01,
+                "Classic: the plate's bar is the game's size, in the game's art, with no Wick border: " .. tostring(w) .. "x" .. tostring(h))
+            check(p.Health.PostUpdateColor and pcall(p.Health.PostUpdateColor, p.Health, "nameplate1"),
+                "Classic: health takes the game's colours without an error")
+        else
         check(p.wuiMarkL:IsShown() and p.wuiMarkR:IsShown(), "your target's plate has a pointer each side")
         do
             local st = ns.Core.Chrome:StyleDef()
@@ -604,12 +618,17 @@ do
         end
         check(p.wuiThreatGlow.wuiUnder and p.wuiTargetGlow.wuiUnder and (p.wuiThreatGlow.wuiAlpha or 1) < 1,
             "the plate glows sit under the border, softer than a unit frame's")
+        end
         local _, _, _, x0 = p.wuiMarkL:GetPoint()
         p.wuiCastbar:Show()
         local _, _, _, x1 = p.wuiMarkL:GetPoint()
         p.wuiCastbar:Hide()
         local _, _, _, x2 = p.wuiMarkL:GetPoint()
-        if ns:Modern() then
+        if game then
+            local cw, ch = p.wuiCastbar:GetSize()
+            check(math.abs(cw - p.wuiGameNP.cast.w) < 0.01 and math.abs(ch - p.wuiGameNP.cast.h) < 0.01 and p.wuiCastbar.wuiIconHolder:IsShown(),
+                "Classic: the plate's cast bar is the game's, its icon where the game puts it: " .. tostring(cw) .. "x" .. tostring(ch))
+        elseif ns:Modern() then
             -- The thin cast line has no icon to step past; the pointer
             -- hugs the card.
             check(x0 == -(3 + NP.CardPad()) and x1 == x0 and x2 == x0, "the left pointer hugs the card, a cast or not: "
@@ -624,11 +643,19 @@ do
         end
         focus = true
         NP:Refresh(p)
-        check(p.wuiMarkL:IsShown() and p:GetAlpha() == 1, "your focus is marked too, and not dimmed")
+        if game then
+            check(not p.wuiMarkL:IsShown() and p:GetAlpha() == (d.plateAlpha or 1), "Classic: the focus is left to the game's marks, at the plate's own opacity")
+        else
+            check(p.wuiMarkL:IsShown() and p:GetAlpha() == 1, "your focus is marked too, and not dimmed")
+        end
         d.targetMarker = "glow"
         focus = false
         NP:Refresh(p)
-        check(p.wuiTargetGlow:IsShown() and not p.wuiMarkL:IsShown(), "the glow instead of the pointers when chosen")
+        if game then
+            check(not p.wuiTargetGlow:IsShown() and not p.wuiMarkL:IsShown(), "Classic: no Wick glow or pointers, whichever is chosen")
+        else
+            check(p.wuiTargetGlow:IsShown() and not p.wuiMarkL:IsShown(), "the glow instead of the pointers when chosen")
+        end
         d.targetMarker = "arrows"
         d.castbar = false
         NP:Configure(p)
@@ -664,7 +691,11 @@ do
         NP:Refresh(p)
         local none = not p.wuiClassMark:IsShown()
         UnitClassification = oc
-        check(mark and none, "a diamond on the bar for an elite, nothing for a normal mob")
+        if game then
+            check(not mark and none, "Classic: no Wick diamond on an elite's plate")
+        else
+            check(mark and none, "a diamond on the bar for an elite, nothing for a normal mob")
+        end
         do
             -- Quest mobs: a mark and how many more are wanted, from the
             -- tooltip's quest lines; nothing once every line is done. An
@@ -825,7 +856,11 @@ do
             local on = p.Health.colorThreat == true
             ns.Threat.IsTank, d.threat = isTank, was
             NP:Configure(p)
-            check(off and on, "threat colours only while you tank; otherwise class and reaction")
+            if game then
+                check(off and not on, "Classic: the game's colours, not threat colours, even while you tank")
+            else
+                check(off and on, "threat colours only while you tank; otherwise class and reaction")
+            end
         end
         do
             local wasN = d.friendlyNameOnly
