@@ -2286,6 +2286,14 @@ do
     if launcher then launcher:Show() end
     local d = MM:db()
     d.square, d.strip = true, true
+    if ns:Game() then
+        -- Classic keeps the game's own minimap: round, its buttons where
+        -- the game puts them, whatever the other looks are set to.
+        local okC, errC = pcall(function() MM:Shape() end)
+        local strip = rawget(_G, "WicksUI_MinimapStrip")
+        check(okC and not (strip and strip:IsShown()) and GetMinimapShape() == "ROUND",
+            "Classic keeps the game's round minimap and its buttons, whatever the other looks are set to: " .. tostring(errC or ""))
+    else
     local okS, errS = pcall(function() MM:Shape() end)
     local strip = rawget(_G, "WicksUI_MinimapStrip")
     check(okS and strip and strip:IsShown(), "the game's buttons get a row under the square map: " .. tostring(errS or ""))
@@ -2310,6 +2318,7 @@ do
         "switched off, the row goes and the mail mark returns to the map's corner")
     d.strip = true
     MM:Shape()
+    end
     _G.GameTimeFrame, _G.MiniMapTrackingDropDown = nil, nil
 end
 
@@ -2770,6 +2779,37 @@ do
     end
     local okR = pcall(DT.RemovePanel, DT, "left")
     check(okR and DT:db().panels.left ~= nil, "the three that come with it cannot be removed")
+end
+
+if ns:Game() then
+    io.write("== classic ==\n")
+    -- The stub has none of the game's nine-slice layouts; one is lent.
+    local was = rawget(_G, "NineSliceUtil")
+    local piece = { atlas = "x" }
+    NineSliceUtil = {
+        GetLayout = function() return { TopLeftCorner = piece, TopRightCorner = piece, BottomLeftCorner = piece,
+            BottomRightCorner = piece, TopEdge = piece, BottomEdge = piece, LeftEdge = piece, RightEdge = piece } end,
+        ApplyLayout = function(container, layout)
+            for k in pairs(layout) do rawset(container, k, container:CreateTexture()) end
+        end,
+    }
+    local f = CreateFrame("Frame", nil, UIParent)
+    ns:SetTemplate(f, "Default")
+    local g = f.wuiGame
+    if g then g:SetSize(200, 100); g:GetScript("OnSizeChanged")(g) end
+    check(g and f.wuiGameOn and not f.wuiBorder.top:IsShown(), "a panel takes the game's tooltip border in place of the line")
+    if g then g:SetSize(30, 30); g:GetScript("OnSizeChanged")(g) end
+    check(g and not f.wuiGameOn and f.wuiBorder.top:IsShown(), "sized down to a tile, it takes the plain line")
+    local tint
+    if g then for _, t in ipairs(g.pieces) do rawset(t, "SetVertexColor", function(_, r, gg, bb) tint = { r, gg, bb } end) end end
+    ns:SetBorderColor(f, { 1, 0, 0 })
+    local red = tint and tint[1] == 1 and tint[2] == 0
+    ns:SetBorderColor(f, "border")
+    check(red and tint[2] == 1, "a border colour tints the game's art, and at rest it is the art's own")
+    NineSliceUtil = was
+    check(not ns.modules.chat:Enabled() and not ns.modules.panelskins:Enabled() and not ns.modules.skins:Enabled()
+        and ns.modules.minimap:Enabled() and ns.modules.tooltip:Enabled(),
+        "the modules that only dress the game's frames stand aside; the minimap and tooltips keep what they do")
 end
 
 io.write("== slash ==\n")
