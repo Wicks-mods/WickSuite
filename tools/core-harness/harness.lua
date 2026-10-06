@@ -305,9 +305,11 @@ do
     -- nine-slice layouts, so one is lent for the check.
     local was = rawget(_G, "NineSliceUtil")
     local piece = { atlas = "x" }
+    local asked
     NineSliceUtil = {
         GetLayout = function(name)
-            if name ~= "TooltipDefaultLayout" then return nil end
+            asked = name
+            if name ~= "TooltipDefaultLayout" and name ~= "ButtonFrameTemplateNoPortrait" then return nil end
             return { TopLeftCorner = piece, TopRightCorner = piece, BottomLeftCorner = piece, BottomRightCorner = piece,
                 TopEdge = piece, BottomEdge = piece, LeftEdge = piece, RightEdge = piece, Center = piece }
         end,
@@ -342,6 +344,12 @@ do
     check(rawget(tile, "gameBorder") == nil and tile.border and tile.border.top, "a tile keeps a plain line: " .. tostring(rawget(tile, "gameBorder")) .. " " .. tostring(tile.border))
     local chk = Chrome:Check(UIParent, "Test", function() return true end, function() end)
     check(chk.fill and chk.label, "the check box draws in the game's art")
+    local win = CreateFrame("Frame", nil, UIParent)
+    win:SetSize(300, 200)
+    rawset(win, "IsMovable", function() return true end)
+    Chrome:AddBorder(win)
+    check(asked == "ButtonFrameTemplateNoPortrait" and win.gameBorder and win.gameWindowBG,
+        "a product's own window wears the game's window frame and background: " .. tostring(asked))
     NineSliceUtil = was
     local p2 = Chrome:NewPanel("WickClassicTest2", { title = "Test" })
     check(not p2.wickGame and p2.bg, "with no nine-slice of the game's, a Classic window falls back to the flat one")
