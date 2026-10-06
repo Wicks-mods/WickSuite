@@ -16,6 +16,9 @@ end
 io.write("== load WickCore + WicksBags (", MODE, ") ==\n")
 S.loadAddon(CORE_DIR, "WickCore")   -- file list straight off WickCore.toc
 S.fire("ADDON_LOADED", "WickCore")
+-- run.py --bags --styles: the whole pass in one WickCore look.
+local STYLE = os.getenv("WICK_STYLE")
+if STYLE and STYLE ~= "" then WickCore.Chrome:CharStore().style = STYLE end
 
 -- Pre-seed an old-layout saved file to exercise the migration.
 WicksBagsDB = { options = { showJunk = false, sortMode = "name" }, bagPos = { posPoint = "CENTER", posRel = "CENTER", posX = 1, posY = 2, panelW = 500 } }
@@ -60,6 +63,12 @@ local okShow, errShow = pcall(function() WB.Bag:Show() end)
 check(okShow, "Bag:Show " .. tostring(errShow or ""))
 local okRef, errRef = pcall(function() WB.Bag:Refresh() end)
 check(okRef, "Bag:Refresh " .. tostring(errRef or ""))
+if WickCore.Chrome.Game and WickCore.Chrome:Game() then
+    -- Classic: the game's search box, sort button and close button.
+    local p = WB.Bag.panel
+    check(p._search and p._search.__template == "SearchBoxTemplate", "Classic: the bag searches with the game's search box")
+    check(p._sortBtn == nil or p._sortBtn.__template == "UIPanelButtonTemplate", "Classic: Sort is the game's button")
+end
 check(WB.Bag.panel:IsShown(), "bag panel shown")
 if MODERN then
     check((S.BAGS_SCANNED[5] or 0) > 0, "reagent bag scanned alongside the carry bags")

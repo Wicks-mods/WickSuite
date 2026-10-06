@@ -67,7 +67,7 @@ def main():
     ap.add_argument("--both", action="store_true", help="modern and legacy")
     ap.add_argument("--all", action="store_true", help="modern, legacy and tbc")
     ap.add_argument("--styles", action="store_true",
-                    help="with --ui: run once in every WickCore style (Modern, OG and the seven looks)")
+                    help="with --ui: run once in every WickCore style; with --bags: in Modern, OG and Classic")
     args = ap.parse_args()
 
     stub = HERE + "/stubclient.lua"
@@ -101,7 +101,11 @@ def main():
     ok = True
     for mode in modes:
         if args.bags:
-            ok = run(HERE + "/bags-harness.lua", mode, args.core, args.bags_dir, mode, stub) and ok
+            for style in (["modern", "og", "classic"] if args.styles else [""]):
+                os.environ["WICK_STYLE"] = style
+                if style:
+                    print(f"-- style {style}")
+                ok = run(HERE + "/bags-harness.lua", mode, args.core, args.bags_dir, mode, stub) and ok
         elif args.kits:
             ok = run(HERE + "/kits-harness.lua", mode, args.core, BETA_ADDONS, mode, stub) and ok
         elif args.ui:
