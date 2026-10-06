@@ -450,8 +450,14 @@ do
     check(next(UF.all or {}) and #over == 0, "incoming heals stop at the end of the health bar: " .. table.concat(over, ", "))
     -- Resting: our crescent on a tile, made only where it shows.
     local ri = UF.frames.player.RestingIndicator
-    check(ri and ri:GetObjectType() == "Frame" and ri.mark and ri.mark:GetTexture() == ns.Media:Glyph("rest"),
-        "the player frame's resting mark is our crescent, not the game's Zzz")
+    if ns:Game() then
+        -- Classic: the game's own resting mark, in its frame's corner.
+        check(ri and ri:GetObjectType() == "Texture" and tostring(ri:GetTexture()):find("UI%-StateIcon"),
+            "Classic: the player frame's resting mark is the game's own")
+    else
+        check(ri and ri:GetObjectType() == "Frame" and ri.mark and ri.mark:GetTexture() == ns.Media:Glyph("rest"),
+            "the player frame's resting mark is our crescent, not the game's Zzz")
+    end
     check(UF.frames.target.wuiIcons.resting == nil, "and a frame that never shows resting makes no mark")
 end
 check(ns.UnitGroups.headers and ns.UnitGroups.headers.party and ns.UnitGroups.headers.raid, "party and raid headers")
@@ -1144,7 +1150,15 @@ do
     check(pf and pf.wuiThreatGlow and pf.ThreatIndicator == pf.wuiThreatGlow, "the player frame has its threat glow: "
         .. tostring(pf and pf.wuiThreatGlow) .. " / " .. tostring(pf and pf.ThreatIndicator))
     check(pf and pf.IsElementEnabled and pf:IsElementEnabled("ThreatIndicator"), "and oUF's threat element is on for it")
-    check(pf and pf.wuiThreatGlow.wuiUnder and (pf.wuiThreatGlow.wuiAlpha or 1) < 1, "and it sits under the frame's border, softened")
+    -- Asked of the frame, which was built in the look: this test's stand-in
+    -- player name reads another character's look.
+    if pf and pf.wuiGameUF then
+        -- Classic: the game's own flash round the frame art, driven the same way.
+        check(pf and pf.wuiThreatGlow.Override == ns.ThreatGlowUpdate and pf.wuiThreatGlow:GetObjectType() == "Texture",
+            "Classic: the threat shows as the game's own flash")
+    else
+        check(pf and pf.wuiThreatGlow.wuiUnder and (pf.wuiThreatGlow.wuiAlpha or 1) < 1, "and it sits under the frame's border, softened")
+    end
     do
         local uts, isv, ue = UnitThreatSituation, issecretvalue, UnitExists
         local SECRET = {}
@@ -2818,6 +2832,39 @@ if ns:Game() then
     check(b1 and b1.MasqueSkinned and rawget(b1, "wuiBorder") == nil and rawget(b1, "wuiEmpty") == nil
         and b1.config and b1.config.text.hotkey.font.font == ns.ActionBars.GAME_NUMBER_FONT,
         "an action button keeps the game's own template art, its keybind in the game's number font: " .. tostring(b1 and b1.MasqueSkinned) .. " " .. tostring(b1 and rawget(b1, "wuiBorder")) .. " " .. tostring(b1 and rawget(b1, "wuiEmpty")) .. " " .. tostring(b1 and b1.config and b1.config.text.hotkey.font.font))
+    do
+        -- The unit frames in the game's own shape: its size, its art, the
+        -- portrait in it, and a target's art swapped for its rank.
+        local UF = ns.UnitFrames
+        local pl, tg = UF.frames.player, UF.frames.target
+        local tbc = ns.Core.Client and ns.Core.Client.isTBC
+        pcall(UF.Configure, UF, pl)
+        local w, h = pl:GetSize()
+        check(pl.wuiGameUF and w == 232 and h == 100 and pl.wuiGameArt and pl.Portrait == pl.wuiPortrait
+            and pl.wuiPortrait:IsShown(),
+            "Classic: the player frame is the game's, 232 by 100, its art round the portrait: " .. tostring(w) .. "x" .. tostring(h))
+        local _, _, _, hx, hy = pl.Health:GetPoint(1)
+        check((tbc and hx == 90 and hy == -45) or (not tbc and hx == 85 and hy == -41),
+            "Classic: health sits where the game puts it on this client: " .. tostring(hx) .. "," .. tostring(hy))
+        local wasClass, wasSel = UnitClassification, UnitSelectionColor
+        UnitClassification = function() return "elite" end
+        UnitSelectionColor = function() return 1, 0, 0, 1 end
+        tg.unit = "target"
+        local okU, errU = pcall(UF.GameUpdate, UF, tg)
+        UnitClassification, UnitSelectionColor = wasClass, wasSel
+        local swapped
+        if tbc then
+            swapped = tostring(tg.wuiGameArt:GetTexture()):find("Elite") ~= nil
+        else
+            swapped = tg.wuiGameDragon and tg.wuiGameDragon:IsShown()
+        end
+        check(okU and swapped and tg.wuiGameBand and tg.wuiGameBand:IsShown(),
+            "Classic: an elite target wears the game's elite art, its name band in its reaction colour: " .. tostring(errU or ""))
+        if not tbc then
+            check(pl.Health:GetStatusBarTexture() and pl.Health.bg and not pl.Health.bg:IsShown(),
+                "Classic on Forever: the bars are clipped to the art, with no backing of ours")
+        end
+    end
     do
         -- The template's art is drawn for its own size; at the bar's size
         -- each piece is scaled with the button.
