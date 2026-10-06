@@ -2414,6 +2414,16 @@ do
 
     -- 5: a chosen setup answer keeps its ring after the pointer leaves.
     local b = W:Button(UIParent, "x", 50)
+    if rawget(b, "wuiBorder") == nil and not b.wuiModern and ns:Game() then
+        -- Classic: the game's button, held lit while chosen.
+        local held
+        rawset(b, "LockHighlight", function() held = true end)
+        rawset(b, "UnlockHighlight", function() held = false end)
+        b:SetSelected(true)
+        check(b.selected and held, "Classic: a chosen button is the game's, held lit")
+        b:SetSelected(false)
+        check(not b.selected and held == false, "and let go when it is not")
+    else
     b:SetSelected(true)
     b:GetScript("OnEnter")(b)
     b:GetScript("OnLeave")(b)
@@ -2422,6 +2432,7 @@ do
     b:SetSelected(false)
     b:GetScript("OnLeave")(b)
     check(not b.selected and near(b.text.__textColor, C.text), "and drops it when deselected")
+    end
 
     -- 6: nothing of ours written onto a host the client made.
     local host = CreateFrame("Button")
