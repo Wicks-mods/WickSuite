@@ -2367,7 +2367,9 @@ do
     local UF, AB = ns.UnitFrames, ns.ActionBars
     local uf, ab = UF:db(), AB:db()
     check(uf.castColor == nil and UF:CastColor() == C.fel, "the cast bar is in the look's accent by default")
-    check(ab.hotkeyColor == nil and AB:HotkeyColor() == C.text, "the keybinds are in the look's text colour by default")
+    -- Classic's keybinds are the game's grey, as its own are.
+    local restKey = ns:Game() and AB.GAME_HOTKEY or C.text
+    check(ab.hotkeyColor == nil and AB:HotkeyColor() == restKey, "the keybinds are in the look's text colour by default (the game's grey in Classic)")
     local cb = UF.frames.player and rawget(UF.frames.player, "Castbar")
     check(cb and near(cb.__color, C.fel), "the player's cast bar took the new accent at the theme change")
     uf.castColor, uf.colorsMigrated = { 0.31, 0.78, 0.47, 1 }, false
@@ -2379,7 +2381,7 @@ do
     check(near(uf.castColor, { 1, 0, 0 }) and UF:CastColor() == uf.castColor, "a cast colour the player picked stays")
     uf.castColor = nil
     local b1 = _G.WicksUI_Bar1.buttons[1]
-    check(b1.config and near(b1.config.text.hotkey.color, C.text), "the keybind text took the new text colour")
+    check(b1.config and near(b1.config.text.hotkey.color, restKey), "the keybind text took the new text colour (the game's grey in Classic)")
     restoreTheme()
 
     -- 3: the look's own outline reaches the action bars as a real flag.
@@ -2810,6 +2812,12 @@ if ns:Game() then
     check(not ns.modules.chat:Enabled() and not ns.modules.panelskins:Enabled() and not ns.modules.skins:Enabled()
         and ns.modules.minimap:Enabled() and ns.modules.tooltip:Enabled(),
         "the modules that only dress the game's frames stand aside; the minimap and tooltips keep what they do")
+    -- Earlier sections switch looks; the bars are laid out again in this one.
+    pcall(function() ns.ActionBars:Update() end)
+    local b1 = _G.WicksUI_Bar1 and _G.WicksUI_Bar1.buttons[1]
+    check(b1 and b1.MasqueSkinned and rawget(b1, "wuiBorder") == nil and rawget(b1, "wuiEmpty") == nil
+        and b1.config and b1.config.text.hotkey.font.font == ns.ActionBars.GAME_NUMBER_FONT,
+        "an action button keeps the game's own template art, its keybind in the game's number font: " .. tostring(b1 and b1.MasqueSkinned) .. " " .. tostring(b1 and rawget(b1, "wuiBorder")) .. " " .. tostring(b1 and rawget(b1, "wuiEmpty")) .. " " .. tostring(b1 and b1.config and b1.config.text.hotkey.font.font))
 end
 
 io.write("== slash ==\n")
