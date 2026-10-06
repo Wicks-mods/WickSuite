@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 // Render per-addon monograms from logo-variants.html.
 // Output: WickSuite/images/{slug}/logo-{256,512}.png
+//
+//   node tools/render-monograms.mjs              every tile below
+//   node tools/render-monograms.mjs reminders    only the named slugs
 
 import path from "node:path";
 import fs from "node:fs";
@@ -23,7 +26,15 @@ const TILES = [
   { id: "wick-logo-le-512",     slug: "ledger",    out: "logo-512.png", w: 512, h: 512 },
   { id: "wick-logo-bo-256",     slug: "bones",     out: "logo-256.png", w: 256, h: 256 },
   { id: "wick-logo-bo-512",     slug: "bones",     out: "logo-512.png", w: 512, h: 512 },
+  { id: "wick-logo-re-256",     slug: "reminders", out: "logo-256.png", w: 256, h: 256 },
+  { id: "wick-logo-re-512",     slug: "reminders", out: "logo-512.png", w: 512, h: 512 },
 ];
+
+// Slugs named on the command line narrow the run, so adding one addon's
+// logo does not re-render everyone else's.
+const only = process.argv.slice(2);
+const todo = only.length ? TILES.filter(t => only.includes(t.slug)) : TILES;
+if (only.length && !todo.length) { console.error(`! no tiles for: ${only.join(", ")}`); process.exit(1); }
 
 const browser = await puppeteer.launch({
   executablePath: CHROME, headless: "new",
@@ -36,7 +47,7 @@ try {
   await page.goto(BASE, { waitUntil: "networkidle0" });
   await new Promise(r => setTimeout(r, 800));
 
-  for (const t of TILES) {
+  for (const t of todo) {
     const el = await page.$(`#${t.id}`);
     if (!el) { console.error(`! tile not found: #${t.id}`); continue; }
     const destDir = path.join(OUT, t.slug);

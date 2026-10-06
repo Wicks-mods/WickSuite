@@ -646,6 +646,31 @@
         "Looks shared with every Wick addon"
       ],
       "repo": "WicksUIForever"
+    },
+    {
+      "folder": "WicksReminders",
+      "title": "Wick's Reminders",
+      "short": "Reminders",
+      "client": "both",
+      "cf_game_versions": [
+        16533,
+        17053
+      ],
+      "slash": "/remind",
+      "tagline": "Timers, alarms and reminders that keep counting between sessions.",
+      "short_tagline": "Timers, alarms and reminders that keep counting",
+      "accent": "#4FC778",
+      "accent_name": "Fel Green",
+      "cf_slug": "wicks-reminders",
+      "cf_project_id": 1730807,
+      "key": "reminders",
+      "icon": "re",
+      "features": [
+        "Timers, alarms and event reminders",
+        "Keeps counting while you are offline",
+        "Snooze or Done on every alert"
+      ],
+      "repo": "WicksReminders"
     }
   ],
   "retired": [
