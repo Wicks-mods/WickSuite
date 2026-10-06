@@ -2818,6 +2818,26 @@ if ns:Game() then
     check(b1 and b1.MasqueSkinned and rawget(b1, "wuiBorder") == nil and rawget(b1, "wuiEmpty") == nil
         and b1.config and b1.config.text.hotkey.font.font == ns.ActionBars.GAME_NUMBER_FONT,
         "an action button keeps the game's own template art, its keybind in the game's number font: " .. tostring(b1 and b1.MasqueSkinned) .. " " .. tostring(b1 and rawget(b1, "wuiBorder")) .. " " .. tostring(b1 and rawget(b1, "wuiEmpty")) .. " " .. tostring(b1 and b1.config and b1.config.text.hotkey.font.font))
+    do
+        -- The template's art is drawn for its own size; at the bar's size
+        -- each piece is scaled with the button.
+        local tb = CreateFrame("CheckButton", nil, UIParent)
+        tb:SetSize(45, 45)
+        local frame = tb:CreateTexture()
+        frame:SetSize(46, 45)
+        frame:SetPoint("TOPLEFT", tb, "TOPLEFT", 0, 0)
+        local glow = tb:CreateTexture()
+        glow:SetSize(62, 62)
+        glow:SetPoint("CENTER", tb, "CENTER", 0, -2)
+        ns.ActionBars.FitGameArt(tb)
+        tb:SetSize(36, 36)
+        if tb.wuiGameArt then tb.wuiGameArt() end
+        local fw, fh = frame:GetSize()
+        local gw = glow:GetSize()
+        local _, _, _, _, gy = glow:GetPoint(1)
+        check(math.abs(fw - 46 * 0.8) < 0.01 and math.abs(fh - 36) < 0.01 and math.abs(gw - 62 * 0.8) < 0.01 and math.abs(gy + 1.6) < 0.01,
+            "the game's button art scales with the button, sizes and offsets: " .. tostring(fw) .. " " .. tostring(gw) .. " " .. tostring(gy))
+    end
 end
 
 io.write("== slash ==\n")
