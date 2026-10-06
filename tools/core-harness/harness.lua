@@ -298,7 +298,55 @@ rp:Hide()
 
 -- ---------- themes --------------------------------------------------------
 io.write("== themes ==\n")
-check(#Chrome.Themes == 17 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, seven looks' palettes and custom, warlock is fel")
+check(#Chrome.Themes == 18 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, eight looks' palettes and custom, warlock is fel")
+
+do
+    -- Classic: the game's own art. The stub has none of the game's
+    -- nine-slice layouts, so one is lent for the check.
+    local was = rawget(_G, "NineSliceUtil")
+    local piece = { atlas = "x" }
+    NineSliceUtil = {
+        GetLayout = function(name)
+            if name ~= "TooltipDefaultLayout" then return nil end
+            return { TopLeftCorner = piece, TopRightCorner = piece, BottomLeftCorner = piece, BottomRightCorner = piece,
+                TopEdge = piece, BottomEdge = piece, LeftEdge = piece, RightEdge = piece, Center = piece }
+        end,
+        ApplyLayout = function(container, layout)
+            for k in pairs(layout) do rawset(container, k, container:CreateTexture()) end
+        end,
+    }
+    local wasForce = Chrome.forceStyle
+    Chrome.forceStyle = "classic"
+    check(Chrome:Game() and not Chrome:Modern() and Chrome.ThemeByID.classic and Chrome:TitleMarkup("Wick's Test"):find("Wick's Test", 1, true),
+        "Classic is the flat family drawn in the game's art, with its own palette and one-colour titles")
+    local p = Chrome:NewPanel("WickClassicTest", { title = "Wick's Test" })
+    local okR = pcall(function() for _, t in pairs(p.border) do t:SetColorTexture(1, 0, 0, 1) end end)
+    check(p.wickGame and p.content and okR and not p.brackets.TOPLEFT,
+        "a Classic window is the game's own, no corner marks, and a product recolouring its border changes nothing and does not fail")
+    local box = CreateFrame("Frame", nil, UIParent)
+    box:SetSize(200, 100)
+    Chrome:Texture(box, "BACKGROUND", Chrome.Colors.voidBG):SetAllPoints()
+    Chrome:AddBorder(box)
+    local holder = box.gameBorder
+    check(holder and #holder.pieces == 8 and rawget(holder, "Center") == nil and rawget(box, "TopLeftCorner") == nil,
+        "a panel gets the game's tooltip border on a child of its own, without the layout's middle")
+    local got
+    for _, t in ipairs(holder and holder.pieces or {}) do rawset(t, "SetVertexColor", function(_, r, g, b) got = { r, g, b } end) end
+    box.border.top:SetColorTexture(Chrome.Colors.fel[1], Chrome.Colors.fel[2], Chrome.Colors.fel[3], 1)
+    local lit = got and got[1] == Chrome.Colors.fel[1]
+    box.border.top:SetColorTexture(Chrome.Colors.border[1], Chrome.Colors.border[2], Chrome.Colors.border[3], 1)
+    check(lit and got[1] == 1 and got[2] == 1 and got[3] == 1, "a border coloured for hover tints the game's art, and back at rest it is the art's own colour")
+    local tile = CreateFrame("Frame", nil, UIParent)
+    tile:SetSize(30, 30)
+    Chrome:AddBorder(tile)
+    check(rawget(tile, "gameBorder") == nil and tile.border and tile.border.top, "a tile keeps a plain line: " .. tostring(rawget(tile, "gameBorder")) .. " " .. tostring(tile.border))
+    local chk = Chrome:Check(UIParent, "Test", function() return true end, function() end)
+    check(chk.fill and chk.label, "the check box draws in the game's art")
+    NineSliceUtil = was
+    local p2 = Chrome:NewPanel("WickClassicTest2", { title = "Test" })
+    check(not p2.wickGame and p2.bg, "with no nine-slice of the game's, a Classic window falls back to the flat one")
+    Chrome.forceStyle = wasForce
+end
 -- Crisp takes the player's class colour as its accent over neutral greys.
 do
     local t, cls = Chrome.ThemeByID.crisp, Chrome.ThemeByClass[select(2, UnitClass("player")) or ""]
