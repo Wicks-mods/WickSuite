@@ -304,8 +304,9 @@ do
     -- Classic: the game's own art. The stub has none of the game's
     -- nine-slice layouts, so one is lent for the check.
     local was = rawget(_G, "NineSliceUtil")
-    local piece = { atlas = "x" }
+    local piece = { atlas = "x", x = -8, y = 16 }
     local asked
+    local laid
     NineSliceUtil = {
         GetLayout = function(name)
             asked = name
@@ -314,6 +315,7 @@ do
                 TopEdge = piece, BottomEdge = piece, LeftEdge = piece, RightEdge = piece, Center = piece }
         end,
         ApplyLayout = function(container, layout)
+            laid = layout
             for k in pairs(layout) do rawset(container, k, container:CreateTexture()) end
         end,
     }
@@ -332,6 +334,9 @@ do
     local holder = box.gameBorder
     check(holder and #holder.pieces == 8 and rawget(holder, "Center") == nil and rawget(box, "TopLeftCorner") == nil,
         "a panel gets the game's tooltip border on a child of its own, without the layout's middle")
+    check(laid and laid.TopLeftCorner and laid.TopLeftCorner.x == nil and laid.TopLeftCorner.y == nil and laid.TopLeftCorner.atlas == "x"
+        and piece.x == -8,
+        "the border lies on the panel's edge: the layout's offsets are left out, and the game's own layout is not changed")
     local got
     for _, t in ipairs(holder and holder.pieces or {}) do rawset(t, "SetVertexColor", function(_, r, g, b) got = { r, g, b } end) end
     box.border.top:SetColorTexture(Chrome.Colors.fel[1], Chrome.Colors.fel[2], Chrome.Colors.fel[3], 1)
