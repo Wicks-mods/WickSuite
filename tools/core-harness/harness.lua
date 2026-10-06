@@ -335,9 +335,8 @@ do
     local holder = box.gameBorder
     check(holder and #holder.pieces == 8 and rawget(holder, "Center") == nil and rawget(box, "TopLeftCorner") == nil,
         "a panel gets the game's tooltip border on a child of its own, without the layout's middle")
-    check(laid and laid.TopLeftCorner and laid.TopLeftCorner.x == nil and laid.TopLeftCorner.y == 16 and laid.TopLeftCorner.atlas == "x"
-        and laid.BottomLeftCorner.x == nil and laid.BottomLeftCorner.y == nil and crest.x == -8 and piece.y == -8,
-        "the border lies on the panel's sides and bottom, its crest lifted as the game's, and the game's own layout is not changed")
+    check(laid and laid.TopLeftCorner == crest and laid.BottomLeftCorner == piece and laid.Center == nil,
+        "the border keeps the game's own placing, all but its middle")
     local got
     for _, t in ipairs(holder and holder.pieces or {}) do rawset(t, "SetVertexColor", function(_, r, g, b) got = { r, g, b } end) end
     box.border.top:SetColorTexture(Chrome.Colors.fel[1], Chrome.Colors.fel[2], Chrome.Colors.fel[3], 1)
@@ -356,6 +355,13 @@ do
     Chrome:AddBorder(win)
     check(asked == "ButtonFrameTemplateNoPortrait" and win.gameBorder and win.gameWindowBG,
         "a product's own window wears the game's window frame and background: " .. tostring(asked))
+    local win2 = CreateFrame("Frame", nil, UIParent)
+    win2:SetSize(300, 200)
+    rawset(win2, "IsMovable", function() return true end)
+    local fill = Chrome:Texture(win2, "BACKGROUND", Chrome.Colors.voidBG)
+    fill:SetAllPoints()
+    Chrome:AddBorder(win2)
+    check(fill:GetAlpha() == 0, "and its own fill is put away, so the frame is its only edge")
     NineSliceUtil = was
     local p2 = Chrome:NewPanel("WickClassicTest2", { title = "Test" })
     check(not p2.wickGame and p2.bg, "with no nine-slice of the game's, a Classic window falls back to the flat one")
