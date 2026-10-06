@@ -232,6 +232,8 @@ const SHOTS = {
   reminders:       'images/reminders/screenshots/main.png',
   reminders_list:  'images/reminders/screenshots/list.png',
   reminders_alert: 'images/reminders/screenshots/alert.png',
+  reminders_classic_list:  'images/reminders/screenshots/classic-list.png',
+  reminders_classic_alarm: 'images/reminders/screenshots/classic-alarm.png',
   // Wick's UI, one per look, each titled in the look's own heading font.
   ui_WicksModern: 'images/ui/screenshots/looks/WicksModern.png',
   ui_WicksOG:     'images/ui/screenshots/looks/WicksOG.png',
@@ -739,6 +741,42 @@ function RemindersThumb() {
       </div>
       <div style={{position:'absolute',right:14,bottom:14,left:160,height:106}}>
         <Shot which="reminders_alert" size="contain" origin="center" glowAt="50% 50%"/>
+      </div>
+    </div>
+  );
+}
+
+// The same tile in the Classic look (Forever shots): the list over the
+// alarm editor, since there is no Classic shot of a card going off.
+function RemindersClassicThumb() {
+  return (
+    <div style={{width:460,height:260,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
+      <DungeonBg width={460} height={260} glowX="25%" glowY="45%" glowColor={G} accent="#4FC778" opacity={0.15}/>
+      <div style={{position:'absolute',left:-20,top:'50%',transform:'translateY(-50%)',
+        width:200,height:200,borderRadius:'50%',
+        background:`radial-gradient(circle, ${G}22 0%, transparent 70%)`,pointerEvents:'none'}}/>
+      <div style={{position:'absolute',left:20,top:18,bottom:18,width:128,
+        display:'flex',flexDirection:'column',justifyContent:'flex-start',gap:10}}>
+        <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch'}}>
+          <WickWordmark size={22}/>
+          <div style={{fontFamily:FM,fontSize:7,letterSpacing:'0.3em',color:G,marginTop:2,textAlign:'right'}}>REMINDERS</div>
+        </div>
+        <div style={{height:1,width:'100%',background:BR}}/>
+        <div style={{fontFamily:FU,fontSize:10,color:TX,lineHeight:1.35,fontWeight:500}}>Don't forget to<br/>pick up your kids...</div>
+        <div style={{display:'flex',flexDirection:'column',gap:3,marginTop:'auto'}}>
+          {['Timers, alarms and events','Counts on while offline','Snooze or Done on the card'].map(f=>(
+            <div key={f} style={{display:'flex',alignItems:'center',gap:4}}>
+              <div style={{width:3,height:3,borderRadius:'50%',background:G}}/>
+              <span style={{fontFamily:FM,fontSize:6.5,color:MDIM}}>{f}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{position:'absolute',right:14,top:14,left:160,height:120}}>
+        <Shot which="reminders_classic_list" size="contain" origin="center" glowAt="30% 40%"/>
+      </div>
+      <div style={{position:'absolute',right:14,bottom:14,left:160,height:104}}>
+        <Shot which="reminders_classic_alarm" size="contain" origin="center" glowAt="25% 35%"/>
       </div>
     </div>
   );
@@ -1755,6 +1793,7 @@ const ONLY_COMPONENTS = {
   poisons:  { Comp: PoisonsThumb,       w: 460, h: 260 },
   seals:    { Comp: SealsThumb,         w: 460, h: 260 },
   reminders: { Comp: RemindersThumb,    w: 460, h: 260 },
+  reminders_classic: { Comp: RemindersClassicThumb, w: 460, h: 260 },
   gear:     { Comp: GearThumb,          w: 460, h: 260 },
   ui:       { Comp: UIThumb,            w: 460, h: 260 },
   travel:   { Comp: TravelThumb,        w: 460, h: 260 },
@@ -1835,6 +1874,7 @@ function App() {
       <Artboard id="beasts-thumb" label="Wick's Beasts and Things" w={460} h={260} Component={BeastsThumb}/>
       <Artboard id="demons-thumb" label="Wick's Demons and Things" w={460} h={260} Component={DemonsThumb}/>
       <Artboard id="reminders-thumb" label="Wick's Reminders" w={460} h={260} Component={RemindersThumb}/>
+      <Artboard id="reminders-classic-thumb" label="Wick's Reminders (Classic look)" w={460} h={260} Component={RemindersClassicThumb}/>
       <Artboard id="gear-thumb" label="Wick's Gear" w={460} h={260} Component={GearThumb}/>
       <Artboard id="ui-thumb" label="Wick's UI" w={460} h={260} Component={UIThumb}/>
       <Artboard id="travel-thumb" label="Wick's Travel Form" w={460} h={260} Component={TravelThumb}/>
