@@ -115,7 +115,11 @@ def main():
                     print(f"-- style {style}")
                 ok = run(HERE + "/ui-harness.lua", mode, args.core, BETA_ADDONS + "/WicksUI", mode, stub, lua51=True) and ok
         elif args.suite:
-            ok = run(HERE + "/suite-harness.lua", mode, args.core, ANNIV_ADDONS, mode, stub) and ok
+            for style in (["og", "modern", "classic"] if args.styles else [""]):
+                os.environ["WICK_STYLE"] = style
+                if style:
+                    print(f"-- style {style}")
+                ok = run(HERE + "/suite-harness.lua", mode, args.core, ANNIV_ADDONS, mode, stub) and ok
         elif args.gear:
             ok = run(HERE + "/gear-harness.lua", mode, args.core, BETA_ADDONS, mode, stub) and ok
         elif args.probe:
