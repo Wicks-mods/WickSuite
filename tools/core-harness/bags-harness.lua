@@ -126,6 +126,31 @@ if slotWithCd then
     check(slotWithCd._cd.__mouseEnabled == false,
         "its cooldown overlay does not take the click meant for the item under it")
 end
+-- The game's cooldown numbers are sized for an action button; in a bag slot
+-- "49m" ran into the next slot, and two items on a shared cooldown side by
+-- side read "49m49m". The countdown draws in a font sized to the slot.
+S.ITEM_COOLDOWNS[6948] = { GetTime() + 1, 3600 }
+WB.Bag:Show()
+WB.Bag:Refresh()
+local onCd, fitted, worst = 0, 0, 0
+for _, b in ipairs(S.frames) do
+    if b.__name and b.__name:find("WicksBagsSlot") and b._cd and b._itemID == 6948 and b._cd:IsShown() then
+        onCd = onCd + 1
+        local font = b._cd.__countdownFont and S.FONTS[b._cd.__countdownFont]
+        local px
+        if font then px = select(2, font:GetFont()) end
+        if px then
+            worst = math.max(worst, px)
+            -- "49m" in Arial Narrow is about 1.6 em wide; it must sit inside the slot.
+            if px * 1.6 <= ((b._host or b):GetWidth() or 32) then fitted = fitted + 1 end
+        end
+    end
+end
+check(onCd > 0, "an item on cooldown draws its swirl (" .. onCd .. " slots)")
+check(onCd > 0 and fitted == onCd, "its countdown is in a font that fits the slot (" .. worst .. "px)")
+S.ITEM_COOLDOWNS[6948] = nil
+WB.Bag:Refresh()
+WB.Bag:Hide()
 WB.Bank.panel._buyBtn.__scripts.OnClick()
 if MODERN then
     check(S.PURCHASED_TAB == nil, "buy tab never calls the restricted C_Bank.PurchaseBankTab")

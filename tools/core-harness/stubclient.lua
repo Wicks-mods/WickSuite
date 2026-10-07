@@ -196,6 +196,7 @@ local function newMock(kind, name)
             end
         elseif k == "SetShown" then return function(_, v) if v then t:Show() else t:Hide() end end
         elseif k == "SetSize" then return function(_, w, h) t.__w, t.__h = w, h end
+        elseif k == "SetCountdownFont" then return function(_, name) t.__countdownFont = name end
         elseif k == "SetWidth" then return function(_, w) t.__w = w end
         elseif k == "SetWordWrap" then return function(_, v) t.__wordWrap = v and true or false end
         elseif k == "SetHeight" then return function(_, h) t.__h = h end
@@ -431,7 +432,7 @@ function CreateFrame(kind, name, parent, template)
         parent.__children[#parent.__children + 1] = f
     end
     f.__template = template
-    if name then _G[name] = f end
+    if name then S.FONTS[name] = f; _G[name] = f end
     -- TBC Anniversary keeps the XML item button, whose regions are globals
     -- named after the button; the intrinsic is Forever's.
     if MODERN and not TBC and (kind == "ItemButton" or (template and ITEM_BUTTON_TEMPLATES[template])) then
@@ -842,7 +843,30 @@ function GetWeaponEnchantInfo()
     return out[1], out[2], out[3], out[4], out[5], out[6], out[7], out[8],
            out[9], out[10], out[11], out[12]
 end
-function GetItemCooldown() return 0, 0, 1 end
+-- An item on cooldown: a check puts one in S.ITEM_COOLDOWNS[itemID] = { start, duration }.
+S.ITEM_COOLDOWNS = {}
+local function itemCooldown(id)
+    local cd = S.ITEM_COOLDOWNS[tonumber(id) or id]
+    if cd then return cd[1], cd[2], 1 end
+    return 0, 0, 1
+end
+S.itemCooldown = itemCooldown
+function GetItemCooldown(id) return itemCooldown(id) end
+-- A font object: what a check asks of it is its name and the font it was given.
+S.FONTS = {}
+function CreateFont(name)
+    local f = { __name = name, __font = nil }
+    function f:GetName() return self.__name end
+    function f:SetFont(path, size, flags) self.__font = { path, size, flags } end
+    function f:GetFont() local x = self.__font or {} return x[1], x[2], x[3] end
+    function f:SetTextColor() end
+    function f:SetShadowColor() end
+    function f:SetShadowOffset() end
+    -- Anything else a font object takes is accepted and ignored.
+    setmetatable(f, { __index = function() return function() end end })
+    if name then S.FONTS[name] = f; _G[name] = f end
+    return f
+end
 function PlaySound() end
 SOUNDKIT = { UI_AUTOLOOT_COMPLETE = 798 }
 BOOKTYPE_SPELL = "spell"
@@ -1240,7 +1264,7 @@ if MODERN then
         end,
         GetItemSpell = function() return "Hearth", 8690 end,
         GetItemQualityColor = function(q) return 1, 1, 1, "|cffffffff" end,
-        GetItemCooldown = function() return 0, 0, 1 end,
+        GetItemCooldown = function(id) return S.itemCooldown(id) end,
         GetWeaponEnchantInfo = function(slot)
             if S.TEMPENCH_API and S.TEMPENCH_API.item == false then return nil end
             local e = S.TEMPENCH[slot]
@@ -1292,7 +1316,7 @@ if MODERN then
         UseContainerItem = function() end,
         PickupContainerItem = function() end,
         ContainerIDToInventoryID = function(bag) return 19 + bag end,
-        GetItemCooldown = function() return 0, 0, 1 end,
+        GetItemCooldown = function(id) return S.itemCooldown(id) end,
         SortBags = function() S.SORTED = (S.SORTED or 0) + 1 end,
         SortBank = function() S.SORTED_BANK = (S.SORTED_BANK or 0) + 1 end,
     }
@@ -1425,7 +1449,7 @@ if MODERN then
             return C_ClassTalents.ImportLoadout(self:GetConfigID(), {}, name, text)
         end,
     }
-    C_Item.GetItemCooldown = function() return 0, 0, 1 end
+    C_Item.GetItemCooldown = function(id) return S.itemCooldown(id) end
     Settings = {
         RegisterCanvasLayoutCategory = function(f, n) return { ID = "cat:" .. n, GetID = function(s) return s.ID end } end,
         RegisterCanvasLayoutSubcategory = function(root, f, n) return { ID = "sub:" .. n, GetID = function(s) return s.ID end } end,
@@ -1464,7 +1488,7 @@ if not MODERN or TBC then
     function GetItemStats(link) return { ITEM_MOD_STAMINA_SHORT = 10 } end
     function GetItemSpell() return "Hearth", 8690 end
     function GetItemQualityColor(q) return 1, 1, 1, "|cffffffff" end
-    function GetItemCooldown() return 0, 0, 1 end
+    function GetItemCooldown(id) return S.itemCooldown(id) end
     function GetPetHappiness() return PET.happiness, PET.damage, PET.rate end
     function GetPetLoyalty() return PET.loyalty end
     function GetPetTrainingPoints() return PET.total, PET.used end
