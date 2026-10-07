@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- Promo layout: one frame of Wick's Mods marketing chrome (OG: void
+     ground, 1px muted-purple border, fel L-brackets, flame-as-i wordmark)
+     with a hole where render.mjs lays the footage. Driven by the URL hash:
+     #{"w":1080,"h":1920,"addon":"UI","kicker":"...","caption":"...","hole":[x,y,w,h],"end":false} -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #0D0A14; }
+  #art { position: relative; background: #0D0A14; overflow: hidden; color: #D4C8A1; }
+  .br { position: absolute; width: var(--arm); height: var(--arm); border: 0 solid #4FC778; }
+  .tl { top: 0; left: 0; border-top-width: var(--th); border-left-width: var(--th); }
+  .tr { top: 0; right: 0; border-top-width: var(--th); border-right-width: var(--th); }
+  .bl { bottom: 0; left: 0; border-bottom-width: var(--th); border-left-width: var(--th); }
+  .brr { bottom: 0; right: 0; border-bottom-width: var(--th); border-right-width: var(--th); }
+  .box { position: absolute; border: 1px solid #383058; box-sizing: border-box; }
+  .wm { font-family: 'Cinzel', serif; font-weight: 900; letter-spacing: -0.04em; line-height: 1; white-space: nowrap; color: #D4C8A1; }
+  .wm svg { height: 1.08em; width: 0.475em; vertical-align: -0.05em; margin: 0 -0.06em;
+    filter: drop-shadow(0 0.025em 0.05em rgba(0,0,0,.55)) drop-shadow(0 0 0.08em rgba(79,199,120,.35)); }
+  .wm .apo { color: #4FC778; }
+  .wm .name { color: #4FC778; letter-spacing: 0.02em; margin-left: 0.25em; }
+  .kicker { font: 700 var(--k) 'Space Mono', monospace; letter-spacing: 0.32em; color: #4FC778; text-transform: uppercase; }
+  .cap { font-family: 'Cinzel', serif; font-weight: 700; color: #D4C8A1; line-height: 1.15; }
+  .foot { font: 400 var(--f) 'Space Mono', monospace; color: #8C8270; letter-spacing: 0.06em; }
+  .foot b { color: #4FC778; font-weight: 700; }
+  .center { position: absolute; left: 0; right: 0; text-align: center; }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="flame-i" viewBox="20 0 40 91">
+    <rect x="38" y="52" width="4" height="36" fill="#4FC778" opacity="0.5"/>
+    <ellipse cx="40" cy="88" rx="18" ry="5" fill="#4FC778" opacity="0.15"/>
+    <rect x="22" y="83" width="36" height="8" rx="1" fill="#383058"/>
+    <path d="M40 8 C40 8, 58 30, 58 50 C58 63.8, 50.1 72, 40 72 C29.9 72, 22 63.8, 22 50 C22 30, 40 8 Z" fill="#4FC778" opacity="0.2"/>
+    <path d="M40 18 C40 18, 52 36, 52 50 C52 59.9, 46.6 66, 40 66 C33.4 66, 28 59.9, 28 50 C28 36, 40 18 Z" fill="#4FC778" opacity="0.5"/>
+    <path d="M40 28 C40 28, 47 40, 47 50 C47 54.9, 43.9 58, 40 58 C36.1 58, 33 54.9, 33 50 C33 40, 40 28 Z" fill="#4FC778" opacity="0.9"/>
+    <path d="M40 36 C40 36, 43.5 43, 43.5 50 C43.5 52.8, 42 54.5, 40 54.5 C38 54.5, 36.5 52.8, 36.5 50 C36.5 43, 40 36 Z" fill="#D4C8A1" opacity="0.85"/>
+    <circle cx="40" cy="52" r="2" fill="#4FC778"/>
+  </symbol></defs></svg>
+<div id="art"></div>
+<script>
+const p = JSON.parse(decodeURIComponent(location.hash.slice(1) || '{}'));
+const W = p.w || 1080, H = p.h || 1920, s = W / 1080;   // sizes are designed at 1080 wide
+const art = document.getElementById('art');
+art.style.width = W + 'px'; art.style.height = H + 'px';
+art.style.setProperty('--arm', 22 * s + 'px'); art.style.setProperty('--th', 3 * s + 'px');
+art.style.setProperty('--k', 26 * s + 'px'); art.style.setProperty('--f', 28 * s + 'px');
+const flame = '<svg width="40" height="91"><use href="#flame-i"/></svg>';
+const wordmark = (size, name) => `<div class="wm" style="font-size:${size}px">W${flame}ck<span class="apo">'</span>s${name ? `<span class="name">${name}</span>` : ''}</div>`;
+const add = html => art.insertAdjacentHTML('beforeend', html);
+// outer chrome: a 1px border inset from the edge, brackets on its corners
+const inset = 24 * s;
+add(`<div class="box" style="left:${inset}px;top:${inset}px;right:${inset}px;bottom:${inset}px">
+  <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>`);
+if (p.end) {
+  add(`<div class="center" style="top:${H * 0.30}px">${'<div style="display:inline-block">' + wordmark(150 * s, p.addon) + '</div>'}</div>`);
+  add(`<div class="center kicker" style="top:${H * 0.30 + 210 * s}px">${p.kicker || 'Free on CurseForge'}</div>`);
+  add(`<div class="center cap" style="top:${H * 0.30 + 300 * s}px;font-size:${60 * s}px">${p.caption || 'wicksmods.com'}</div>`);
+} else {
+  const [hx, hy, hw, hh] = p.hole;
+  // the header hangs above the footage
+  const head = Math.max(110 * s, hy - 300 * s);
+  add(`<div class="center kicker" style="top:${head}px">${p.kicker || "Wick's Mods"}</div>`);
+  add(`<div class="center" style="top:${head + 50 * s}px"><div style="display:inline-block">${wordmark(110 * s, p.addon)}</div></div>`);
+  // the footage frame: border + brackets drawn just outside the hole
+  const g = 10 * s;
+  add(`<div class="box" style="left:${hx - g}px;top:${hy - g}px;width:${hw + 2 * g}px;height:${hh + 2 * g}px">
+    <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>`);
+  if (p.caption) add(`<div class="center cap" style="top:${hy + hh + 70 * s}px;font-size:${68 * s}px;padding:0 ${80 * s}px">${p.caption}</div>`);
+  add(`<div class="center foot" style="bottom:${90 * s}px"><b>&gt;</b> wicksmods.com &middot; free on CurseForge</div>`);
+}
+document.fonts.ready.then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
