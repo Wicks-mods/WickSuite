@@ -3,11 +3,14 @@
 //
 // EDL: { source, format: "vertical"|"landscape"|"square", addon, kicker,
 //        shots: [{ in, out, crop: [x,y,w,h], speed, caption }],
-//        end: { kicker, caption } | false, out }
+//        end: { kicker, caption } | false, out,
+//        music: { file, start, volume } }   (file in design-handoff/music)
 // Times are seconds or "m:ss.s". Each shot's footage is cropped to the
 // addon, scaled into the layout's hole, and laid over a frame of Wick's Mods
-// chrome rendered from layout.html; an end card closes it. Silent audio
-// track (music bed comes later), H.264 for every platform.
+// chrome rendered from layout.html; an end card closes it. With "music",
+// a track from design-handoff/music plays under it (faded in and out) and
+// its CC BY credit line is written to <out>.credits.txt for the post.
+// H.264 + AAC for every platform.
 
 import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
@@ -84,5 +87,21 @@ await browser.close();
 const list = path.join(work, "list.txt");
 fs.writeFileSync(list, parts.map(p => `file '${p.replace(/\\/g, "/")}'`).join("\n"));
 const final = path.resolve(path.dirname(edlPath), edl.out || path.basename(edlPath, ".json") + ".mp4");
-ff(["-f", "concat", "-safe", "0", "-i", list, "-c", "copy", "-movflags", "+faststart", final]);
+const joined = edl.music ? path.join(work, "joined.mp4") : final;
+ff(["-f", "concat", "-safe", "0", "-i", list, "-c", "copy", "-movflags", "+faststart", joined]);
+
+if (edl.music) {
+  const musicDir = path.join(here, "..", "..", "..", "design-handoff", "music");
+  const file = path.resolve(musicDir, edl.music.file);
+  const dur = parseFloat(execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", joined]).toString());
+  const vol = edl.music.volume ?? 0.8;
+  ff(["-i", joined, "-ss", String(edl.music.start || 0), "-i", file, "-filter_complex",
+    `[1:a]atrim=0:${dur},asetpts=PTS-STARTPTS,afade=t=in:d=0.4,afade=t=out:st=${Math.max(0, dur - 1.8)}:d=1.8,volume=${vol}[a]`,
+    "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", final]);
+  // The CC BY credit line, from the library's ATTRIBUTION.md row for this file.
+  const row = fs.readFileSync(path.join(musicDir, "ATTRIBUTION.md"), "utf8").split(/\r?\n/).find(l => l.includes(edl.music.file));
+  const credit = row ? row.split("|").map(c => c.trim()).filter(Boolean).pop() : `Music: ${edl.music.file}`;
+  fs.writeFileSync(final.replace(/\.mp4$/, ".credits.txt"), credit + "\n");
+  console.log("credit:", credit);
+}
 console.log("wrote", final);
