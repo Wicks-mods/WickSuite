@@ -25,6 +25,9 @@ LOOKS = {
     "Arena":       ("ARENA", "BarlowCondensed-Bold.ttf", "FF5263"),
     "Foundry":     ("FOUNDRY", "Tektur-SemiBold.ttf", "FF8A1F"),
     "Frost":       ("FROST", "Michroma-Regular.ttf", "8FD3FF"),
+    "Crisp":       ("Crisp", "PT_Sans-Narrow-Web-Bold.ttf", "EDEDED"),
+    # The game's own font is not ours to ship; Cinzel (bold) stands in.
+    "Classic":     ("CLASSIC", r"C:\Users\jspli\AppData\Local\Microsoft\Windows\Fonts\Cinzel-VariableFont_wght.ttf#Bold", "FFD100"),
 }
 
 
@@ -33,10 +36,14 @@ def rgb(h):
 
 
 def fit_font(path, text, width):
-    """The largest size at which the text spans about the given width."""
+    """The largest size at which the text spans about the given width.
+    A variable font names its weight after a #: "Font.ttf#Bold"."""
+    path, _, weight = path.partition("#")
     size = 40
     while True:
         f = ImageFont.truetype(path, size)
+        if weight:
+            f.set_variation_by_name(weight)
         l, t, r, b = f.getbbox(text)
         if r - l >= width or size > 900:
             return f

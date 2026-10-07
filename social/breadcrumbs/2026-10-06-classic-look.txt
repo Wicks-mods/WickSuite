@@ -1,0 +1,15 @@
+== facebook ==
+The classic look you love now comes with the features you love from Wick's.
+
+Wick's UI 0.11.0 adds a look called Classic. Your windows, bags, buttons, unit frames, party frames and nameplates are drawn in the game's own art, so the screen looks the way you know it. Everything Wick's UI does still runs underneath: threat on your plates, hit numbers, quest marks, frames that fade until you need them, info panels and the rest.
+
+It works on WoW Forever and TBC Classic Anniversary, each in that client's own style. Pick Classic under Wick's Mods in the game's Options. Or keep the look you have and give only your unit frames and nameplates the Classic look.
+
+Free on CurseForge: https://www.curseforge.com/wow/addons/wicks-ui
+
+== x ==
+The classic look you love now comes with the features you love from Wick's. Wick's UI 0.11.0 adds Classic: the game's own windows, bags and frames, with threat, hit numbers and fading frames underneath.
+
+https://wicksmods.com/ui
+
+#WoWForever #TBCClassic

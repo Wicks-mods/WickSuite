@@ -244,6 +244,7 @@ const SHOTS = {
   ui_Foundry:     'images/ui/screenshots/looks/Foundry.png',
   ui_Frost:       'images/ui/screenshots/looks/Frost.png',
   ui_Crisp:       'images/ui/screenshots/looks/Crisp.png',
+  ui_Classic:     'images/ui/screenshots/looks/Classic.png',
 };
 function Shot({ which, style={}, accent=G, size='auto', origin='left top', glowAt='20% 25%' }) {
   return (
@@ -815,7 +816,7 @@ function GearThumb() {
 
 // Wick's UI: the looks are the selling point, so the right side is four of
 // them, the collage's titled screenshots, in a grid.
-const UI_THUMB_LOOKS = ['WicksModern', 'Rebel', 'Hologram', 'Gilded'];
+const UI_THUMB_LOOKS = ['WicksModern', 'Classic', 'Rebel', 'Hologram'];
 function UIThumb() {
   return (
     <div style={{width:460,height:260,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
@@ -850,7 +851,7 @@ function UIThumb() {
           ))}
         </div>
         <div style={{fontFamily:FM,fontSize:6.5,letterSpacing:'0.28em',color:MDIM,textAlign:'center',textTransform:'uppercase'}}>
-          Nine looks <span style={{color:G}}>&middot;</span> or your own
+          Ten looks <span style={{color:G}}>&middot;</span> or your own
         </div>
       </div>
     </div>
@@ -1151,7 +1152,7 @@ const SOCIAL = {
   poisons: { label: 'POISONS AND THINGS', title: true, tagline: 'The rogue kit: coatings, combo points and weapon swaps.', features: ['What coats each blade, and how long is left', 'One key per hand to recoat', 'Combo points over your target, energy under them', 'Weapon swap keys for a dagger opener'] },
   seals: { label: 'SEALS AND THINGS', title: true, tagline: 'The paladin kit: the seal key, blessings and weapon swaps.', features: ['One seal key: Crusader, fighting seal and back', 'A blessing key, friend first', 'Two-hander and sword-and-board swap keys', 'Talents, checklist and racials'] },
   reminders: { label: 'REMINDERS', title: true, tagline: 'Set it once. It keeps counting, even while you are logged out.', features: ['Timers, alarms and event reminders', 'Anything missed goes off when you log in', 'Snooze or Done on every alert', 'TBC Anniversary and Forever'] },
-  ui: { label: 'UI', title: true, tagline: 'The whole interface, in one look.', features: ['Bars, frames, nameplates and chat', "The game's own windows, dressed to match", 'Nine looks, full customization', 'Take the tour at wicksmods.com/ui'] },
+  ui: { label: 'UI', title: true, tagline: 'The whole interface, in one look.', features: ['Bars, frames, nameplates and chat', "The game's own windows, dressed to match", 'Ten looks, Classic among them', 'Take the tour at wicksmods.com/ui'] },
 };
 
 // 1200x630, which is what Facebook asks for and what a boosted post
@@ -1205,7 +1206,7 @@ function AddonSocial({ which }) {
               ))}
             </div>
             <div style={{fontFamily:FM,fontSize:14,letterSpacing:'0.3em',color:MDIM,textAlign:'center',textTransform:'uppercase'}}>
-              Nine looks <span style={{color:G}}>&middot;</span> or your own
+              Ten looks <span style={{color:G}}>&middot;</span> or your own
             </div>
           </div>
         ) : which === 'reminders' ? (
@@ -1225,7 +1226,7 @@ function AddonSocial({ which }) {
 /* ── Wick's UI · the looks ──────────────────────
    A gallery card for the CurseForge page: every look Wick's UI (and the
    suite) can wear, each a real screenshot titled in the look's own font. */
-const UI_LOOKS = ['WicksModern', 'WicksOG', 'Hologram', 'Rebel', 'Gilded', 'Arena', 'Foundry', 'Frost', 'Crisp'];
+const UI_LOOKS = ['WicksModern', 'WicksOG', 'Classic', 'Hologram', 'Rebel', 'Gilded', 'Arena', 'Foundry', 'Frost', 'Crisp'];
 // The main parts, two lines across the top of the screenshots.
 const UI_FEATURES = [
   ['Unit frames', 'Nameplates', 'Action bars', 'Threat meter', 'Window skins', 'Chat', 'Minimap', 'Tooltips'],
@@ -1507,8 +1508,8 @@ function Milestone({ n = MILESTONE.n, eyebrow = MILESTONE.eyebrow,
 const BREADCRUMB = {
   label: 'UI',
   eyebrow: 'NEW LOOK: CLASSIC',
-  title: "Wick's UI can now look like the game's own interface.",
-  points: ["The game's windows, buttons and bags", 'Its unit frames, party frames and plates', 'On WoW Forever and TBC Anniversary', 'Unit frames can take a look of their own'],
+  title: "The classic look you love now comes with the features you love from Wick's.",
+  points: ["The game's own windows, bags and frames", 'Threat, hit numbers and fading frames stay', 'On WoW Forever and TBC Anniversary', 'Or give only your unit frames the look'],
   foot: 'wicksmods.com/ui',
   shot: 'images/ui/screenshots/classic.png',
   aspect: 1028 / 658,
