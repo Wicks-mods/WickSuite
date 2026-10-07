@@ -2910,6 +2910,25 @@ if ns:Game() then
             check(pl.Health:GetStatusBarTexture() and pl.Health.bg and not pl.Health.bg:IsShown(),
                 "Classic on Forever: the bars are clipped to the art, with no backing of ours")
         end
+        -- The party in the game's own frames, stacked as the game stacks them.
+        local PL = UF:GameLayout("party")
+        pcall(function() ns.UnitGroups:Layout("party") end)
+        local hw, hh = ns.UnitGroups.holders.party:GetSize()
+        do
+            -- A plate's debuff in the game's art: its mask, its ring, its
+            -- sweep and count, drawn on a button the client made.
+            local NPm = ns.Nameplates
+            local btn = CreateFrame("Button", nil, UIParent)
+            btn:SetSize(19, 19)
+            btn.Icon = btn:CreateTexture()
+            btn.Cooldown = CreateFrame("Cooldown", nil, btn)
+            btn.Count = btn:CreateFontString()
+            btn.Time = btn:CreateFontString()
+            local okA, errA = pcall(NPm.GameAura, NPm, btn, NPm:GameAuraSize())
+            check(okA and NPm:GameAuraSize() == (tbc and 25 or 19), "Classic: a plate's debuff takes the game's art at the game's size: " .. tostring(errA or ""))
+        end
+        check(PL and hw == PL.w and hh == PL.h * 5 + PL.gap * 4,
+            "Classic: the party holder is five of the game's party frames, the game's gap apart: " .. tostring(hw) .. "x" .. tostring(hh))
     end
     do
         -- The template's art is drawn for its own size; at the bar's size
