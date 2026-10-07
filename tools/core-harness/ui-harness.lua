@@ -2952,6 +2952,30 @@ if ns:Game() then
     end
 end
 
+io.write("== unit frames in a look of their own ==\n")
+do
+    local Ch = ns.Core.Chrome
+    local suite = Ch:StyleID()
+    local other = suite == "classic" and "modern" or "classic"
+    local g = ns:G()
+    g.unitFrameLook = other
+    local inside = ns:InUFLook(function() return Ch:StyleID() end)
+    check(inside == other and Ch:StyleID() == suite and Ch.forceStyle == nil,
+        "the unit frames draw in their own look, and the suite stays in its own: " .. tostring(inside) .. " / " .. tostring(Ch:StyleID()))
+    local okE = pcall(ns.InUFLook, ns, function() error("boom") end)
+    check(not okE and Ch.forceStyle == nil and Ch:StyleID() == suite, "an error in their look leaves the suite's look in force")
+    -- A plate made now is made in their look.
+    local oUF = ns.oUF
+    oUF:SetActiveStyle("WicksUI_Nameplate")
+    local okP, p = pcall(oUF.Spawn, oUF, "target", "WicksUI_TestPlateOwnLook")
+    oUF:SetActiveStyle("WicksUI")
+    local classicPlate = okP and p and p.wuiGameNP ~= nil
+    check(okP and classicPlate == (other == "classic"),
+        "a plate made while the unit frames have their own look is made in it: " .. tostring(not okP and p or classicPlate))
+    g.unitFrameLook = nil
+    check(ns:InUFLook(function() return Ch:StyleID() end) == suite, "set back, they follow the suite's look")
+end
+
 io.write("== slash ==\n")
 check(type(SlashCmdList.WICK_WICKSUI) == "function", "/wui registered")
 local okS, errS = pcall(SlashCmdList.WICK_WICKSUI, "help")
