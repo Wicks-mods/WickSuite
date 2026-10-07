@@ -105,4 +105,28 @@ d.polygon([(12.2 * K, 4 * K), (19.8 * K, 4 * K), (18.2 * K, 20 * K), (13.8 * K, 
 d.ellipse([12.2 * K, 2.2 * K, 19.8 * K, 7.4 * K], fill=(255, 255, 255, 255))
 d.ellipse([12.6 * K, 23 * K, 19.4 * K, 29.8 * K], fill=(255, 255, 255, 255))
 save(img, "quest")
+
+
+# Speaker: the minimap's volume button. A box and its cone, then sound
+# waves for how loud (none, one, two), or a cross for muted.
+def speaker(name, waves=0, mute=False):
+    img, d = canvas()
+    d.rounded_rectangle([5 * K, 12 * K, 10.5 * K, 20 * K], radius=1 * K, fill=(255, 255, 255, 255))
+    d.polygon([(10 * K, 12 * K), (16 * K, 6.5 * K), (16 * K, 25.5 * K), (10 * K, 20 * K)], fill=(255, 255, 255, 255))
+    for r in (5.5, 10)[:waves]:
+        pts = []
+        for i in range(13):
+            a = math.radians(-48 + i * 8)
+            pts.append((16 + math.cos(a) * r, 16 + math.sin(a) * r))
+        line(d, pts)
+    if mute:
+        line(d, [(20.5, 12.5), (27.5, 19.5)])
+        line(d, [(27.5, 12.5), (20.5, 19.5)])
+    save(img, name)
+
+
+speaker("speaker-0")
+speaker("speaker-1", waves=1)
+speaker("speaker-2", waves=2)
+speaker("speaker-mute", mute=True)
 print("ok")

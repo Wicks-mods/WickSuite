@@ -2369,6 +2369,60 @@ do
     MM:Shape()
     end
     _G.GameTimeFrame, _G.MiniMapTrackingDropDown = nil, nil
+
+    -- The volume speaker on the map's edge: a click mutes the game, the
+    -- wheel turns the master volume, and the picture follows the sound.
+    local vol = rawget(_G, "WicksUI_MinimapVolume")
+    check(vol and vol:GetParent() == Minimap and vol:IsShown(), "the volume speaker sits on the map")
+    local function cv(n) return C_CVar.GetCVar(n) end
+    C_CVar.SetCVar("Sound_EnableAllSound", "1")
+    C_CVar.SetCVar("Sound_MasterVolume", "0.5")
+    MM:UpdateVolume()
+    check(vol.glyph == "speaker-2", "at half volume it shows two waves: " .. tostring(vol.glyph))
+    vol:GetScript("OnClick")(vol, "LeftButton")
+    check(cv("Sound_EnableAllSound") == "0" and vol.glyph == "speaker-mute", "a click mutes the game")
+    vol:GetScript("OnMouseWheel")(vol, -1)
+    check(cv("Sound_MasterVolume") == "0.45" and cv("Sound_EnableAllSound") == "0",
+        "the wheel down turns it down a notch and leaves it muted: " .. tostring(cv("Sound_MasterVolume")))
+    vol:GetScript("OnMouseWheel")(vol, 1)
+    check(cv("Sound_MasterVolume") == "0.50" and cv("Sound_EnableAllSound") == "1" and vol.glyph == "speaker-2",
+        "the wheel up turns it up and brings the sound back")
+    vol:GetScript("OnClick")(vol, "LeftButton")
+    vol:GetScript("OnClick")(vol, "LeftButton")
+    check(cv("Sound_EnableAllSound") == "1", "a second click unmutes")
+    C_CVar.SetCVar("Sound_MasterVolume", "0.03")
+    vol:GetScript("OnMouseWheel")(vol, -1)
+    check(cv("Sound_MasterVolume") == "0.00" and vol.glyph == "speaker-0", "it stops at silent, with no waves")
+    C_CVar.SetCVar("Sound_MasterVolume", "0.3")
+    MM:UpdateVolume()
+    check(vol.glyph == "speaker-1", "quiet shows one wave")
+    C_CVar.SetCVar("Sound_MasterVolume", "0.98")
+    vol:GetScript("OnMouseWheel")(vol, 1)
+    check(cv("Sound_MasterVolume") == "1.00", "and stops at full")
+    local okT = pcall(vol:GetScript("OnEnter"), vol)
+    check(okT, "its tooltip builds")
+    vol:GetScript("OnLeave")(vol)
+    MM:PlaceVolume()
+    local vp, vrel, _, vx, vy = vol:GetPoint(1)
+    local half = Minimap:GetWidth() / 2
+    if GetMinimapShape() == "SQUARE" then
+        check(vp == "CENTER" and vrel == Minimap and vx > 0 and vx < half and math.abs(vy) < 0.01,
+            "on the square map it sits inside the right edge: " .. tostring(vx))
+    else
+        check(vp == "CENTER" and vrel == Minimap and vx > half and math.abs(vy) < 0.01,
+            "on the round map it sits just outside the right edge: " .. tostring(vx))
+    end
+    d.volumeAngle = 90
+    MM:PlaceVolume()
+    local _, _, _, ux, uy = vol:GetPoint(1)
+    check(math.abs(ux) < 0.01 and uy > 0, "its angle moves it round the edge, to the top at 90")
+    d.volumeAngle = 0
+    d.volume = false
+    MM:PlaceVolume()
+    check(not vol:IsShown(), "switched off, the speaker goes")
+    d.volume = true
+    MM:PlaceVolume()
+    C_CVar.SetCVar("Sound_MasterVolume", "1.0")
 end
 
 io.write("== keybinds ==\n")
