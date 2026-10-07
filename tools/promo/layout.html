@@ -47,6 +47,29 @@ art.style.setProperty('--k', 26 * s + 'px'); art.style.setProperty('--f', 28 * s
 const flame = '<svg width="40" height="91"><use href="#flame-i"/></svg>';
 const wordmark = (size, name) => `<div class="wm" style="font-size:${size}px">W${flame}ck<span class="apo">'</span>s${name ? `<span class="name">${name}</span>` : ''}</div>`;
 const add = html => art.insertAdjacentHTML('beforeend', html);
+// A plate: void panel, 1px border, fel brackets. *word* in text turns fel.
+const plate = (x, y, w, html, pad) => `<div class="box" style="left:${x}px;top:${y}px;width:${w}px;padding:${pad}px;background:rgba(13,10,20,.82)">
+  <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span>${html}</div>`;
+const fel = t => String(t).replace(/\*([^*]+)\*/g, '<span style="color:#4FC778">$1</span>');
+
+if (p.overlay) {
+  // Full-bleed overlay: transparent except a corner brand mark, the caption
+  // plate (or the bigger hook), and a frame round a blown-up "fit" region.
+  document.documentElement.style.background = document.body.style.background = art.style.background = 'transparent';
+  add(plate(56 * s, 110 * s, 'auto', `<div style="display:inline-block">${wordmark(46 * s, p.addon)}</div>`, 14 * s).replace('width:autopx', 'width:auto'));
+  if (p.frame) {
+    const [fx, fy, fw, fh] = p.frame, g = 8 * s;
+    add(`<div class="box" style="left:${fx - g}px;top:${fy - g}px;width:${fw + 2 * g}px;height:${fh + 2 * g}px">
+      <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>`);
+  }
+  const text = p.hook || p.caption;
+  if (text) {
+    const size = (p.hook ? 92 : 70) * s, w = 900 * s;
+    add(plate((W - w) / 2, (p.hook ? 300 : 330) * s, w, `<div class="cap" style="font-size:${size}px;text-align:center;font-weight:900">${fel(text)}</div>`, 30 * s));
+  }
+  document.fonts.ready.then(() => { document.body.dataset.ready = '1'; });
+  throw 0;   // done: no outer chrome on an overlay
+}
 // outer chrome: a 1px border inset from the edge, brackets on its corners
 const inset = 24 * s;
 add(`<div class="box" style="left:${inset}px;top:${inset}px;right:${inset}px;bottom:${inset}px">
@@ -54,7 +77,7 @@ add(`<div class="box" style="left:${inset}px;top:${inset}px;right:${inset}px;bot
 if (p.end) {
   add(`<div class="center" style="top:${H * 0.30}px">${'<div style="display:inline-block">' + wordmark(150 * s, p.addon) + '</div>'}</div>`);
   add(`<div class="center kicker" style="top:${H * 0.30 + 210 * s}px">${p.kicker || 'Free on CurseForge'}</div>`);
-  add(`<div class="center cap" style="top:${H * 0.30 + 300 * s}px;font-size:${60 * s}px">${p.caption || 'wicksmods.com'}</div>`);
+  add(`<div class="center cap" style="top:${H * 0.30 + 290 * s}px;font-size:${86 * s}px">${p.caption || 'wicksmods.com'}</div>`);
 } else {
   const [hx, hy, hw, hh] = p.hole;
   // the header hangs above the footage

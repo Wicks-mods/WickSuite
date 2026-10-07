@@ -52,12 +52,56 @@ async function frame(params, file) {
   await page.goto("about:blank");
   await page.goto(url, { waitUntil: "networkidle0" });
   await page.waitForSelector("body[data-ready='1']");
-  await (await page.$("#art")).screenshot({ path: file });
+  await (await page.$("#art")).screenshot({ path: file, omitBackground: !!params.overlay });
 }
 
 const ff = args => execFileSync("ffmpeg", ["-v", "error", "-y", ...args], { stdio: "inherit" });
 const parts = [];
+const enc = ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-r", String(FPS), "-c:a", "aac", "-b:a", "128k"];
+
+// Full-bleed style: the footage fills the frame, a transparent overlay adds
+// the corner brand mark and the caption (or the hook on the first shot).
+// A shot's "dur" (seconds, e.g. whole bars of the music) wins over "out".
+//   mode "fill": crop [x,y,w,h] scaled to cover the frame, pushing in from
+//                zoom[0] to zoom[1] (default 1 to 1.06) over the shot.
+//   mode "fit":  crop blown up to the frame width over a blurred, darkened
+//                backdrop of the same moment, framed in brand chrome.
+async function fullbleedShot(i, s) {
+  const a = sec(s.in), speed = s.speed || 1;
+  const dur = s.dur || (sec(s.out) - a) / speed;
+  const [cx, cy, cw, ch] = s.crop;
+  const [z0, z1] = s.zoom || [1, 1.06];
+  const ov = path.join(work, `ov_${i}.png`);
+  let filter, frameRect = null;
+  const src = `[1:v]setpts=(PTS-STARTPTS)/${speed}`;
+  const cover = Math.max(W / cw, H / ch) * 1.005;   // a hair over, so rounding never leaves it short
+  const push = `scale=w='trunc(${cw * cover}*(${z0}+(${z1 - z0})*t/${dur})/2)*2':h=-2:eval=frame:flags=lanczos,crop=${W}:${H}`;
+  if ((s.mode || "fill") === "fill") {
+    filter = `${src},crop=${cw}:${ch}:${cx}:${cy},${push}[v]`;
+  } else {
+    // backdrop: a 9:16 slice centred on the region, blurred and dimmed
+    const bw = Math.min(1920, Math.round(1080 * W / H)), bx = Math.max(0, Math.min(1920 - bw, Math.round(cx + cw / 2 - bw / 2)));
+    const fw = even(W - 2 * Math.round(70 * W / 1080)), fh = even(ch * fw / cw);
+    const fx = (W - fw) / 2, fy = even((H - fh) / 2 + 120 * W / 1080);
+    frameRect = [fx, fy, fw, fh];
+    filter = `${src},split[a][b];[a]crop=${bw}:1080:${bx}:0,scale=${W}:${H},boxblur=24:2,eq=brightness=-0.28[bg];` +
+      `[b]crop=${cw}:${ch}:${cx}:${cy},scale=${fw}:${fh}:flags=lanczos[fg];[bg][fg]overlay=${fx}:${fy}[v]`;
+  }
+  await frame({ overlay: true, addon: edl.addon, hook: s.hook || "", caption: s.caption || "", frame: frameRect }, ov);
+  const out = path.join(work, `part_${i}.mp4`);
+  ff(["-ss", String(a), "-t", String(dur * speed + 0.5), "-i", edl.source, "-loop", "1", "-framerate", String(FPS), "-i", ov,
+    "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo",
+    "-filter_complex", filter.replace("[1:v]", "[0:v]") + `;[v][1:v]overlay=0:0,fps=${FPS},format=yuv420p[o]`,
+    "-map", "[o]", "-map", "2:a", "-t", String(dur), ...enc, out]);
+  return out;
+}
+
 for (const [i, s] of edl.shots.entries()) {
+  if (edl.style === "fullbleed") {
+    parts.push(await fullbleedShot(i, s));
+    console.log(`shot ${i + 1}/${edl.shots.length}: ${s.in} ${s.mode || "fill"} "${s.hook || s.caption || ""}"`);
+    continue;
+  }
   const hole = holeFor(s.crop);
   const bg = path.join(work, `bg_${i}.png`);
   await frame({ addon: edl.addon, kicker: edl.kicker, caption: s.caption || "", hole }, bg);
@@ -78,7 +122,7 @@ if (edl.end !== false) {
   const card = path.join(work, "end.png");
   await frame({ end: true, addon: edl.addon, ...(edl.end || {}) }, card);
   const out = path.join(work, "part_end.mp4");
-  ff(["-loop", "1", "-framerate", String(FPS), "-i", card, "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo", "-t", "2.8",
+  ff(["-loop", "1", "-framerate", String(FPS), "-i", card, "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo", "-t", String((edl.end && edl.end.dur) || 2.8),
     "-vf", "fade=t=in:d=0.3,format=yuv420p", "-c:v", "libx264", "-crf", "18", "-r", String(FPS), "-c:a", "aac", "-b:a", "128k", "-shortest", out]);
   parts.push(out);
 }
