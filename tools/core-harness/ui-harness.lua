@@ -507,6 +507,23 @@ do
     g.styleSizes.otherlook, g.styleSizes[key] = nil, was.snap
 end
 do
+    -- The slider sets the power bar's height in every look. The Modern
+    -- family had clamped it to a 3px line, so the slider did nothing there.
+    local u = A.db.profile.unitframes.units.player
+    local was = u.powerHeight
+    u.powerHeight = 9
+    UF:Configure(UF.frames.player)
+    local got = UF.frames.player.Power and UF.frames.player.Power:GetHeight()
+    if ns:Game() then
+        -- Classic: the game's own frame, at the game's sizes (Classic.lua).
+        check(got ~= 9, "Classic keeps the game's own power bar height: " .. tostring(got))
+    else
+        check(got == 9, "the power bar height slider counts in this look: " .. tostring(got))
+    end
+    u.powerHeight = was
+    UF:Configure(UF.frames.player)
+end
+do
     local got = {}
     local fs = { SetFont = function(_, p, sz) got.p, got.s = p, sz end, SetShadowOffset = function() end, SetShadowColor = function() end }
     ns.Media:SetFont(fs, 12, "OUTLINE", "Wick", true)
