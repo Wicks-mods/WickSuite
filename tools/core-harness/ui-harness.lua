@@ -401,6 +401,17 @@ do
     rawset(cf, "GetFont", function(self) local x = self.__font or {} return x[1], x[2], x[3] end)
     cf:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
     rawset(cf, "GetMaxLines", function() return 0 end)
+    ChatTypeInfo = { SAY = { r = 1, g = 1, b = 1 }, GUILD = { r = 0.25, g = 1, b = 0.25 }, WHISPER = { r = 1, g = 0.5, b = 1 }, PARTY = { r = 0.67, g = 0.67, b = 1 } }
+    S.CHAT_COLORS, S.CLASS_NAMES, S.SENT, S.BN_SENT, S.OPENED_CHAT = {}, {}, {}, {}, {}
+    function ChangeChatColor(t, r, g, b) S.CHAT_COLORS[t] = { r, g, b }; local c = ChatTypeInfo[t] or {}; c.r, c.g, c.b = r, g, b; ChatTypeInfo[t] = c end
+    function SetChatColorNameByClass(t, on) S.CLASS_NAMES[t] = on; if ChatTypeInfo[t] then ChatTypeInfo[t].colorNameByClass = on end end
+    for _, c in pairs(ChatTypeInfo) do c.colorNameByClass = false end
+    function FCF_StartAlertFlash(frame) frame.__alerting = true end
+    function FCF_StopAlertFlash(frame) frame.__alerting = false end
+    function SendChatMessage(msg, kind, lang, target) S.SENT[#S.SENT + 1] = { msg, kind, target } end
+    function BNSendWhisper(id, msg) S.BN_SENT[#S.BN_SENT + 1] = { id, msg } end
+    function ChatFrame_OpenChat(text) S.OPENED_CHAT[#S.OPENED_CHAT + 1] = text end
+    function GetPlayerInfoByGUID(guid) return "Mage", "MAGE" end
     rawset(cf, "SetMaxLines", function() end)
     _G.ChatFrame1 = cf
     _G.CHAT_FRAMES = { "ChatFrame1" }
@@ -470,8 +481,108 @@ if ns.modules.chat:Enabled() then
         "a size picked from the game's menu becomes the setting and survives an update: " .. tostring(d.fontSize) .. " " .. tostring(s4))
     d.fontSize = was
     CH:Update()
+    -- The tab glow switch: off is done through the game's own stop, so
+    -- the tab's own alerting state stays in step with the game.
+    d.tabAlerts = false
+    FCF_StartAlertFlash(f)
+    local stopped = f.__alerting == false
+    d.tabAlerts = true
+    FCF_StartAlertFlash(f)
+    check(stopped and f.__alerting == true, "the tab glow switch works through the game's own start and stop")
+    -- Colours through the game's own chat colours: the game's saved first,
+    -- and put back when the switch goes off.
+    local fel = ns.Core.Chrome.Colors.fel
+    d.channelColors = true; CH:Update()
+    local gc = S.CHAT_COLORS.GUILD
+    local saved = d.gameColors and d.gameColors.GUILD
+    d.channelColors = false; CH:Update()
+    local back = S.CHAT_COLORS.GUILD
+    check(gc and math.abs(gc[1] - fel[1]) < 0.01 and saved and saved[2] == 1 and back and back[2] == 1 and d.gameColors == nil,
+        "the Wick channel colours go through the game's chat colours, and off puts the game's back")
+    d.classNames = "on"; CH:Update()
+    local onAll = S.CLASS_NAMES.SAY == true and S.CLASS_NAMES.GUILD == true
+    d.classNames = "game"; CH:Update()
+    check(onAll, "class colours on names set per chat type through the game")
+    d.timestamps = "%H:%M "; CH:Update()
+    check(S.CVARS.showTimestamps == "%H:%M ", "timestamps through the game's own setting")
+    d.timestamps = "game"; CH:Update()
+    -- The game's own Chat Settings win, and our page follows them.
+    d.timestamps = "%H:%M "; CH:Update()
+    S.CVARS.showTimestamps = "none"
+    CH:SyncFromGame()
+    local tsGame = d.timestamps == "game"
+    d.classNames = "on"; CH:Update()
+    ChatTypeInfo.GUILD.colorNameByClass = false
+    CH:SyncFromGame()
+    local cnGame = d.classNames == "game"
+    d.channelColors = true; CH:Update()
+    ChangeChatColor("WHISPER", 0.1, 0.2, 0.3)
+    d.channelColors = false; CH:Update()
+    local keptTheirs = S.CHAT_COLORS.WHISPER[1] == 0.1 and S.CHAT_COLORS.GUILD[2] == 1
+    check(tsGame and cnGame and keptTheirs,
+        "a change in the game's Chat Settings wins: the page shows the game's setting, and a colour changed there is not put back")
+    -- No send while the client has chat locked down: the line goes to the
+    -- game's own box instead, so no blocked-action warning can come of it.
+    local R = ns.Core.Restrict
+    local was = R.ChatBlocked
+    R.ChatBlocked = function() return true end
+    local nSent, nOpen = #S.SENT, #S.OPENED_CHAT
+    local lw = ns.Whispers:Open("Eve-Realm", { name = "Eve-Realm", kind = "char", lines = {} })
+    ns.Whispers:Send(lw, "later")
+    R.ChatBlocked = was
+    check(#S.SENT == nSent and S.OPENED_CHAT[#S.OPENED_CHAT] == "/w Eve-Realm later",
+        "with chat locked down the whisper goes to the game's own box, never through the send")
+    lw:Hide()
 else
     check(true, "the chat module stands aside in this look")
+end
+
+io.write("== whispers ==\n")
+do
+    local WH = ns.Whispers
+    local d, g = A.db.profile.whispers, A.db.global
+    local function tell(text, who, guid) S.fire("CHAT_MSG_WHISPER", text, who, "", "", "", "", 0, 0, "", 0, 1, guid or "Player-1-ABC") end
+    tell("hi there", "Bob-Realm")
+    local win = WH.windows["Bob-Realm"]
+    local c = g.whispers and g.whispers.convos["Bob-Realm"]
+    check(win and win:IsShown() and c and c.lines[1] and c.lines[1].text == "hi there" and c.lines[1].out == false and c.class == "MAGE",
+        "a whisper opens a window for its sender and is kept, with the sender's class")
+    S.fire("CHAT_MSG_WHISPER_INFORM", "yo", "Bob-Realm")
+    check(c.lines[2] and c.lines[2].out == true and c.lines[2].text == "yo", "a whisper of yours is kept as yours")
+    win.eb:SetText("hey")
+    WH:Send(win, win.eb:GetText())
+    local sent = S.SENT[#S.SENT]
+    check(sent and sent[1] == "hey" and sent[2] == "WHISPER" and sent[3] == "Bob-Realm" and win.eb:GetText() == "",
+        "Enter sends through the game's own whisper, to that person, and clears the line")
+    WH:Send(win, "/dance")
+    check(S.OPENED_CHAT[#S.OPENED_CHAT] == "/dance" and #S.SENT == 1, "a slash command typed there goes to the game's own chat box, not out as a whisper")
+    if S.forever then
+        local before = #c.lines
+        tell(S.SECRET, "Bob-Realm")
+        check(#c.lines == before, "a line the client keeps secret is shown and never kept")
+        tell("psst", S.SECRET)
+        check(WH.windows[S.SECRET] == nil, "a sender the client keeps secret gets no window")
+    end
+    S.fire("CHAT_MSG_BN_WHISPER", "bn hi", "Friend", "", "", "", "", 0, 0, "", 0, 1, "", 42)
+    local bw = WH.windows["bn:42"]
+    check(bw and bw:IsShown(), "a Battle.net whisper opens a window keyed by the account")
+    WH:Send(bw, "bn yo")
+    check(S.BN_SENT[1] and S.BN_SENT[1][1] == 42 and S.BN_SENT[1][2] == "bn yo", "and sends through the Battle.net whisper")
+    d.popup = false
+    tell("quiet", "Carl-Realm")
+    local cc = g.whispers.convos["Carl-Realm"]
+    check(WH.windows["Carl-Realm"] == nil and cc and cc.lines[1].text == "quiet", "with popups off a whisper is kept but opens nothing")
+    d.popup = true
+    d.history = false
+    tell("forget me", "Dan-Realm")
+    check(WH.windows["Dan-Realm"] and #g.whispers.convos["Dan-Realm"].lines == 0, "with history off the window opens and nothing is kept")
+    d.history = true
+    -- A kept conversation comes back into a fresh window with its lines.
+    WH.windows["Bob-Realm"] = nil
+    local again = WH:Open("Bob-Realm", c)
+    check(again and again ~= win and again:IsShown(), "a kept conversation opens again in a window of its own")
+    WH:Clear()
+    check(next(g.whispers.convos) == nil and not again:IsShown(), "forgetting closes the windows and drops the lines")
 end
 
 io.write("== unit frames ==\n")
