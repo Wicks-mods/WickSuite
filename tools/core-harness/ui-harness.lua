@@ -393,6 +393,25 @@ for _, d in pairs(ns.defaults.profile) do
     if type(d) == "table" and d.enable == false then d.enable = true end
 end
 
+-- A chat window, as the client makes it before any addon loads, with the
+-- font calls the chat module and the client's own size menu use.
+do
+    local cf = CreateFrame("ScrollingMessageFrame", "ChatFrame1", UIParent)
+    rawset(cf, "SetFont", function(self, path, size, flags) self.__font = { path, size, flags } end)
+    rawset(cf, "GetFont", function(self) local x = self.__font or {} return x[1], x[2], x[3] end)
+    cf:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
+    rawset(cf, "GetMaxLines", function() return 0 end)
+    rawset(cf, "SetMaxLines", function() end)
+    _G.ChatFrame1 = cf
+    _G.CHAT_FRAMES = { "ChatFrame1" }
+    -- The client's size setter, as the Font Size menu calls it.
+    function FCF_SetChatWindowFontSize(self, chatFrame, fontSize)
+        chatFrame = chatFrame or ChatFrame1
+        local file, _, flags = chatFrame:GetFont()
+        chatFrame:SetFont(file, fontSize, flags)
+    end
+end
+
 io.write("== lifecycle ==\n")
 S.fire("ADDON_LOADED", "WicksUI")
 S.fire("PLAYER_LOGIN")
@@ -426,6 +445,34 @@ check(bar1.buttons[7].__shown ~= false or true, "no layout while in combat")
 COMBAT = false
 S.fire("PLAYER_REGEN_ENABLED")
 check(bar1.buttons[7]:GetAttribute("statehidden") == true, "queued layout applied after combat")
+
+io.write("== chat ==\n")
+if ns.modules.chat:Enabled() then
+    local CH, f, d = ns.Chat, _G.ChatFrame1, A.db.profile.chat
+    local face, size = f:GetFont()
+    check(face == ns.Media:Font(d.font) and size == d.fontSize,
+        "the chat text takes the profile's font and size: " .. tostring(face) .. " " .. tostring(size))
+    -- Something else sets the size; a chat window update puts the
+    -- profile's size back. (The client's update events read the saved
+    -- size and never apply it; only its Font Size menu sets one.)
+    f:SetFont(face, 11, "")
+    S.fire("UPDATE_CHAT_WINDOWS")
+    local _, s2 = f:GetFont()
+    check(s2 == d.fontSize, "a chat window update puts the profile's size back: " .. tostring(s2))
+    -- A size picked from the game's own Font Size menu becomes the setting,
+    -- so it is kept across sessions instead of being put back.
+    local was = d.fontSize
+    FCF_SetChatWindowFontSize(nil, f, 16)
+    local _, s3 = f:GetFont()
+    S.fire("UPDATE_CHAT_WINDOWS")
+    local _, s4 = f:GetFont()
+    check(d.fontSize == 16 and s3 == 16 and s4 == 16,
+        "a size picked from the game's menu becomes the setting and survives an update: " .. tostring(d.fontSize) .. " " .. tostring(s4))
+    d.fontSize = was
+    CH:Update()
+else
+    check(true, "the chat module stands aside in this look")
+end
 
 io.write("== unit frames ==\n")
 local UF = ns.UnitFrames
