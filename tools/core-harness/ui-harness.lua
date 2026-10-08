@@ -489,16 +489,15 @@ if ns.modules.chat:Enabled() then
     d.tabAlerts = true
     FCF_StartAlertFlash(f)
     check(stopped and f.__alerting == true, "the tab glow switch works through the game's own start and stop")
-    -- Colours through the game's own chat colours: the game's saved first,
-    -- and put back when the switch goes off.
-    local fel = ns.Core.Chrome.Colors.fel
-    d.channelColors = true; CH:Update()
-    local gc = S.CHAT_COLORS.GUILD
-    local saved = d.gameColors and d.gameColors.GUILD
-    d.channelColors = false; CH:Update()
-    local back = S.CHAT_COLORS.GUILD
-    check(gc and math.abs(gc[1] - fel[1]) < 0.01 and saved and saved[2] == 1 and back and back[2] == 1 and d.gameColors == nil,
-        "the Wick channel colours go through the game's chat colours, and off puts the game's back")
+    -- The Wick channel colours were taken out. A profile that had them gets
+    -- the game's own colours back once, and keeps no trace of them.
+    d.gameColors = { GUILD = { 0.25, 1, 0.25 } }
+    d.channelColors = true
+    ChangeChatColor("GUILD", 0.31, 0.78, 0.47)
+    CH:Update()
+    local g2 = S.CHAT_COLORS.GUILD
+    check(g2 and g2[1] == 0.25 and g2[2] == 1 and d.gameColors == nil and d.channelColors == nil,
+        "a profile that had the Wick channel colours gets the game's own back, once")
     d.classNames = "on"; CH:Update()
     local onAll = S.CLASS_NAMES.SAY == true and S.CLASS_NAMES.GUILD == true
     d.classNames = "game"; CH:Update()
@@ -515,12 +514,7 @@ if ns.modules.chat:Enabled() then
     ChatTypeInfo.GUILD.colorNameByClass = false
     CH:SyncFromGame()
     local cnGame = d.classNames == "game"
-    d.channelColors = true; CH:Update()
-    ChangeChatColor("WHISPER", 0.1, 0.2, 0.3)
-    d.channelColors = false; CH:Update()
-    local keptTheirs = S.CHAT_COLORS.WHISPER[1] == 0.1 and S.CHAT_COLORS.GUILD[2] == 1
-    check(tsGame and cnGame and keptTheirs,
-        "a change in the game's Chat Settings wins: the page shows the game's setting, and a colour changed there is not put back")
+    check(tsGame and cnGame, "a change in the game's Chat Settings wins: the page shows the game's setting")
     -- No send while the client has chat locked down: the line goes to the
     -- game's own box instead, so no blocked-action warning can come of it.
     local R = ns.Core.Restrict
@@ -542,8 +536,20 @@ do
     local WH = ns.Whispers
     local d, g = A.db.profile.whispers, A.db.global
     local function tell(text, who, guid) S.fire("CHAT_MSG_WHISPER", text, who, "", "", "", "", 0, 0, "", 0, 1, guid or "Player-1-ABC") end
+    -- The game makes a new frame shown. A window that relies on Show to be
+    -- placed is never placed, and draws nowhere.
+    local cf0 = CreateFrame
+    CreateFrame = function(...) local f = cf0(...); f:Show(); return f end
     tell("hi there", "Bob-Realm")
+    CreateFrame = cf0
     local win = WH.windows["Bob-Realm"]
+    -- (the stub answers GetPoint with a fixed point for a frame with none,
+    -- so its own record of the points is read)
+    local pts = win and rawget(win, "__points")
+    check(win and win:IsShown() and pts and #pts > 0, "a whisper window has a place on the screen when it opens")
+    local listed = false
+    for _, n in ipairs(UISpecialFrames or {}) do if win and n == win:GetName() then listed = true end end
+    check(listed, "and Escape can close it")
     local c = g.whispers and g.whispers.convos["Bob-Realm"]
     check(win and win:IsShown() and c and c.lines[1] and c.lines[1].text == "hi there" and c.lines[1].out == false and c.class == "MAGE",
         "a whisper opens a window for its sender and is kept, with the sender's class")
