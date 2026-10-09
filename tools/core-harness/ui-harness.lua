@@ -2968,6 +2968,14 @@ do
     end)
     check(okU and not Mv:IsUnlocked(), "the frames unlock and lock on the controller: " .. tostring(errU or ""))
 
+    -- Ways in that never touch the chat box, and a notice for one that does.
+    check(type(_G.WicksUI_ToggleSettings) == "function" and type(_G.WicksUI_ToggleMovers) == "function"
+        and _G.BINDING_NAME_WICKSUI_SETTINGS and _G.BINDING_NAME_WICKSUI_MOVE,
+        "keys for the settings and the movers are bound by name")
+    ns.padSlashWarned = nil
+    SlashCmdList["WICK_WICKSUI"]("errors")
+    check(ns.padSlashWarned == true, "a command typed on the controller gets the one-time notice")
+
     -- On the controller a settings page is built a few controls a frame.
     do
         local Cfg = ns.Config
