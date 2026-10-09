@@ -2513,6 +2513,18 @@ do
     ns:G().combatTextFont = true
     CT:Refresh()
 
+    -- Your own combat text off in the game's settings: nothing of ours to
+    -- place, so no box and no sample.
+    C_CVar.SetCVar("enableFloatingCombatText", "0")
+    CT:Layout()
+    CT:Clear()
+    ns.Movers:Unlock()
+    run(0.01)
+    check(not ns.Movers.list.combattext:IsShown() and #CT.lines == 0,
+        "with your own combat text off in the game's settings, its box stays out of /wui move")
+    ns.Movers:Lock()
+    C_CVar.SetCVar("enableFloatingCombatText", "1")
+    CT:Layout()
     ns.Movers:Unlock()
     run(0.01)
     check(ns.Movers.list.combattext:IsShown() and #CT.lines > 0, "unlocked, its box shows with a sample running in it")
@@ -2951,6 +2963,31 @@ do
         Mv:Lock()
     end)
     check(okU and not Mv:IsUnlocked(), "the frames unlock and lock on the controller: " .. tostring(errU or ""))
+
+    -- On the controller a settings page is built a few controls a frame.
+    do
+        local Cfg = ns.Config
+        Cfg:Show("general")
+        local key = "minimap"
+        Cfg:Rebuild(key)
+        local okB, errB = pcall(function() Cfg:Show(key) end)
+        local page = Cfg.pages[key]
+        local first = page.layout and #page.layout.controls or 0
+        check(okB and page.building and first > 0 and first <= Cfg.BUILD_STEP + 1,
+            "on the controller a settings page is built a few controls at a time: " .. tostring(errB or first))
+        local reached
+        Cfg:Go({ page = page, kind = "setting", text = "Zone size", index = 9999 })
+        page.whenBuilt = page.whenBuilt or {}
+        page.whenBuilt[#page.whenBuilt + 1] = function() reached = true end
+        local guard = 0
+        while page.buildDriver and guard < 200 do
+            page.buildDriver:GetScript("OnUpdate")(page.buildDriver)
+            guard = guard + 1
+        end
+        check(not page.building and page.buildError == nil and #page.layout.controls > first and reached,
+            "and finishes over the next frames, a search result waiting for it: " .. tostring(page.buildError))
+        Cfg:Hide()
+    end
 
     -- Places: kept apart for the controller.
     local name
