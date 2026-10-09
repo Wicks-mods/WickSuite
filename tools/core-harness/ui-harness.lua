@@ -2143,10 +2143,178 @@ do
     tab.Background, tab.TabGlow, tab.HighlightTexture, tab.SelectedTexture = tab:CreateTexture(), tab:CreateTexture(), tab:CreateTexture(), tab:CreateTexture()
     tab.SelectedTexture:Show()
     lf.Tabs = { tab }
+
+    -- Its pages, as Blizzard_LegacySystem builds them.
+    local function art(parent, atlas, w, h)
+        local t = parent:CreateTexture()
+        t:SetAtlas(atlas)
+        if w then t:SetSize(w, h) end
+        return t
+    end
+    local function kids(f, list) rawset(f, "GetChildren", function() return unpack(list) end) end
+    -- The challenges: the category list and the challenge cards.
+    local cp = CreateFrame("Frame", nil, lf)
+    cp:SetSize(920, 575)
+    cp:Show()
+    cp.Background = art(cp, "Legacy-Challenge-BG", 917, 561)
+    local cl = CreateFrame("Frame", nil, cp)
+    cl:Show()
+    cp.CategoryList = cl
+    cl.ScrollBox = CreateFrame("Frame", nil, cl)
+    cl.ScrollBox:Show()
+    local clTarget = CreateFrame("Frame", nil, cl.ScrollBox)
+    clTarget:Show()
+    cl.ScrollBox.ScrollTarget = clTarget
+    local function category(heading, chosen)
+        local r = CreateFrame("Button", nil, clTarget)
+        r:SetSize(300, 25)
+        r:Show()
+        r.ButtonText = r:CreateFontString()
+        r.CollapseButton = realCreateFrame("Button", nil, r)
+        r.NotificationIcon = art(r, "UI-HUD-MicroMenu-Communities-Icon-Notification", 14, 14)
+        r.Normal = art(r, heading and "common-button-list-collapseExpand" or "Legacy-Challenge-Left-Sub-Tab", 300, 25)
+        r.collapsable, r.selected = heading, chosen
+        return r
+    end
+    local heading, leaf, other = category(true, false), category(false, true), category(false, false)
+    kids(clTarget, { heading, leaf, other })
+    local dp = CreateFrame("Frame", nil, cp)
+    dp:Show()
+    cp.DetailPane = dp
+    dp.ScrollBox = CreateFrame("Frame", nil, dp)
+    dp.ScrollBox:Show()
+    local dpTarget = CreateFrame("Frame", nil, dp.ScrollBox)
+    dpTarget:Show()
+    dp.ScrollBox.ScrollTarget = dpTarget
+    local function challenge(open)
+        local b = CreateFrame("Button", nil, dpTarget)
+        b:SetSize(516, 122)
+        b:Show()
+        for _, k in ipairs({ "Background", "BackgroundTop", "BackgroundMiddle", "BackgroundBottom", "TitleBar", "SelectedOverlay" }) do
+            b[k] = art(b, "Legacy-Challenge-Cards", 516, 122)
+        end
+        b.SelectedOverlay:SetShown(open)
+        local ic = CreateFrame("Frame", nil, b)
+        ic:SetSize(60, 60)
+        ic:Show()
+        ic.texture = ic:CreateTexture()
+        ic.texture:SetTexture(134400)
+        ic.texture:SetSize(50, 50)
+        ic.frame = art(ic, "Legacy-Tree-Frame-icon-frame", 60, 60)
+        ic.TextureMask = S.newMock("Texture")
+        b.Icon = ic
+        local sh = CreateFrame("Button", nil, b)
+        sh:SetSize(64, 64)
+        sh:Show()
+        sh.Icon = art(sh, "Legacy-Tree-Frame-Points-Icon", 40, 46)
+        sh.CheckBackground = art(sh, "Legacy-Challenge-Cards-Date-BG", 60, 24)
+        b.Shield = sh
+        -- A real texture forgets its atlas when given a file.
+        local pm = b:CreateTexture()
+        rawset(pm, "GetAtlas", function() return pm.__atlas end)
+        rawset(pm, "SetAtlas", function(_, a) pm.__atlas = a end)
+        rawset(pm, "SetTexture", function(_, t) pm.__tex = t; pm.__atlas = nil end)
+        pm:SetAtlas(open and "128-redbutton-minus" or "128-redbutton-plus")
+        b.PlusMinus = pm
+        local crit = CreateFrame("Frame", nil, b)
+        crit:SetSize(180, 30)
+        crit:Show()
+        crit.Background = art(crit, "Legacy-Challenge-Cards-Bar", 180, 30)
+        crit.Check = art(crit, "worldquest-tracker-checkmark", 16, 16)
+        crit.Name = crit:CreateFontString()
+        kids(b, { ic, sh, crit })
+        return b, crit
+    end
+    local shut = challenge(false)
+    local open, crit = challenge(true)
+    kids(dpTarget, { shut, open })
+    lf.ChallengesPage = cp
+    -- The reward track: the last reward earned and one still to earn.
+    local rp = CreateFrame("Frame", nil, lf)
+    rp:Show()
+    rp.Background = art(rp, "Legacy-Rewards-Tracker-background", 910, 569)
+    local track = CreateFrame("Frame", nil, rp)
+    track:Show()
+    rp.LegacyRewardProgressFrame = track
+    local clip = CreateFrame("Frame", nil, track)
+    clip:Show()
+    track.ClipFrame = clip
+    local function reward(cardArt)
+        local c = CreateFrame("Frame", nil, clip)
+        c:SetSize(216, 241)
+        c:Show()
+        c.RewardCardBG = art(c, cardArt, 216, 241)
+        c.Icon = c:CreateTexture()
+        c.Icon:SetTexture(134400)
+        c.Icon:SetSize(64, 64)
+        c.IconBorder = art(c, "Legacy-Rewards-Tracker-Icons-Frame", 80, 80)
+        c.LevelSquare = art(c, "Legacy-Rewards-Tracker-Diamond", 34, 34)
+        c.EarnedCheckmark = art(c, "worldquest-tracker-checkmark", 20, 20)
+        c.Level, c.RewardName = c:CreateFontString(), c:CreateFontString()
+        return c
+    end
+    local last, locked = reward("Legacy-Rewards-Tracker-Cards-Green"), reward("Legacy-Rewards-Tracker-Cards-Disable")
+    kids(clip, { last, locked })
+    lf.RewardTrackPage = rp
+    -- The tree: a talent tree whose line is art on a plain frame.
+    local tp = CreateFrame("Frame", nil, lf)
+    tp:Show()
+    tp.Background = art(tp, "Legacy-Tree-Frame-background", 917, 561)
+    local panel = CreateFrame("Frame", nil, tp)
+    panel:Show()
+    local edge = art(panel, "talents-arrow-line-yellow", 200, 80)
+    lf.TreePage = tp
+    lf:Show()
+
     local ok, err = pcall(PS.Skin, PS, lf)
     check(ok, "the Legacy window skins: " .. tostring(err or ""))
     local e = PS.extrasOf(tab)
     check(e and e.tile and e.ring and e.ring:IsShown(), "its tabs are side tiles, the open one in the accent ring, not bottom tabs")
+    -- A frame of the full skin's poll.
+    local okP, errP = pcall(function()
+        for _, c in ipairs({ lf:GetChildren() }) do
+            local u = c.GetScript and c:GetScript("OnUpdate")
+            if u then u(c, 1) end
+        end
+    end)
+    check(okP, "the full skin's pass runs over its pages: " .. tostring(errP or ""))
+    local E = PS.extrasOf
+    check(cp.Background:GetAlpha() == 0 and rp.Background:GetAlpha() == 0 and tp.Background:GetAlpha() == 0,
+        "the painted pages go for the panel")
+    check(edge:GetAlpha() == 1, "the tree's lines are left alone")
+    check(heading.Normal:GetAlpha() == 0 and E(heading).backdrop:IsShown() and not E(heading).sel:IsShown(),
+        "a category heading is a grey pill, its wooden bar gone")
+    check(E(leaf).sel:IsShown() and E(leaf).bar:IsShown() and not E(leaf).backdrop:IsShown(),
+        "the chosen category carries the accent wash and bar")
+    check(not E(other).sel:IsShown(), "the others do not")
+    check(leaf.NotificationIcon:GetAlpha() == 1, "the unseen-challenges mark stays")
+    check(shut.Background:GetAlpha() == 0 and shut.TitleBar:GetAlpha() == 0 and E(shut).backdrop ~= nil,
+        "a challenge is our card, the wooden card and its ribbon gone")
+    check(E(open).ring:IsShown() and not E(shut).ring:IsShown(), "the open challenge wears the accent ring")
+    check(shut.Icon.frame:GetAlpha() == 0 and shut.Icon.texture:GetAlpha() == 1 and E(shut.Icon).tile ~= nil,
+        "its icon sits on a tile, Blizzard's round frame gone and the picture kept")
+    check(shut.Shield.CheckBackground:GetAlpha() == 0 and shut.Shield.Icon:GetAlpha() == 1,
+        "the points shield stays, its black box goes")
+    check(shut.PlusMinus.__tex == ns.Media:Glyph("plus") and open.PlusMinus.__tex == ns.Media:Glyph("minus"),
+        "the red plus and minus are ours")
+    open.PlusMinus:SetAtlas("128-redbutton-plus")
+    PS.legacyPages(lf)
+    check(open.PlusMinus.__tex == ns.Media:Glyph("plus"), "and stay ours when Blizzard sets them again")
+    check(crit.Background:GetAlpha() == 0 and crit.Check:GetAlpha() == 1, "an objective's bar goes and its tick stays")
+    check(last.RewardCardBG:GetAlpha() == 0 and last.IconBorder:GetAlpha() == 0 and last.LevelSquare:GetAlpha() == 0
+        and E(last).tile ~= nil and E(last).iconTile ~= nil, "a reward is our card, its icon on a tile")
+    check(E(last).ring:IsShown() and not E(locked).ring:IsShown(), "the last reward earned wears the accent ring")
+    local C = ns.Core.Chrome.Colors
+    for _, d in ipairs({ E(last).diamond, E(locked).diamond }) do
+        rawset(d, "SetVertexColor", function(self, r, g, b) rawset(self, "__rgb", { r, g, b }) end)
+    end
+    PS.legacyPages(lf)
+    local lr, kr = rawget(E(last).diamond, "__rgb") or {}, rawget(E(locked).diamond, "__rgb") or {}
+    check(lr[1] == C.fel[1] and kr[1] == C.border[1],
+        "its level sits on a diamond in the accent, one still to earn in the border colour")
+    check(last.EarnedCheckmark:GetAlpha() == 1 and last.Icon:GetAlpha() == 1, "the earned tick and the picture stay")
+    check(rawget(shut, "wuiBG") == nil and rawget(last, "backdrop") == nil and rawget(leaf, "sel") == nil,
+        "nothing of ours written into Blizzard's frames")
     LegacySystemFrame = nil
 end
 
