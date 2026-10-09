@@ -2654,9 +2654,15 @@ do
     hits = Cfg:Search("speaker wheel")
     check(hits and hits[1] and hits[1].entry.text == "Volume button on the map", "words in a tooltip find it too")
     check(#(Cfg:Search("qqzzxx") or { 1 }) == 0, "nonsense finds nothing")
-    local okS, errS = pcall(function() Cfg:OpenSearch("zone size") end)
-    check(okS and Cfg.results and Cfg.results:IsShown() and Cfg.searchBox:GetText() == "zone size",
-        "the window opens on a search, its results in place of the page: " .. tostring(errS or ""))
+    check(Cfg.OpenSearch == nil, "searching is the settings window's box alone, not a command")
+    -- Typed into the box over the page list.
+    local okS, errS = pcall(function()
+        Cfg:Show()
+        Cfg.searchBox:SetText("zone size")
+        Cfg:ShowResults(Cfg.searchBox:GetText())
+    end)
+    check(okS and Cfg.results and Cfg.results:IsShown(),
+        "a search typed into the box shows its results in place of the page: " .. tostring(errS or ""))
     local row = Cfg.results.rows[1]
     check(row and row:IsShown() and row.entry and row.entry.text == "Zone size", "the top result is the first row")
     local okG, errG = pcall(function() row:GetScript("OnClick")(row) end)
@@ -2666,6 +2672,27 @@ do
     Cfg:ShowResults("zone size")
     Cfg:ShowResults("")
     check(not Cfg.results:IsShown() and page.content:IsShown(), "an empty search puts the page back")
+
+    -- The window's list is made a page a frame, never all at once.
+    Cfg:DropIndex()
+    local ready
+    Cfg:IndexAsync(function(idx) ready = idx end)
+    local step = Cfg.indexDriver and Cfg.indexDriver:GetScript("OnUpdate")
+    check(step ~= nil and Cfg.index == nil, "the search's list is made over several frames")
+    step(Cfg.indexDriver)
+    check(Cfg.index == nil and Cfg.indexing and Cfg.indexing.i == 1, "one page a frame")
+    local okR = pcall(function() Cfg:ShowResults("zone size") end)
+    check(okR and Cfg.results:IsShown() and Cfg.results.count:GetText() == "Looking through every page...",
+        "a search typed meanwhile says it is looking")
+    local guard = 0
+    while Cfg.indexDriver:GetScript("OnUpdate") and guard < 500 do
+        Cfg.indexDriver:GetScript("OnUpdate")(Cfg.indexDriver)
+        guard = guard + 1
+    end
+    check(Cfg.index and ready == Cfg.index and #Cfg.index > 100, "and once made, whoever waited gets it")
+    local row1 = Cfg.results.rows[1]
+    check(row1 and row1:IsShown() and row1.entry and row1.entry.text == "Zone size",
+        "the search typed meanwhile fills in by itself")
     Cfg:Hide()
 end
 
@@ -2870,6 +2897,25 @@ do
     local dpad, dpadNormal = button(false)
     local face = button(true)
 
+    -- Typing with a controller in hand flips the style many times a
+    -- second: nothing is done until it settles, and then once.
+    local applies = 0
+    Pad:OnChange(function() applies = applies + 1 end)
+    local realAfter, waiting = C_Timer.After, {}
+    C_Timer.After = function(_, fn) waiting[#waiting + 1] = fn end
+    for i = 1, 6 do
+        style = (i % 2 == 1) and GP or 0
+        Pad:Changed()
+    end
+    check(applies == 0, "a run of changes of style does nothing while it lasts")
+    style = GP
+    for _, fn in ipairs(waiting) do fn() end
+    C_Timer.After = realAfter
+    check(applies == 1, "and is acted on once it settles: " .. applies)
+    Pad:Changed()
+    check(applies == 1, "the same style again does nothing")
+    style = 0
+    Pad:Changed()
     style = GP
     local okC, errC = pcall(function() Pad:Changed() end)
     check(okC and Pad:Active(), "the controller is followed when the interface turns to it: " .. tostring(errC or ""))
