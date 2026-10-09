@@ -1069,18 +1069,25 @@ async function cmdRelease(folder, newVer, ...flags) {
   // ── Append CHANGELOG entry (stub — user edits after) ───────────────
   // Skip the append if an entry for this version already exists (re-release
   // or the user pre-wrote real notes before running `wick release`).
+  // Notes kept under an "## Unreleased" heading become this version's: the
+  // heading takes the version and the day. Otherwise a stub goes on top.
+  // The day is the local one, as the changelogs' own dates are.
   setProgress(cmd, 2, TOTAL, "updating CHANGELOG");
   const changelog = path.join(dir, "CHANGELOG.md");
   if (fs.existsSync(changelog)) {
-    const date = new Date().toISOString().slice(0, 10);
+    const date = new Date().toLocaleDateString("en-CA");
     const existing = fs.readFileSync(changelog, "utf8");
+    const unreleased = /^##\s+\(?unreleased\)?[ \t]*$/im;
     if (new RegExp(`^##\\s+${newVer.replace(/\./g, "\\.")}\\b`, "m").test(existing)) {
       log(`  CHANGELOG.md already has a ${newVer} entry — leaving it as-is`);
+    } else if (unreleased.test(existing)) {
+      fs.writeFileSync(changelog, existing.replace(unreleased, `## ${newVer} (${date})`));
+      ok(`CHANGELOG.md: the Unreleased notes are now ${newVer}`);
     } else {
-      const head = `# ${addon.title} — Changelog\n\n## ${newVer} — ${date}\n\n- (edit this entry with the actual changes)\n\n`;
+      const stub = `## ${newVer} (${date})\n\n- (edit this entry with the actual changes)\n\n`;
       const body = existing.startsWith(`# ${addon.title}`)
-        ? existing.replace(/^(# [^\n]+\n\n)/, `$1## ${newVer} — ${date}\n\n- (edit this entry with the actual changes)\n\n`)
-        : head + existing;
+        ? existing.replace(/^(# [^\n]+\n\n)/, `$1${stub}`)
+        : `# ${addon.title}\n\n${stub}` + existing;
       fs.writeFileSync(changelog, body);
       ok(`CHANGELOG.md: appended ${newVer}`);
     }
