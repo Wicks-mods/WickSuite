@@ -1092,6 +1092,27 @@ do
     check(okN and uf:IsShown() == false and uf:GetParent() == plate, "a nameplate's own frame is hidden and left on its nameplate: " .. tostring(errN or ""))
     uf:Show()
     check(uf:IsShown() == false, "and hidden again when the client shows it")
+
+    -- Plates made ahead under a holder, handed to nameplates as they come.
+    local driver = ns.Nameplates and ns.Nameplates.driver
+    check(driver and driver.PrefillNamePlates, "the plate driver can make plates ahead")
+    if driver and driver.PrefillNamePlates then
+        local okP, errP = pcall(function() driver:PrefillNamePlates(3, 3) end)
+        local pooler = driver.platePooler
+        local tick = pooler and pooler:GetScript("OnUpdate")
+        if tick then tick(pooler) end
+        check(okP and driver:PooledNamePlates() == 3, "three plates are made ahead, styled, with no nameplate yet: " .. tostring(errP or driver:PooledNamePlates()))
+        local p2 = CreateFrame("Frame", "WicksUI_TestBlizzPlate2", UIParent)
+        rawset(p2, "__nokeys", NOROLE)
+        stubGlobal("UnitNameplateShowsWidgetsOnly", function() return false end)
+        stubGlobal("UnitIsGameObject", function() return false end)
+        C_NamePlate.GetNamePlateForUnit = function() return p2 end
+        local okA, errA = pcall(driver:GetScript("OnEvent"), driver, "NAME_PLATE_UNIT_ADDED", "nameplate1")
+        C_NamePlate.GetNamePlateForUnit = wasGet
+        local got = rawget(p2, "unitFrame")
+        check(okA and got and got:GetParent() == p2 and tostring(got:GetName()):find("^WicksUI_Plate") and driver:PooledNamePlates() == 2,
+            "a nameplate takes a plate from the pool, parented to it: " .. tostring(errA or (got and got:GetName())))
+    end
 end
 
 io.write("== pvp indicator ==\n")
