@@ -2898,6 +2898,14 @@ do
         check(tf.square:IsShown() and not tf.round:IsShown(), "a button the game reshapes takes the other tile")
     end
 
+    -- /wui move on the controller: unlock, a drop, lock.
+    local okU, errU = pcall(function()
+        Mv:Unlock()
+        Mv:PlaceAll()
+        Mv:Lock()
+    end)
+    check(okU and not Mv:IsUnlocked(), "the frames unlock and lock on the controller: " .. tostring(errU or ""))
+
     -- Places: kept apart for the controller.
     local name
     for n, m in pairs(Mv.list) do if not m.groups.actionbars then name = n; break end end
@@ -2922,9 +2930,17 @@ do
         function m.SetPoint(_, p, rel, rp, x, y) m.pts = { p, rel, rp, x, y } end
         return m
     end
-    for k, v in pairs({ GetLeft = 632, GetRight = 1288, GetTop = 312, GetBottom = 110, GetEffectiveScale = 1 }) do
-        rawset(root, k, function() return v end)
+    -- The controller frame reaches higher than its buttons; the buttons
+    -- are what the frames clear.
+    local function rect(f, l, r, b, t)
+        for k, v in pairs({ GetLeft = l, GetRight = r, GetTop = t, GetBottom = b, GetEffectiveScale = 1 }) do
+            rawset(f, k, function() return v end)
+        end
+        rawset(f, "IsVisible", function() return true end)
     end
+    rect(root, 632, 1288, 110, 312)
+    rect(dpad, 700, 730, 200, 230)
+    rect(face, 1100, 1130, 230, 260)
     local oldH, oldE = rawget(UIParent, "GetHeight"), rawget(UIParent, "GetEffectiveScale")
     rawset(UIParent, "GetHeight", function() return 1080 end)
     rawset(UIParent, "GetEffectiveScale", function() return 1 end)
@@ -2932,8 +2948,8 @@ do
     local chat, ownBar, placed = fake(0, 420, 40, 240), fake(700, 1200, 40, 80, { actionbars = true }), fake(700, 900, 150, 200)
     A.db.profile.moversPad = { placed = "BOTTOM,UIParent,BOTTOM,0,150" }
     local okL, errL = pcall(Mv.ClearOfPad, { list = { player = player, cast = cast, chat = chat, bar1 = ownBar, placed = placed } })
-    check(okL and player.pts[5] == 230 + 90 and cast.pts[5] == 300 + 90,
-        "frames over the controller bars go up together, the lowest just clear of them: " .. tostring(errL or player.pts[5]))
+    check(okL and player.pts[5] == 230 + 38 and cast.pts[5] == 300 + 38,
+        "frames over the controller buttons go up together, the lowest just clear of the buttons: " .. tostring(errL or player.pts[5]))
     check(chat.pts[5] == 40 and ownBar.pts[5] == 40 and placed.pts[5] == 150,
         "frames off to the side, Wick's own bars and one placed for the controller stay")
     AB:db().pad.clearFrames = false
@@ -2941,6 +2957,18 @@ do
     Mv.ClearOfPad({ list = { player = player } })
     check(player.pts[5] == 230, "switched off, nothing moves")
     AB:db().pad.clearFrames = true
+
+    -- Kit bars to the top middle, one under the next.
+    local seals, totems = fake(800, 1000, 280, 300, { suite = true }), fake(820, 980, 250, 280, { suite = true })
+    rawset(seals, "GetHeight", function() return 20 end)
+    rawset(totems, "GetHeight", function() return 30 end)
+    A.db.profile.moversPad = { suite_mine = "TOP,UIParent,TOP,0,-300" }
+    local mine = fake(0, 100, 600, 620, { suite = true })
+    local okT, errT = pcall(Mv.KitsToTop, { list = { suite_a = seals, suite_b = totems, suite_mine = mine, player = player } })
+    check(okT and seals.pts[1] == "TOP" and seals.pts[5] == -60 and totems.pts[1] == "TOP" and totems.pts[5] == -60 - 20 - 6,
+        "on the controller the kit bars go to the top middle, one under the next: " .. tostring(errT or seals.pts[5]))
+    check(mine.pts[1] == "BOTTOM" and player.pts[1] == "BOTTOM", "one placed for the controller and the rest of the frames stay")
+    A.db.profile.moversPad = nil
     rawset(UIParent, "GetHeight", oldH)
     rawset(UIParent, "GetEffectiveScale", oldE)
     A.db.profile.moversPad = nil
