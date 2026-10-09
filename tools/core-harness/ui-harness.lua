@@ -2620,6 +2620,55 @@ for key, page in pairs(ns.Config.pages) do
 end
 check(#broken == 0, "every settings page builds: " .. table.concat(broken, " | "))
 
+io.write("== settings search ==\n")
+do
+    local Cfg = ns.Config
+    local okI, index = pcall(function() return Cfg:Index() end)
+    check(okI and type(index) == "table", "the settings are indexed: " .. tostring(okI and "" or index))
+    check(#(Cfg.probeErrors or {}) == 0, "every page's builder runs through the probe: " .. table.concat(Cfg.probeErrors or {}, " | "))
+    local pages, settings = 0, 0
+    for _, e in ipairs(index) do
+        if e.kind == "page" then pages = pages + 1 elseif e.kind == "setting" then settings = settings + 1 end
+    end
+    local n = 0
+    for _ in pairs(Cfg.pages) do n = n + 1 end
+    check(pages == n and settings > 100, ("every page is in it, with its settings: %d of %d pages, %d settings"):format(pages, n, settings))
+    -- Each setting found where the built page has it.
+    local off = {}
+    for _, e in ipairs(index) do
+        local L = e.page.layout
+        local c = e.index and L and L.controls[e.index]
+        if e.kind == "setting" and c and c.labelText and Cfg.Plain(c.labelText) ~= e.text then
+            off[#off + 1] = e.page.key .. ":" .. e.text .. "~" .. Cfg.Plain(c.labelText)
+        end
+    end
+    check(#off == 0, "each setting is counted to its place on the built page: " .. table.concat(off, " | ", 1, math.min(#off, 5)))
+    check(Cfg:Search("z") == nil, "one letter is not a search")
+    local hits = Cfg:Search("zone size")
+    check(hits and hits[1] and hits[1].entry.text == "Zone size" and hits[1].entry.page.key == "minimap",
+        "the setting named by the search comes first: " .. tostring(hits and hits[1] and hits[1].entry.text))
+    hits = Cfg:Search("VOLUME")
+    local vol
+    for _, h in ipairs(hits or {}) do if h.entry.text == "Volume button on the map" then vol = h end end
+    check(vol ~= nil, "case does not matter")
+    hits = Cfg:Search("speaker wheel")
+    check(hits and hits[1] and hits[1].entry.text == "Volume button on the map", "words in a tooltip find it too")
+    check(#(Cfg:Search("qqzzxx") or { 1 }) == 0, "nonsense finds nothing")
+    local okS, errS = pcall(function() Cfg:OpenSearch("zone size") end)
+    check(okS and Cfg.results and Cfg.results:IsShown() and Cfg.searchBox:GetText() == "zone size",
+        "the window opens on a search, its results in place of the page: " .. tostring(errS or ""))
+    local row = Cfg.results.rows[1]
+    check(row and row:IsShown() and row.entry and row.entry.text == "Zone size", "the top result is the first row")
+    local okG, errG = pcall(function() row:GetScript("OnClick")(row) end)
+    local page = Cfg.pages.minimap
+    check(okG and Cfg.current == "minimap" and not Cfg.results:IsShown() and page.content:IsShown(),
+        "a result opens its page: " .. tostring(errG or ""))
+    Cfg:ShowResults("zone size")
+    Cfg:ShowResults("")
+    check(not Cfg.results:IsShown() and page.content:IsShown(), "an empty search puts the page back")
+    Cfg:Hide()
+end
+
 io.write("== movers ==\n")
 local okU = pcall(function() ns.Movers:Unlock() end)
 check(okU and ns.Movers:IsUnlocked(), "unlock")
