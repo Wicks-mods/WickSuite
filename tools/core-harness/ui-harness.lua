@@ -2912,6 +2912,10 @@ do
     C_InputInterfaceStyle = { GetCurrentStyle = function() return style end }
     Enum.InputDeviceInterfaceType = Enum.InputDeviceInterfaceType or { Mkb = 0, Gamepad = 1 }
     local GP = Enum.InputDeviceInterfaceType.Gamepad
+    -- Everything below runs Wick's UI on the controller; standing aside
+    -- is checked at the end.
+    check(Pad:StandAside(), "Wick's UI stands aside on the controller unless told otherwise")
+    AB:db().pad.standAside = false
     -- The game's action button relay, recorded.
     local relay = CreateFrame("Frame")
     local got = {}
@@ -3129,6 +3133,35 @@ do
     Pad:Changed()
     check(next(got) == nil and b1.__drivers.visibility == "show",
         "back on the mouse and keyboard, the relay goes quiet and Wick's bars return")
+    -- Standing aside.
+    do
+        local Chrome = ns.Core.Chrome
+        local prompts, oldPrompt = {}, Chrome.ReloadPrompt
+        Chrome.ReloadPrompt = function(_, text) prompts[#prompts + 1] = text end
+        local ran = 0
+        Pad:OnChange(function() ran = ran + 1 end)
+        AB:db().pad.standAside = true
+        -- Built as usual, then a controller picked up: a reload is asked for.
+        style = GP
+        Pad:Changed()
+        check(#prompts == 1 and prompts[1]:find("stands aside") and ran == 1,
+            "a controller picked up while Wick's UI runs asks for a reload, and the bars still make way: " .. #prompts .. " " .. ran)
+        -- Logged in standing aside: nothing of ours is built or updated.
+        Pad.standingAside = true
+        local m, calls = ns.ActionBars, 0
+        local oldUpdate = m.Update
+        m.Update = function(...) calls = calls + 1 return oldUpdate(...) end
+        ns:UpdateAll()
+        ns:InitializeModules()
+        m.Update = oldUpdate
+        check(calls == 0, "standing aside, a settings change builds and updates nothing")
+        style = 0
+        Pad:Changed()
+        check(#prompts == 2 and prompts[2]:find("comes back") and ran == 1,
+            "back on the mouse and keyboard it asks for a reload, and nothing of ours is acted on: " .. #prompts .. " " .. ran)
+        Pad.standingAside = false
+        Chrome.ReloadPrompt = oldPrompt
+    end
     C_InputInterfaceStyle = oldStyle
     rawset(_G, "ActionBarActionEventsFrame", oldRelay)
     GamepadMainActionBarFrame = nil
