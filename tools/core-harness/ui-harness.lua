@@ -2527,7 +2527,11 @@ do
     CT:Layout()
     ns.Movers:Unlock()
     run(0.01)
-    check(ns.Movers.list.combattext:IsShown() and #CT.lines > 0, "unlocked, its box shows with a sample running in it")
+    run(3)
+    check(ns.Movers.list.combattext:IsShown() and #CT.lines == 0,
+        "unlocked, its box shows, with no sample playing by itself")
+    CT:Sample()
+    check(#CT.lines > 0, "a sample plays when asked for")
     ns.Movers:Lock()
     CT:Clear()
 
