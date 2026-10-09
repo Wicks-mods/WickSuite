@@ -1,0 +1,13 @@
+== facebook ==
+Every setting in Wick's UI is now a search away, and every whisper gets a window of its own.
+
+Wick's UI 0.12.0 puts a search box over the settings list. Type a word or two and every matching setting shows up with where it lives; click one and its page opens right at it. Whispers now open in a small window for each person, with the conversation kept between sessions and across your characters. Chat gains class colors on names, timestamps and a switch for the tab glow, all in step with the game's own chat settings. The Legacy window matches your look now too.
+
+Free on CurseForge: https://www.curseforge.com/wow/addons/wicks-ui
+
+== x ==
+Wick's UI 0.12.0: a search box that finds any setting as you type, a window of its own for every whisper, class colors and timestamps in chat, and the Legacy window in your look.
+
+https://wicksmods.com/ui
+
+#WoWForever #TBCClassic
