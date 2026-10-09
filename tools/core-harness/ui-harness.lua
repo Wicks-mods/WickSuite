@@ -2823,6 +2823,143 @@ do
     C_CVar.SetCVar("Sound_MasterVolume", "1.0")
 end
 
+io.write("== controller ==\n")
+do
+    local Pad, PB, Mv, AB = ns.Pad, ns.PadBars, ns.Movers, ns.ActionBars
+    check(Pad and PB and AB.Visibility, "the controller pieces load")
+    check(not Pad:Active(), "without the client's controller interface there is nothing to follow")
+    local oldStyle, oldRelay = rawget(_G, "C_InputInterfaceStyle"), rawget(_G, "ActionBarActionEventsFrame")
+    local style = 0
+    C_InputInterfaceStyle = { GetCurrentStyle = function() return style end }
+    Enum.InputDeviceInterfaceType = Enum.InputDeviceInterfaceType or { Mkb = 0, Gamepad = 1 }
+    local GP = Enum.InputDeviceInterfaceType.Gamepad
+    -- The game's action button relay, recorded.
+    local relay = CreateFrame("Frame")
+    local got = {}
+    rawset(relay, "RegisterEvent", function(_, e) got[e] = true end)
+    rawset(relay, "RegisterUnitEvent", function(_, e, u) got[e] = u end)
+    rawset(relay, "UnregisterAllEvents", function() got = {} end)
+    rawset(_G, "ActionBarActionEventsFrame", relay)
+    -- The game's controller bars: a page unit, a bar, a D-pad button and a
+    -- face button.
+    local root = CreateFrame("Frame", "GamepadMainActionBarFrame", UIParent)
+    root:Show()
+    local page = CreateFrame("Frame", nil, root)
+    page:Show()
+    page.LeftShoulderBackground, page.RightShoulderBackground = page:CreateTexture(), page:CreateTexture()
+    root.PageUnit = page
+    local bar = CreateFrame("Frame", nil, page)
+    bar:Show()
+    bar.LeftButtonFrame, bar.RightButtonFrame, bar.BackgroundWatermark = bar:CreateTexture(), bar:CreateTexture(), bar:CreateTexture()
+    local function button(round)
+        local b = CreateFrame("CheckButton", nil, bar)
+        b:SetSize(30, 30)
+        b:Show()
+        b.icon, b.SlotArt = b:CreateTexture(), b:CreateTexture()
+        b.CircleMask = b:CreateTexture()
+        if round then b.CircleMask:Show() else b.CircleMask:Hide() end
+        for _, k in ipairs({ "Border", "CircleShadow", "SquareShadow", "CircleShadowFocus", "SquareShadowFocus" }) do b[k] = b:CreateTexture() end
+        local normal, pushed, hl, checked = b:CreateTexture(), b:CreateTexture(), b:CreateTexture(), b:CreateTexture()
+        rawset(b, "GetNormalTexture", function() return normal end)
+        rawset(b, "GetPushedTexture", function() return pushed end)
+        rawset(b, "GetHighlightTexture", function() return hl end)
+        rawset(b, "GetCheckedTexture", function() return checked end)
+        b.Count, b.Name = b:CreateFontString(), b:CreateFontString()
+        return b, normal, checked
+    end
+    local dpad, dpadNormal = button(false)
+    local face = button(true)
+
+    style = GP
+    local okC, errC = pcall(function() Pad:Changed() end)
+    check(okC and Pad:Active(), "the controller is followed when the interface turns to it: " .. tostring(errC or ""))
+    check(got.SPELL_UPDATE_CHARGES and got.UNIT_SPELLCAST_START == "player",
+        "on the controller the game's button relay listens again, for its casts and charges")
+    local b1 = AB.bars[1]
+    check(b1 and b1.__drivers.visibility == "hide", "Wick's bars stand aside for the controller bars")
+    local stance = ns.Special and ns.Special.pet
+    check(not stance or not stance.__drivers or stance.__drivers.visibility == nil or stance.__drivers.visibility == "hide",
+        "and so do the pet and stance bars")
+    local okS, errS = pcall(function() PB:Skin() end)
+    check(okS, "the controller bars skin: " .. tostring(errS or ""))
+    if ns:Game() then
+        check(not PB:Skinning(), "Classic keeps the game's own controller art")
+    else
+        local td, tf = PB.TileOf(dpad), PB.TileOf(face)
+        check(dpad.Border:GetAlpha() == 0 and dpadNormal:GetAlpha() == 0 and dpad.SquareShadow:GetAlpha() == 0,
+            "the game's ring, border and shadow go")
+        check(td and td.square:IsShown() and not td.round:IsShown(), "a D-pad button sits on a square tile")
+        check(tf and tf.round:IsShown() and not tf.square:IsShown(), "a face button sits on a round one")
+        check(dpad.SlotArt:GetAlpha() == 1 and dpad.icon:GetAlpha() == 1, "the controller button marks and the picture stay")
+        check(bar.LeftButtonFrame:GetAlpha() == 0 and bar.BackgroundWatermark:GetAlpha() == 0 and page.LeftShoulderBackground:GetAlpha() == 0,
+            "the ornate backings go")
+        face.CircleMask:Hide()
+        PB:Skin()
+        check(tf.square:IsShown() and not tf.round:IsShown(), "a button the game reshapes takes the other tile")
+    end
+
+    -- Places: kept apart for the controller.
+    local name
+    for n, m in pairs(Mv.list) do if not m.groups.actionbars then name = n; break end end
+    local before = A.db.profile.movers[name]
+    Mv:Save(name)
+    check(A.db.profile.moversPad and A.db.profile.moversPad[name] ~= nil and A.db.profile.movers[name] == before,
+        "a frame moved on the controller keeps that place for the controller only")
+    Mv:Reset(name)
+    check(A.db.profile.moversPad[name] == nil and A.db.profile.movers[name] == before,
+        "a reset there gives back its usual place")
+
+    -- The lift: frames over the controller bars go up together.
+    local function fake(l, r, b, t, groups)
+        local m = { groups = groups or {}, pts = { "BOTTOM", UIParent, "BOTTOM", 0, b } }
+        function m.GetLeft() return l end
+        function m.GetRight() return r end
+        function m.GetTop() return t end
+        function m.GetBottom() return b end
+        function m.GetEffectiveScale() return 1 end
+        function m.GetPoint() return unpack(m.pts) end
+        function m.ClearAllPoints() end
+        function m.SetPoint(_, p, rel, rp, x, y) m.pts = { p, rel, rp, x, y } end
+        return m
+    end
+    for k, v in pairs({ GetLeft = 632, GetRight = 1288, GetTop = 312, GetBottom = 110, GetEffectiveScale = 1 }) do
+        rawset(root, k, function() return v end)
+    end
+    local oldH, oldE = rawget(UIParent, "GetHeight"), rawget(UIParent, "GetEffectiveScale")
+    rawset(UIParent, "GetHeight", function() return 1080 end)
+    rawset(UIParent, "GetEffectiveScale", function() return 1 end)
+    local player, cast = fake(600, 840, 230, 290), fake(620, 820, 300, 316)
+    local chat, ownBar, placed = fake(0, 420, 40, 240), fake(700, 1200, 40, 80, { actionbars = true }), fake(700, 900, 150, 200)
+    A.db.profile.moversPad = { placed = "BOTTOM,UIParent,BOTTOM,0,150" }
+    local okL, errL = pcall(Mv.ClearOfPad, { list = { player = player, cast = cast, chat = chat, bar1 = ownBar, placed = placed } })
+    check(okL and player.pts[5] == 230 + 90 and cast.pts[5] == 300 + 90,
+        "frames over the controller bars go up together, the lowest just clear of them: " .. tostring(errL or player.pts[5]))
+    check(chat.pts[5] == 40 and ownBar.pts[5] == 40 and placed.pts[5] == 150,
+        "frames off to the side, Wick's own bars and one placed for the controller stay")
+    AB:db().pad.clearFrames = false
+    player.pts[5] = 230
+    Mv.ClearOfPad({ list = { player = player } })
+    check(player.pts[5] == 230, "switched off, nothing moves")
+    AB:db().pad.clearFrames = true
+    rawset(UIParent, "GetHeight", oldH)
+    rawset(UIParent, "GetEffectiveScale", oldE)
+    A.db.profile.moversPad = nil
+
+    -- Making way can be switched off.
+    AB:db().pad.hideBars = false
+    PB:Changed(true)
+    check(b1.__drivers.visibility ~= "hide", "switched off, Wick's bars stay up on the controller")
+    AB:db().pad.hideBars = true
+
+    style = 0
+    Pad:Changed()
+    check(next(got) == nil and b1.__drivers.visibility == "show",
+        "back on the mouse and keyboard, the relay goes quiet and Wick's bars return")
+    C_InputInterfaceStyle = oldStyle
+    rawset(_G, "ActionBarActionEventsFrame", oldRelay)
+    GamepadMainActionBarFrame = nil
+end
+
 io.write("== keybinds ==\n")
 local okK, errK = pcall(function() ns.Keybind:Activate(); ns.Keybind:Deactivate(false) end)
 check(okK, "keybind mode opens and closes: " .. tostring(errK or ""))
