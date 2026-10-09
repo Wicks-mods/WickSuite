@@ -3001,6 +3001,21 @@ do
         Cfg:Hide()
     end
 
+    -- The shipped controller layout: a frame in it takes that place on the
+    -- controller and is not lifted; Reset there gives it back.
+    local shipped = ns.defaults.profile.moversPad
+    check(type(shipped) == "table" and shipped.uf_player and shipped.uf_target and shipped.castbar_player,
+        "a controller layout ships with the player, target and cast bar placed")
+    A.db.profile.moversPad = {}
+    Mv:Place("uf_player")
+    local pm = Mv.list.uf_player
+    local sp, _, _, sx, sy = pm:GetPoint(1)
+    local wp, _, _, wx, wy = ns:StringToPoint(shipped.uf_player)
+    check(sp == wp and sx == wx and sy == wy, "on the controller the player frame takes the shipped place: " .. tostring(sp))
+    Mv:Reset("uf_player")
+    local rp, _, _, rx, ry = pm:GetPoint(1)
+    check(rp == wp and rx == wx and ry == wy, "and Reset there puts it back to it")
+
     -- Places: kept apart for the controller.
     local name
     for n, m in pairs(Mv.list) do if not m.groups.actionbars then name = n; break end end
