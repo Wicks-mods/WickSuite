@@ -171,6 +171,10 @@ for _, n in ipairs({ "TotemFrame", "PlayerFrame", "TargetFrame", "FocusFrame", "
     "RuneFrame", "MonkStaggerBar", "AlternatePowerBar", "PlayerFrameAlternatePowerBarArea" }) do
     if rawget(_G, n) == nil then rawset(_G, n, realCreateFrame("Frame", n)) end
 end
+-- The game's buff frames watch auras; the check under buffs reads whether
+-- Wick's UI left that alone.
+BuffFrame:RegisterEvent("UNIT_AURA")
+DebuffFrame:RegisterEvent("UNIT_AURA")
 if not S.tbc then
     for _, n in ipairs({ "BossTargetFrameContainer", "OverrideActionBar", "OverlayPlayerCastingBarFrame" }) do
         if rawget(_G, n) == nil then rawset(_G, n, realCreateFrame("Frame", n)) end
@@ -1136,6 +1140,17 @@ end
 
 io.write("== buffs ==\n")
 check(ns.Auras.initialized and ns.Auras.buffs and ns.Auras.debuffs, "buff and debuff containers built")
+-- The game's buff frames: hidden and kept hidden, and on Forever their
+-- events kept so the controller's shortcuts bar and radial, which read the
+-- frame's aura list, find one.
+do
+    check(not BuffFrame:IsShown() and not DebuffFrame:IsShown(), "the game's buff and debuff frames are hidden")
+    BuffFrame:Show()
+    check(not BuffFrame:IsShown(), "and stay hidden when the game shows one")
+    check((BuffFrame.__events["UNIT_AURA"] ~= nil) == (S.forever and true or false)
+        and (DebuffFrame.__events["UNIT_AURA"] ~= nil) == (S.forever and true or false),
+        "their events are kept only where the controller reads their aura list")
+end
 -- Which Auras element answered: the AuraContainer intrinsic on Forever,
 -- the plain-frame element on a client without it. oUF hides its Private
 -- table after load, so the answer is read off the elements and frames.
