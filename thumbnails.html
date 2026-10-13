@@ -1603,7 +1603,7 @@ function tileSrc(name) {
 // offset, which is what makes the field look like it is sliding.
 function IsoCollage({ tiles, featured = [], accent = [], zone = [600, 1120, 90, 540], cols = 10, cw = 300, gap = 18, colH = 2800,
   stagger = [-260, 70, -150, 210, -330, 10, -210, 150, -70, 110], cx = 820, cy = 300, scale = 0.86,
-  tilt = 55, turn = -45 }) {
+  tilt = 55, turn = -45, src = tileSrc }) {
   const W = cols * (cw + gap);
   // Where a point on the plane lands on the card: turn, lay down, scale.
   const r = turn * Math.PI / 180, cosT = Math.cos(tilt * Math.PI / 180);
@@ -1637,7 +1637,7 @@ function IsoCollage({ tiles, featured = [], accent = [], zone = [600, 1120, 90, 
           <div key={t.key} style={{position:'absolute',left:t.c * (cw + gap),top:t.y,width:cw,height:t.h,
             background:'#000',border:`${hot ? 2 : 1}px solid ${hot ? G : BR}`,
             boxShadow:'0 26px 40px rgba(0,0,0,0.55)'}}>
-            <img src={tileSrc(t.name)} style={{display:'block',width:'100%',height:'100%',objectFit:'cover',objectPosition:t.pos,filter:'brightness(1.15) saturate(1.08)'}}/>
+            <img src={src(t.name)} style={{display:'block',width:'100%',height:'100%',objectFit:'cover',objectPosition:t.pos,filter:'brightness(1.15) saturate(1.08)'}}/>
             {hot && <Brackets size={14} thick={3} inset={-5}/>}
           </div>
         );
@@ -1749,6 +1749,66 @@ function SocialCover({ flavour = 'forever' } = {}) {
   );
 }
 
+/* ── Front-page link cards ───────────────────────
+   What wicksmods.com shows when the link is shared. X draws the card
+   about 500px wide and lays the page title over its bottom left, so
+   the words are big and nothing that matters sits down there. The
+   looks are the raw captures in images/ui/screenshots/plain/ (the ones
+   in looks/ carry their names baked in). */
+
+function CardLockup({ headline, sub, label = 'SUITE', size = 96, url = 'wicksmods.com' }) {
+  return (
+    <div style={{display:'flex',flexDirection:'column'}}>
+      <div style={{fontFamily:FM,fontSize:15,letterSpacing:'0.3em',color:MDIM,marginBottom:20}}>
+        WORLD OF WARCRAFT <span style={{color:G}}>&middot;</span> FOREVER
+      </div>
+      <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch',alignSelf:'flex-start'}}>
+        <WickWordmark size={size}/>
+        <div style={{fontFamily:FM,fontSize:20,letterSpacing:'0.5em',color:G,marginTop:6,marginRight:'-0.5em',textAlign:'right'}}>{label}</div>
+      </div>
+      <div style={{height:1,background:BR,width:'100%',margin:'26px 0 24px'}}/>
+      <div style={{fontFamily:FU,fontSize:42,fontWeight:600,color:TX,lineHeight:1.12,textShadow:'0 2px 14px rgba(0,0,0,0.85)'}}>{headline}</div>
+      {sub && <div style={{fontFamily:FU,fontSize:21,color:MDIM,lineHeight:1.4,marginTop:14,textShadow:'0 2px 10px rgba(0,0,0,0.85)'}}>{sub}</div>}
+      {url && <div style={{fontFamily:FM,fontSize:22,letterSpacing:'0.1em',color:G,marginTop:22}}>{url}</div>}
+    </div>
+  );
+}
+
+// The whole suite on a tilted plane, the way the TBC teaser laid out
+// the UI. Paths are under images/; the plain looks lead the field.
+const WALL = {
+  tiles: [
+    ['ui/screenshots/plain/Hologram.jpg',1.78,2.0,'center 40%'],['bags/screenshots/main.png',1.36],['ui/screenshots/collage/c176.png',1.56],
+    ['ui/screenshots/plain/WicksModern.jpg',1.78,2.0,'center 45%'],['gear/screenshots/main.png',1.25],['ui/screenshots/collage/c221.png',8.21],
+    ['trade/screenshots/main.png',2.26],['ui/screenshots/plain/Rebel.jpg',1.78,2.0,'center 40%'],['reminders/screenshots/alert.png',2.71],
+    ['ui/screenshots/collage/c099.png',0.95],['comforts/screenshots/main.png',1.07],['ui/screenshots/plain/Gilded.jpg',1.78,2.0,'center 40%'],
+    ['poisons/screenshots/main.png',1.12],['ui/screenshots/collage/c189.png',1.28],['core/screenshots/main.png',1.06],
+    ['ui/screenshots/plain/Frost.jpg',1.78,2.0,'center 40%'],['ui/screenshots/collage/c064.png',2.68],['demons/screenshots/main.png',1.49],
+    ['ui/screenshots/combat-text.png',1.48],['ui/screenshots/plain/Classic.jpg',1.78,2.3,'center 92%'],['beasts/screenshots/main.png',1.20],
+    ['reminders/screenshots/list.png',2.46],['ui/screenshots/collage/c177.png',0.92],['ui/screenshots/plain/Crisp.jpg',1.78,2.0,'center 40%'],
+    ['seals/screenshots/main.png',0.89],['ui/screenshots/collage/c219.png',8.13],['ui/screenshots/plain/Arena.jpg',1.78,2.0,'center 40%'],
+    ['ui/screenshots/threat-numbers.png',1.02],['ui/screenshots/collage/c054.png',1.69],['ui/screenshots/plain/WicksOG.jpg',1.78,2.0,'center 40%'],
+    ['ui/screenshots/collage/c145.png',1.20],['ui/screenshots/plain/Foundry.jpg',1.78,2.0,'center 40%'],['ui/screenshots/collage/c195.png',1.16],
+  ],
+  featured: ['bags/screenshots/main.png','ui/screenshots/plain/Hologram.jpg','gear/screenshots/main.png','reminders/screenshots/alert.png',
+    'trade/screenshots/main.png','ui/screenshots/collage/c176.png','ui/screenshots/plain/Rebel.jpg','comforts/screenshots/main.png'],
+  accent: ['bags/screenshots/main.png','gear/screenshots/main.png','reminders/screenshots/alert.png'],
+};
+function SuiteCardWall() {
+  return (
+    <div style={{width:1200,height:630,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
+      <IsoCollage tiles={WALL.tiles} featured={WALL.featured} accent={WALL.accent} src={n => `images/${n}`}/>
+      <div style={{position:'absolute',inset:0,background:`linear-gradient(90deg, ${BG} 0%, ${BG} 32%, ${BG}e6 41%, ${BG}66 56%, ${BG}00 70%)`}}/>
+      <div style={{position:'absolute',inset:0,background:`radial-gradient(ellipse at 72% 50%, ${BG}00 55%, ${BG}77 100%)`}}/>
+      <div style={{position:'absolute',left:60,top:52,width:420,zIndex:5}}>
+        <CardLockup headline={<>Rebuild your whole UI for&nbsp;Forever.</>}
+          sub="Bags, gear, trade, class kits and ten looks on one core."/>
+      </div>
+      <div style={{position:'absolute',inset:0,zIndex:10,pointerEvents:'none'}}><Brackets size={20} thick={3}/></div>
+    </div>
+  );
+}
+
 function Artboard({ id, label, w, h, Component }) {
   return (
     <div>
@@ -1769,6 +1829,7 @@ const ONLY_COMPONENTS = {
   bannertbc850:{ Comp: () => <SuiteBanner w={850} h={316} flavour="tbc"/>, w: 850, h: 316 },
   social:      { Comp: SocialCover,                                        w: 1200, h: 630 },
   socialtbc:   { Comp: () => <SocialCover flavour="tbc"/>,                 w: 1200, h: 630 },
+  site_card:   { Comp: SuiteCardWall,                                      w: 1200, h: 630 },
   suite:       { Comp: SuiteThumb,                                         w: 460, h: 260 },
   suitetbc:    { Comp: () => <SuiteThumb flavour="tbc"/>,                  w: 460, h: 260 },
   social_core: { Comp: () => <AddonSocial which="core"/>, w: 1200, h: 630 },
@@ -1854,6 +1915,9 @@ function App() {
     <>
       <div className="section-label">Suite Banner · GitHub / CurseForge hero</div>
       <Artboard id="suite-banner" label="Wick Suite — Project Banner" w={860} h={320} Component={SuiteBanner}/>
+
+      <div className="section-label">Site card · 1200×630 (wicksmods.com link card on X / FB)</div>
+      <Artboard id="site-card" label="Wick Suite — Site Card" w={1200} h={630} Component={SuiteCardWall}/>
 
       <div className="section-label">Social Cover · 1200×630 (FB / X / LinkedIn link cards)</div>
       <Artboard id="social-cover" label="Wick Suite — Social Cover" w={1200} h={630} Component={SocialCover}/>
