@@ -1809,6 +1809,17 @@ function SuiteCardWall() {
   );
 }
 
+// The same wall, bare and bigger, for the wicksmods.com hero. The page
+// lays its own words and fade over it.
+function SiteHeroWall() {
+  return (
+    <div style={{width:1600,height:1000,position:'relative',overflow:'hidden',background:BG}}>
+      <IsoCollage tiles={WALL.tiles} featured={WALL.featured} accent={WALL.accent} src={n => `images/${n}`}
+        cols={14} cx={900} cy={500} scale={0.8} zone={[820, 1520, 150, 860]}/>
+    </div>
+  );
+}
+
 function Artboard({ id, label, w, h, Component }) {
   return (
     <div>
@@ -1830,6 +1841,7 @@ const ONLY_COMPONENTS = {
   social:      { Comp: SocialCover,                                        w: 1200, h: 630 },
   socialtbc:   { Comp: () => <SocialCover flavour="tbc"/>,                 w: 1200, h: 630 },
   site_card:   { Comp: SuiteCardWall,                                      w: 1200, h: 630 },
+  site_hero:   { Comp: SiteHeroWall,                                       w: 1600, h: 1000 },
   suite:       { Comp: SuiteThumb,                                         w: 460, h: 260 },
   suitetbc:    { Comp: () => <SuiteThumb flavour="tbc"/>,                  w: 460, h: 260 },
   social_core: { Comp: () => <AddonSocial which="core"/>, w: 1200, h: 630 },
