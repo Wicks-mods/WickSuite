@@ -1756,11 +1756,11 @@ function SocialCover({ flavour = 'forever' } = {}) {
    looks are the raw captures in images/ui/screenshots/plain/ (the ones
    in looks/ carry their names baked in). */
 
-function CardLockup({ headline, sub, label = 'SUITE', size = 96, url = 'wicksmods.com' }) {
+function CardLockup({ headline, sub, eyebrow = 'FOREVER', label = 'SUITE', size = 96, url = 'wicksmods.com' }) {
   return (
     <div style={{display:'flex',flexDirection:'column'}}>
-      <div style={{fontFamily:FM,fontSize:15,letterSpacing:'0.3em',color:MDIM,marginBottom:20}}>
-        WORLD OF WARCRAFT <span style={{color:G}}>&middot;</span> FOREVER
+      <div style={{fontFamily:FM,fontSize:15,letterSpacing:'0.3em',color:MDIM,marginBottom:20,whiteSpace:'nowrap'}}>
+        WORLD OF WARCRAFT <span style={{color:G}}>&middot;</span> {eyebrow}
       </div>
       <div style={{display:'inline-flex',flexDirection:'column',alignItems:'stretch',alignSelf:'flex-start'}}>
         <WickWordmark size={size}/>
@@ -1794,15 +1794,36 @@ const WALL = {
     'trade/screenshots/main.png','ui/screenshots/collage/c176.png','ui/screenshots/plain/Rebel.jpg','comforts/screenshots/main.png'],
   accent: ['bags/screenshots/main.png','gear/screenshots/main.png','reminders/screenshots/alert.png'],
 };
-function SuiteCardWall() {
+// The /tbc card: the same wall from TBC Anniversary captures only.
+const TBC_WALL = {
+  tiles: [
+    ['cd/screenshots/main.png',1.44],['ui/screenshots/tbc.png',1.78,2.0,'center 60%'],['bis/screenshots/main.png',1.49],
+    ['reminders/screenshots/classic-list.png',2.38],['stats/screenshots/main.png',0.84],['trade/screenshots/main-tbc.png',1.68],
+    ['totems/screenshots/main.png',1.82],['wardrobe/screenshots/main.png',1.30],['combat/screenshots/main.png',2.66],
+    ['questkey/screenshots/main.png',1.11],['survivors/screenshots/title.png',1.60],['macro/screenshots/main.png',1.14],
+    ['ledger/screenshots/Screenshot 2026-05-14 122447.png',2.11],['bags/screenshots/main-tbc.png',0.83],['bis/screenshots/custom-lists.png',1.19],
+    ['reminders/screenshots/classic-alarm.png',2.76],['totems/screenshots/Screenshot 2026-05-05 215703.png',1.13],['ledger/screenshots/main.png',0.86],
+    ['survivors/screenshots/main.png',1.36],['bags/screenshots/alt viewer next to character bag.png',1.55],['demons/screenshots/main.png',1.49],
+  ],
+  featured: ['cd/screenshots/main.png','bis/screenshots/main.png','reminders/screenshots/classic-list.png','trade/screenshots/main-tbc.png',
+    'survivors/screenshots/title.png','wardrobe/screenshots/main.png','questkey/screenshots/main.png','totems/screenshots/main.png'],
+  accent: ['cd/screenshots/main.png','bis/screenshots/main.png','reminders/screenshots/classic-list.png'],
+};
+const WALL_COPY = {
+  forever: { wall: WALL, eyebrow: 'FOREVER', headline: <>Rebuild your whole UI for&nbsp;Forever.</>,
+    sub: 'Bags, gear, trade, class kits and ten looks on one core.' },
+  tbc: { wall: TBC_WALL, eyebrow: 'TBC CLASSIC', headline: <>Built to be read at a glance in&nbsp;combat.</>,
+    sub: 'BIS lists, raid cooldowns, trade chat and more for TBC Anniversary.', url: 'wicksmods.com/tbc' },
+};
+function SuiteCardWall({ flavour = 'forever' } = {}) {
+  const c = WALL_COPY[flavour] || WALL_COPY.forever;
   return (
     <div style={{width:1200,height:630,position:'relative',overflow:'hidden',fontFamily:FU,background:BG}}>
-      <IsoCollage tiles={WALL.tiles} featured={WALL.featured} accent={WALL.accent} src={n => `images/${n}`}/>
+      <IsoCollage tiles={c.wall.tiles} featured={c.wall.featured} accent={c.wall.accent} src={n => `images/${n}`}/>
       <div style={{position:'absolute',inset:0,background:`linear-gradient(90deg, ${BG} 0%, ${BG} 32%, ${BG}e6 41%, ${BG}66 56%, ${BG}00 70%)`}}/>
       <div style={{position:'absolute',inset:0,background:`radial-gradient(ellipse at 72% 50%, ${BG}00 55%, ${BG}77 100%)`}}/>
       <div style={{position:'absolute',left:60,top:52,width:420,zIndex:5}}>
-        <CardLockup headline={<>Rebuild your whole UI for&nbsp;Forever.</>}
-          sub="Bags, gear, trade, class kits and ten looks on one core."/>
+        <CardLockup eyebrow={c.eyebrow} headline={c.headline} sub={c.sub} url={c.url}/>
       </div>
       <div style={{position:'absolute',inset:0,zIndex:10,pointerEvents:'none'}}><Brackets size={20} thick={3}/></div>
     </div>
@@ -1841,6 +1862,7 @@ const ONLY_COMPONENTS = {
   social:      { Comp: SocialCover,                                        w: 1200, h: 630 },
   socialtbc:   { Comp: () => <SocialCover flavour="tbc"/>,                 w: 1200, h: 630 },
   site_card:   { Comp: SuiteCardWall,                                      w: 1200, h: 630 },
+  site_card_tbc: { Comp: () => <SuiteCardWall flavour="tbc"/>,          w: 1200, h: 630 },
   site_hero:   { Comp: SiteHeroWall,                                       w: 1600, h: 1000 },
   suite:       { Comp: SuiteThumb,                                         w: 460, h: 260 },
   suitetbc:    { Comp: () => <SuiteThumb flavour="tbc"/>,                  w: 460, h: 260 },
@@ -1930,6 +1952,7 @@ function App() {
 
       <div className="section-label">Site card · 1200×630 (wicksmods.com link card on X / FB)</div>
       <Artboard id="site-card" label="Wick Suite — Site Card" w={1200} h={630} Component={SuiteCardWall}/>
+      <Artboard id="site-card-tbc" label="Wick Suite — Site Card (TBC)" w={1200} h={630} Component={() => <SuiteCardWall flavour="tbc"/>}/>
 
       <div className="section-label">Social Cover · 1200×630 (FB / X / LinkedIn link cards)</div>
       <Artboard id="social-cover" label="Wick Suite — Social Cover" w={1200} h={630} Component={SocialCover}/>
