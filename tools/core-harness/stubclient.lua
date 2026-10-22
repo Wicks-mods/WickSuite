@@ -371,6 +371,11 @@ local function newMock(kind, name)
             end
         elseif k == "GetStatusBarTexture" then return function() return t.__statusTexObj or t end
         elseif k == "SetColorTexture" then return function(_, r, g, b, a) t.__color = { r, g, b, a } end
+        elseif k == "SetVertexColor" then return function(_, r, g, b, a) t.__vertex = { r, g, b, a } end
+        elseif k == "GetVertexColor" then return function()
+                local c = t.__vertex or { 1, 1, 1, 1 }
+                return c[1], c[2], c[3], c[4] or 1
+            end
         elseif k == "SetTextColor" then return function(_, r, g, b, a) t.__textColor = { r, g, b, a } end
         elseif k == "GetTextColor" then return function()
                 local c = t.__textColor or { 1, 1, 1, 1 }
@@ -908,6 +913,22 @@ C_TooltipInfo.GetHyperlink = function(link)
     if not S.TOOLTIP_LINES_FOR then return nil end
     local lines = {}
     for _, t in ipairs(S.TOOLTIP_LINES_FOR) do lines[#lines + 1] = { leftText = t } end
+    return { lines = lines }
+end
+
+-- A bag item's tooltip as data: the item's name, then the lines staged on
+-- it (tip = { { text = ..., red = true } }). Reads are counted, so a
+-- product that keeps its answers can be seen to.
+S.TIP_SCANS = 0
+C_TooltipInfo.GetBagItem = function(bag, slot)
+    S.TIP_SCANS = S.TIP_SCANS + 1
+    local it = S.SLOT_ITEMS and S.SLOT_ITEMS[bag] and S.SLOT_ITEMS[bag][slot]
+    if not it then return nil end
+    local lines = { { leftText = "item " .. tostring(it.id) } }
+    for _, l in ipairs(it.tip or {}) do
+        lines[#lines + 1] = { leftText = l.text,
+            leftColor = l.red and { r = 1, g = 0.125, b = 0.125 } or { r = 1, g = 1, b = 1 } }
+    end
     return { lines = lines }
 end
 
@@ -1633,7 +1654,7 @@ if TBC then
     QuestWatchFrame = newMock("Frame", "QuestWatchFrame")
     -- Tooltips carry no data table on this client: the processor exists and
     -- never runs (probed 2026-10-02), and the tooltip info API is absent.
-    if C_TooltipInfo then C_TooltipInfo.GetHyperlink = nil; C_TooltipInfo.GetInventoryItem = nil end
+    if C_TooltipInfo then C_TooltipInfo.GetHyperlink = nil; C_TooltipInfo.GetInventoryItem = nil; C_TooltipInfo.GetBagItem = nil end
     -- The game's windows are the old Classic kind: CharacterFrame has no
     -- NineSlice, which is what WickCore reads to tell the generation.
     CharacterFrame = newMock("Frame", "CharacterFrame")

@@ -133,6 +133,47 @@ do
     S.SLOT_ITEMS[1] = nil
 end
 
+io.write("== unusable ==\n")
+if MODERN then
+    -- Two pieces of gear in bag 2: one with a requirement in red, one not.
+    S.ITEMS[9101] = { name = "Plate of Later", quality = 2, sellPrice = 100 }
+    S.ITEMS[9102] = { name = "Cloth of Now", quality = 2, sellPrice = 100 }
+    S.SLOT_ITEMS[2] = {
+        [1] = { id = 9101, count = 1, quality = 2, tip = { { text = "Requires Level 40", red = true } } },
+        [2] = { id = 9102, count = 1, quality = 2, tip = { { text = "Requires Level 10" } } },
+    }
+    local function slotFor(bag, slot)
+        for i = 1, 400 do
+            local b = _G["WicksBagsSlot" .. i]
+            if b and b._bag == bag and b._slot == slot then return b end
+        end
+    end
+    local function red(b)
+        local c = b and b._iconTex and b._iconTex.__vertex
+        return c ~= nil and c[2] < 0.5
+    end
+    S.TIP_SCANS = 0
+    WB.Bag:Refresh()
+    local late, now = slotFor(2, 1), slotFor(2, 2)
+    check(late and red(late), "an item with a requirement in red is tinted red")
+    check(now and not red(now), "one you can use is not")
+    local scans = S.TIP_SCANS
+    check(scans >= 2, "the tooltip was read once per item: " .. scans)
+    WB.Bag:Refresh()
+    check(S.TIP_SCANS == scans, "a second refresh reads no tooltip; the answers are kept")
+    S.fire("PLAYER_LEVEL_UP", 40)
+    check(S.TIP_SCANS > scans, "a level gained forgets them and reads again")
+    scans = S.TIP_SCANS
+    S.fire("UPDATE_FACTION")
+    S.fire("UPDATE_FACTION")
+    check(S.TIP_SCANS <= scans + 2, "reputation steps are taken once a minute at most: " .. (S.TIP_SCANS - scans))
+    WB.db.options.showUnusable = false
+    WB.Bag:Refresh()
+    check(late and not red(late), "the option off leaves every icon plain")
+    WB.db.options.showUnusable = true
+    S.SLOT_ITEMS[2] = nil
+end
+
 WB.Bag:Hide()
 check(not WB.Bag.panel:IsShown(), "Bag:Hide")
 
