@@ -79,7 +79,11 @@ function roster() {
   const byCf = new Map();
   for (const a of config.addons) {
     if (a.benched || !a.cf_project_id || !a.cf_slug) continue;
-    if (live[a.cf_slug] && live[a.cf_slug] !== "live") continue;
+    // A project CurseForge has not approved yet gets no page. One that has a
+    // page already keeps it: the status check flips on a blocked request now
+    // and then, and a page should not come and go with it.
+    const hasPage = HAND_PAGES[a.cf_slug] || fs.existsSync(path.join(SITE, "addons", a.cf_slug, "index.html"));
+    if (live[a.cf_slug] && live[a.cf_slug] !== "live" && !hasPage) continue;
     const r = byCf.get(a.cf_slug) || { slug: a.cf_slug, entries: [], clients: new Set() };
     r.entries.push(a);
     const c = a.client || "tbc";
