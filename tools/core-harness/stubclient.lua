@@ -890,8 +890,12 @@ function IsAltKeyDown() return false end
 function GetTime() return os.clock() end
 function GetCursorPosition() return 0, 0 end
 function GetCursorInfo() return nil end
-function CursorHasItem() return false end
-function ClearCursor() end
+-- The cursor: what PickupContainerItem put there, until it is cleared,
+-- dropped or deleted. S.DELETED keeps the last item deleted from it.
+S.CURSOR = nil
+function CursorHasItem() return S.CURSOR ~= nil end
+function ClearCursor() S.CURSOR = nil end
+function DeleteCursorItem() S.DELETED = S.CURSOR; S.CURSOR = nil end
 function GetMoney() return S.MONEY or 123456 end
 -- The structured tooltip. S.TOOLTIP_LINES_FOR lets a test put words in
 -- the client's mouth, which is how the set bonus reader is exercised:
@@ -1295,7 +1299,7 @@ if MODERN then
         GetContainerItemInfo = function(bag, slot)
             local it = staged(bag, slot)
             if it then
-                return { iconFileID = it.icon or 132382, stackCount = it.count or 1, isLocked = false, quality = 1, hyperlink = stagedLink(it), itemID = it.id, isBound = false }
+                return { iconFileID = it.icon or 132382, stackCount = it.count or 1, isLocked = false, quality = it.quality or 1, hyperlink = stagedLink(it), itemID = it.id, isBound = false }
             end
             if S.SLOT_ITEMS[bag] then return nil end   -- a staged bag holds only what was staged
             if not slotHasItem(bag, slot) or slot > numSlots(bag) then return nil end
@@ -1314,7 +1318,7 @@ if MODERN then
             if slotHasItem(bag, slot) and slot <= numSlots(bag) then return 6948 end
         end,
         UseContainerItem = function() end,
-        PickupContainerItem = function() end,
+        PickupContainerItem = function(bag, slot) S.CURSOR = { bag = bag, slot = slot } end,
         ContainerIDToInventoryID = function(bag) return 19 + bag end,
         GetItemCooldown = function(id) return S.itemCooldown(id) end,
         SortBags = function() S.SORTED = (S.SORTED or 0) + 1 end,
@@ -1510,7 +1514,7 @@ if not MODERN or TBC then
     function GetContainerNumFreeSlots(bag) return math.max(0, numSlots(bag) - 3), S.BAG_FAMILY[bag] or 0 end
     function GetContainerItemInfo(bag, slot)
         local it = staged(bag, slot)
-        if it then return it.icon or 132382, it.count or 1, false, 1, false, false, stagedLink(it), false, false, it.id, false end
+        if it then return it.icon or 132382, it.count or 1, false, it.quality or 1, false, false, stagedLink(it), false, false, it.id, false end
         if S.SLOT_ITEMS[bag] then return nil end
         if not slotHasItem(bag, slot) or slot > numSlots(bag) then return nil end
         return "Interface\\Icons\\INV_Misc_Rune_01", 1, false, 1, false, false, ITEM_LINK, false, false, 6948, true
@@ -1528,7 +1532,7 @@ if not MODERN or TBC then
         if slotHasItem(bag, slot) and slot <= numSlots(bag) then return 6948 end
     end
     function UseContainerItem() end
-    function PickupContainerItem() end
+    function PickupContainerItem(bag, slot) S.CURSOR = { bag = bag, slot = slot } end
     function ContainerIDToInventoryID(bag) return 19 + bag end
     function GetNumBankSlots() return 2 end
     function GetBankSlotCost() return 10000 end

@@ -94,6 +94,45 @@ else
 end
 S.fire("BAG_UPDATE", 0)
 check(true, "BAG_UPDATE handled")
+
+io.write("== junk ==\n")
+do
+    -- Greys in bag 1: the cheapest stack by vendor value goes first.
+    S.ITEMS = S.ITEMS or {}
+    S.ITEMS[9001] = { name = "Broken Fang", quality = 0, sellPrice = 10 }
+    S.ITEMS[9002] = { name = "Cracked Pot", quality = 0, sellPrice = 20 }
+    S.ITEMS[9003] = { name = "Soggy Scroll", quality = 0, sellPrice = 0 }
+    S.SLOT_ITEMS[1] = {
+        [1] = { id = 9001, count = 5, quality = 0 },
+        [2] = { id = 9002, count = 1, quality = 0 },
+        [3] = { id = 2589, count = 3, quality = 1 },
+    }
+    local it = WB.Bag:FindCheapestJunk()
+    check(it and it.bag == 1 and it.slot == 2 and it.value == 20, "the cheapest junk by stack value is found: " .. tostring(it and it.slot))
+    S.SLOT_ITEMS[1][4] = { id = 9003, count = 2, quality = 0 }
+    it = WB.Bag:FindCheapestJunk()
+    check(it and it.slot == 4, "a worthless grey goes before one worth anything")
+    local btn = WB.Bag.panel._junkBtn
+    check(btn ~= nil, "the junk button is in the title bar")
+    if btn and btn.__scripts and btn.__scripts.OnClick then
+        S.DELETED = nil
+        btn.__scripts.OnClick(btn)
+        check(S.DELETED and S.DELETED.bag == 1 and S.DELETED.slot == 4 and S.CURSOR == nil,
+            "one click picks it up and deletes it from the cursor")
+        S.SLOT_ITEMS[1] = { [3] = { id = 2589, count = 3, quality = 1 } }
+        S.DELETED = nil
+        btn.__scripts.OnClick(btn)
+        check(S.DELETED == nil and S.CURSOR == nil, "nothing is picked up or deleted when there is no junk")
+    end
+    WB.db.options.destroyJunkButton = false
+    WB.Bag:ApplyOptionsUI()
+    check(btn and not btn:IsShown(), "the option hides the button")
+    WB.db.options.destroyJunkButton = true
+    WB.Bag:ApplyOptionsUI()
+    check(btn and btn:IsShown(), "and shows it again")
+    S.SLOT_ITEMS[1] = nil
+end
+
 WB.Bag:Hide()
 check(not WB.Bag.panel:IsShown(), "Bag:Hide")
 
