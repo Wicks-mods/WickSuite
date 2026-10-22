@@ -464,8 +464,10 @@ Sitemap: ${ORIGIN}/sitemap.xml
 // ── write ───────────────────────────────────────────────────────────────
 function put(rel, content) {
   const p = path.join(SITE, rel);
+  // A checkout on Windows may hold the file with CRLF line endings; git
+  // normalizes them, so only the content counts.
   const before = read(p);
-  const changed = before !== content;
+  const changed = (before === null ? null : before.replace(/\r\n/g, "\n")) !== content;
   if (changed && !CHECK) {
     fs.mkdirSync(path.dirname(p), { recursive: true });
     fs.writeFileSync(p, content);
