@@ -671,6 +671,31 @@
         "Snooze or Done on every alert"
       ],
       "repo": "WicksReminders"
+    },
+    {
+      "folder": "WicksMap",
+      "title": "Wick's Map",
+      "short": "Map",
+      "client": "both",
+      "cf_game_versions": [
+        16533,
+        17053
+      ],
+      "slash": "/wmap",
+      "tagline": "Scroll the world map from the world down to the ground, and pin your own places.",
+      "short_tagline": "Scroll from the world down to the ground",
+      "accent": "#4FC778",
+      "accent_name": "Fel Green",
+      "cf_slug": "wicks-map",
+      "cf_project_id": 1761623,
+      "key": "map",
+      "icon": "mp",
+      "features": [
+        "A glide between map levels",
+        "Terrain past the painted map",
+        "Your own pins, and an arrow"
+      ],
+      "repo": "WicksMap"
     }
   ],
   "retired": [

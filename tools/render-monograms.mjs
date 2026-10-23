@@ -28,6 +28,8 @@ const TILES = [
   { id: "wick-logo-bo-512",     slug: "bones",     out: "logo-512.png", w: 512, h: 512 },
   { id: "wick-logo-re-256",     slug: "reminders", out: "logo-256.png", w: 256, h: 256 },
   { id: "wick-logo-re-512",     slug: "reminders", out: "logo-512.png", w: 512, h: 512 },
+  { id: "wick-logo-mp-256",     slug: "map",       out: "logo-256.png", w: 256, h: 256 },
+  { id: "wick-logo-mp-512",     slug: "map",       out: "logo-512.png", w: 512, h: 512 },
 ];
 
 // Slugs named on the command line narrow the run, so adding one addon's
