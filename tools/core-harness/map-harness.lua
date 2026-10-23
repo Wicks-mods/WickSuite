@@ -9,10 +9,13 @@
 --   level opens at the size the smaller map was drawn, on the same spot.
 --   The terrain: the real tile data, the grid found from a map's corners,
 --   the fade measured against the zone's painting, tiles placed and reused.
---   The marker: right-click drops and clears, Shift and the left button
---   pass, a click on a continent lands in the zone under it, the pin, the
---   arrow's distance and direction, arrival, the slash forms, and on a
---   client with the game's waypoint, that waypoint.
+--   The right-click menu: Shift and the left button pass, a slip inside
+--   never lets the map go up a level, waypoints set and cleared from it
+--   (the game's own where there is one; ours, its marker and arrow, where
+--   not), a click on a continent landing in the zone under it.
+--   Pins: added from the menu and named after the place, saved with a note
+--   and icon, drawn on their zone and smaller on the continent, headed for,
+--   changed and deleted, pinned where you stand from the slash command.
 --   And that nothing of ours is written into the game's map tables.
 -- args: coreDir, addonsDir, mode, stubPath
 local CORE_DIR, ADDONS_DIR, MODE, STUB = ...
@@ -328,6 +331,7 @@ check(Core.Options.pages.WicksMap ~= nil, "a page under Wick's Mods")
 check(Core.Launcher.entries.WicksMap ~= nil, "a line in the launcher")
 check(ns.attached and Zoom.attached and Marker.attached, "hooked onto the world map")
 check(#MAP.handlers == 1 and MAP.handlers[1].pri == 100, "one canvas click handler, ahead of the game's")
+check(db.continentPins and #db.pins == 0 and db.nextPin == 1, "no pins yet, continent pins on")
 check(ns.Terrain.layer:GetFrameLevel() == 2002, "the terrain sits just over the explored areas: " .. tostring(ns.Terrain.layer:GetFrameLevel()))
 check(Marker.layer:GetFrameLevel() == 2810 and Zoom.ov:GetFrameLevel() == 2820, "the marker and the zoom above every pin")
 local native = Marker:Native()
@@ -669,16 +673,34 @@ else
 end
 noErrors("the wheel")
 
-io.write("== the marker ==\n")
+io.write("== the right-click menu and the waypoint ==\n")
 clearChat()
 settle(); upd(ov, 1); upd(ov, 1)
-MAP.id = 1415
+local Pins = ns.Pins
+local function menuOpen() return Pins.menu ~= nil and Pins.menu:IsShown() end
+local function menuItems()
+    local out = {}
+    for _, r in ipairs(Pins.menu.rows) do
+        if r:IsShown() then out[#out + 1] = plain(r.label:GetText()) end
+    end
+    return table.concat(out, " | ")
+end
+local function pick(text)
+    for _, r in ipairs(Pins.menu.rows) do
+        if r:IsShown() and plain(r.label:GetText()) == text then
+            r.__scripts.OnMouseUp(r, "LeftButton")
+            return true
+        end
+    end
+    return false
+end
+show(1415)
 check(rightClick(0.45, 0.75, "LeftButton") == false, "a left click is the game's")
 SHIFT = true
-check(rightClick(0.45, 0.75) == false, "Shift+right-click goes up a level, as before")
+check(rightClick(0.45, 0.75) == false and not menuOpen(), "Shift+right-click goes up a level, as before")
 SHIFT = false
 db.rightClick = false
-check(rightClick(0.45, 0.75) == false, "switched off, a right-click is the game's")
+check(rightClick(0.45, 0.75) == false and not menuOpen(), "switched off, a right-click is the game's")
 db.rightClick = true
 
 local SET, TRACK, CLEARED = nil, nil, 0
@@ -699,12 +721,23 @@ if MODE ~= "tbc" then
         return mp
     end
     check(Marker:Native(), "the game's waypoint is used")
-    check(rightClick(0.45, 0.71) == true, "right-click on the continent is ours")
+    check(rightClick(0.45, 0.71) == true and menuOpen(), "right-click on the continent opens the menu, and the map stays")
+    check(menuItems() == "Add a pin here | Set a waypoint here", "with a pin and a waypoint to offer: " .. menuItems())
+    check(plain(Pins.menu.title:GetText()):find("Elwynn Forest  50.0, 10.0", 1, true) ~= nil, "headed with the place and its coordinates")
+    pick("Set a waypoint here")
+    check(not menuOpen(), "picking a line closes it")
     check(SET and SET.uiMapID == 1429 and near(SET.position.x, 0.5) and near(SET.position.y, 0.1),
         "the waypoint lands in Elwynn, at the same spot")
     check(TRACK == true, "and is tracked, so the game shows it in the world")
-    check(not Marker.layer:IsShown() and not (Marker.win and Marker.win:IsShown()), "no pin or arrow of ours beside it")
-    check(rightClick(0.4505, 0.7105) == true and SET == nil and CLEARED == 1 and TRACK == false, "right-click on it again takes it away")
+    check(not Marker.layer:IsShown(), "the game draws the pin, so no marker of ours")
+    check(Marker.win and Marker.win:IsShown(), "and the arrow points to it, as the game shows no guide in the world")
+    Marker:UpdateArrow()
+    check(plain(Marker.win.dist:GetText()) == "640 yd", "measured to the game's waypoint: " .. plain(Marker.win.dist:GetText()))
+    rightClick(0.2, 0.2)
+    check(menuItems():find("Clear the waypoint", 1, true) ~= nil, "with one set, the menu offers to clear it")
+    pick("Clear the waypoint")
+    check(SET == nil and CLEARED == 1 and TRACK == false, "and clearing takes it away")
+    check(not Marker.win:IsShown(), "with its arrow")
     -- A realm whose rules switch the map pin off gets ours instead.
     Enum = Enum or {}
     Enum.GameRule = { WorldMapTrackingPinDisabled = 77 }
@@ -713,18 +746,19 @@ if MODE ~= "tbc" then
     check(not Marker:Native(), "with the rule on, our own marker")
 end
 
-check(rightClick(0.45, 0.71) == true, "right-click on the continent drops a marker")
+check(rightClick(0.45, 0.71) == true and menuItems() == "Add a pin here | Point the arrow here", "our own marker's menu: " .. menuItems())
+pick("Point the arrow here")
 local m = db.marker
 check(m and m.mapID == 1429 and near(m.x, 0.5) and near(m.y, 0.1), "kept on Elwynn, at the same spot")
 check(Marker.layer:IsShown(), "the pin layer shows")
 Marker.layer.__scripts.OnUpdate(Marker.layer)
 local p, rel, rp, px, py = Marker.layer.pin:GetPoint()
 check(rp == "TOPLEFT" and near(px, 0.45 * 1002, 0.01) and near(py, -0.71 * 668, 0.01),
-    ("the pin sits on Elwynn's spot on the continent (%.1f, %.1f)"):format(px or -1, py or -1))
+    ("the marker sits on Elwynn's spot on the continent (%.1f, %.1f)"):format(px or -1, py or -1))
 MAP.id = 1429
 Marker.layer.__scripts.OnUpdate(Marker.layer)
 p, rel, rp, px, py = Marker.layer.pin:GetPoint()
-check(near(px, 0.5 * 1002, 0.01) and near(py, -0.1 * 668, 0.01), "and on the zone map where it was dropped")
+check(near(px, 0.5 * 1002, 0.01) and near(py, -0.1 * 668, 0.01), "and on the zone map where it was set")
 
 local win = Marker.win
 check(win and win:IsShown(), "the arrow window shows")
@@ -742,42 +776,175 @@ Marker:UpdateArrow()
 check(plain(win.dist:GetText()) == "480 yd" and near(ROT, -math.pi / 2, 1e-6), "a marker due east: 480 yards, pointing right")
 check(Marker:Describe():find("Elwynn Forest  90.0, 90.0", 1, true) ~= nil, "the launcher line: " .. tostring(Marker:Describe()))
 
-MAP.id = 1415
-check(rightClick(0.49, 0.79) == true and db.marker == nil, "right-click on the marker takes it away")
-check(not Marker.layer:IsShown() and not win:IsShown(), "and the pin and arrow go with it")
+show(1415)
+rightClick(0.2, 0.2)
+check(pick("Clear the arrow") and db.marker == nil, "Clear the arrow, from the menu")
+check(not Marker.layer:IsShown() and not win:IsShown(), "and the marker and arrow go with it")
+
+-- Whatever goes wrong inside, a right-click the menu owns never falls
+-- through to the map going up a level.
+local realMenu = Pins.MapMenu
+Pins.MapMenu = function() error("a slip") end
+check(rightClick(0.45, 0.71) == true, "a slip inside the menu still keeps the map where it is")
+Pins.MapMenu = realMenu
+clearChat()
 
 io.write("== the slash command and arrival ==\n")
 slash("45.5 61")
 m = db.marker
-check(m and m.mapID == 1429 and near(m.x, 0.455) and near(m.y, 0.61), "/wmap 45.5 61 puts a marker in the zone you are in")
+check(m and m.mapID == 1429 and near(m.x, 0.455) and near(m.y, 0.61), "/wmap 45.5 61 sets a waypoint in the zone you are in")
 check(win:IsShown(), "with the arrow")
 win.close:Click()
 check(not win:IsShown() and Marker.arrowClosed, "closing the arrow puts it away")
 Marker:Refresh()
-check(not win:IsShown(), "and it stays away for this marker")
+check(not win:IsShown(), "and it stays away for this waypoint")
 PLAYER.x, PLAYER.y = 0.455, 0.612
 Marker.arrowClosed = nil
 clearChat()
 Marker:Refresh()
-check(db.marker == nil and chatSince():find("reached your marker", 1, true) ~= nil, "walking onto it puts it away: " .. chatSince())
+check(db.marker == nil and chatSince():find("reached your waypoint", 1, true) ~= nil, "walking onto it puts it away: " .. chatSince())
 slash("12 34")
 slash("clear")
 check(db.marker == nil, "/wmap clear takes it away")
 clearChat()
 slash("clear")
-check(chatSince():find("no marker", 1, true) ~= nil, "and says so when there is none")
+check(chatSince():find("no waypoint", 1, true) ~= nil, "and says so when there is none")
 slash("200 10")
 check(db.marker == nil, "coordinates past 100 are refused")
-MAP.id = 947
-check(rightClick(0.55 + 0.45 * 0.4, 0.1 + 0.71 * 0.8) == true, "right-click on the world map")
+show(947)
+rightClick(0.55 + 0.45 * 0.4, 0.1 + 0.71 * 0.8)
+check(menuItems() == "Add a pin here | Point the arrow here", "right-click on the world map: the same menu")
+pick("Point the arrow here")
 m = db.marker
 check(m and m.mapID == 1429 and near(m.x, 0.5) and near(m.y, 0.1), "lands in Elwynn through the continent")
 slash("clear")
 clearChat()
-check(rightClick(0.2, 0.5) == true and db.marker == nil, "a place with no world position is refused")
-check(chatSince():find("cannot go there", 1, true) ~= nil, "and says why: " .. chatSince())
+rightClick(0.2, 0.5)
+check(menuItems() == "Point the arrow here", "a place with no world position has no pin to offer")
+pick("Point the arrow here")
+check(db.marker == nil and chatSince():find("cannot go there", 1, true) ~= nil, "and the waypoint is refused, saying why: " .. chatSince())
 clearChat()
-noErrors("the marker")
+noErrors("the waypoint")
+
+io.write("== pins ==\n")
+clearChat()
+local function placePins() Pins.layer.__scripts.OnUpdate(Pins.layer) end
+show(1415)
+rightClick(0.45, 0.71)
+check(pick("Add a pin here"), "Add a pin here, from the menu")
+local ed = Pins.editor
+check(ed and ed:IsShown() and plain(ed.name.edit:GetText()) == "Elwynn Forest" and not ed.delete:IsShown(),
+    "the editor opens, named after the place, with nothing to delete yet")
+ed.name.edit:SetText("Goldshire inn")
+ed.note.edit:SetText("Hearth here")
+Pins:PickIcon(3)
+ed.save:Click()
+local pin = db.pins[1]
+check(pin and pin.mapID == 1429 and near(pin.x, 0.5) and near(pin.y, 0.1) and pin.title == "Goldshire inn"
+    and pin.note == "Hearth here" and pin.icon == 3, "saved on Elwynn at the spot, with its name, note and icon")
+check(not ed:IsShown() and chatSince():find("pinned Goldshire inn", 1, true) ~= nil, "the editor closes, and says so")
+placePins()
+local f = Pins.frames[1]
+local _, _, _, fx, fy = f:GetPoint()
+check(f:IsShown() and f.pin == pin and near(fx, 0.45 * 1002, 0.01) and near(fy, -0.71 * 668, 0.01),
+    "drawn on the continent, at its spot")
+check(f:GetWidth() < 18, "smaller on a continent")
+check(Pins.layer:GetFrameLevel() == 2806, "over the game's icons, under the waypoint")
+show(1429); placePins()
+_, _, _, fx, fy = Pins.frames[1]:GetPoint()
+check(near(fx, 0.5 * 1002, 0.01) and near(fy, -0.1 * 668, 0.01) and Pins.frames[1]:GetWidth() == 18, "and full size on Elwynn")
+show(947); placePins()
+check(not Pins.frames[1]:IsShown(), "not on the world map")
+db.continentPins = false; Pins:Changed()
+show(1415); placePins()
+check(not Pins.frames[1]:IsShown(), "and off continents when switched off")
+db.continentPins = true; Pins:Changed()
+show(1429); placePins()
+f = Pins.frames[1]
+f.__scripts.OnEnter(f)
+f.__scripts.OnMouseUp(f, "LeftButton")
+check(db.marker and db.marker.mapID == 1429 and near(db.marker.x, 0.5) and near(db.marker.y, 0.1)
+    and chatSince():find("heading for Goldshire inn", 1, true) ~= nil, "left-click a pin: heading there")
+check(Marker.win:IsShown() and plain(Marker.win.where:GetText()) == "Goldshire inn"
+    and Marker:Describe():find("Goldshire inn", 1, true) ~= nil, "the arrow window names the pin")
+check(db.marker.pin == pin.id and not Marker.layer:IsShown(), "the pin itself is the destination, with no marker drawn over it")
+placePins()
+check(f.glow:IsShown(), "and it glows while you head for it")
+clearChat()
+f.__scripts.OnMouseUp(f, "LeftButton")
+check(db.marker == nil and not Marker.win:IsShown() and chatSince():find("stopped heading for Goldshire inn", 1, true) ~= nil,
+    "left-click it again: stop heading there")
+placePins()
+check(not f.glow:IsShown(), "and the glow goes")
+f.__scripts.OnMouseUp(f, "RightButton")
+check(menuOpen() and menuItems() == "Head here | Change | Delete", "right-click a pin: its own menu")
+pick("Head here")
+check(db.marker and db.marker.pin == pin.id, "Head here, from its menu")
+f.__scripts.OnMouseUp(f, "RightButton")
+check(menuItems() == "Stop heading here | Change | Delete", "then it offers to stop")
+show(1415); rightClick(0.2, 0.2)
+check(menuItems():find("Stop heading for Goldshire inn", 1, true) ~= nil, "and the map's menu names what you are heading for")
+Pins:HideMenu()
+show(1429); placePins()
+f.__scripts.OnMouseUp(f, "RightButton")
+pick("Change")
+check(ed:IsShown() and plain(ed.name.edit:GetText()) == "Goldshire inn" and plain(ed.note.edit:GetText()) == "Hearth here"
+    and ed.icon == 3 and ed.delete:IsShown(), "Change opens it in the editor as it was, with Delete")
+ed.name.edit:SetText("The inn")
+Pins:PickIcon(8)
+ed.save:Click()
+check(#db.pins == 1 and pin.title == "The inn" and pin.icon == 8 and pin.note == "Hearth here", "changed in place")
+check(Marker:Label() == "The inn" and plain(Marker.win.where:GetText()) == "The inn", "the arrow window takes the new name")
+placePins()
+f.__scripts.OnMouseUp(f, "RightButton")
+pick("Delete")
+check(#db.pins == 0, "Delete from its menu removes it")
+check(db.marker == nil and not Marker.win:IsShown(), "and deleting the pin you head for stops the heading, arrow and all")
+placePins()
+check(not Pins.frames[1]:IsShown(), "and it leaves the map")
+clearChat()
+slash("pin Herbs")
+pin = db.pins[1]
+check(pin and pin.title == "Herbs" and pin.mapID == 1429 and near(pin.x, PLAYER.x) and near(pin.y, PLAYER.y),
+    "/wmap pin Herbs pins where you stand")
+slash("pin")
+check(#db.pins == 2 and db.pins[2].title == "Elwynn Forest", "with no name, it is named after the place")
+clearChat(); slash("pins")
+check(chatSince():find("Herbs", 1, true) ~= nil and chatSince():find("Elwynn Forest", 1, true) ~= nil, "/wmap pins lists them")
+Pins:Edit(db.pins[2])
+ed.delete:Click()
+check(#db.pins == 1 and db.pins[1].title == "Herbs", "the editor's Delete removes the one it shows")
+check(db.pins[1].id == 2 and db.nextPin == 4, "each pin keeps an id of its own, never reused")
+-- A pin away from where the test player stands, so heading there does
+-- not arrive at once.
+local far = Pins:Add(1429, 0.1, 0.1, "Far", 2)
+Pins:HeadTo(far)
+check(db.marker and db.marker.pin == far.id, "(heading for a pin away from you)")
+Marker:Set(1429, 0.3, 0.3)
+check(db.marker and db.marker.pin == nil and not Marker:PinID(), "a waypoint set elsewhere replaces the pin you were heading for")
+slash("clear")
+db.marker = { mapID = 1429, x = 0.5, y = 0.5, label = "Gone", pin = 999 }
+Marker:Restore()
+check(db.marker == nil, "a pin headed for and since deleted is let go at login")
+if MODE ~= "tbc" then
+    -- The game's waypoint back on: heading for a pin replaces it.
+    C_GameRules.IsGameRuleActive = function() return false end
+    Marker:Set(1429, 0.3, 0.3)
+    check(Marker:Native() and SET ~= nil, "(a waypoint of the game's set)")
+    local clearedBefore = CLEARED
+    Pins:HeadTo(far)
+    check(SET == nil and CLEARED == clearedBefore + 1 and db.marker and db.marker.pin == far.id,
+        "heading for a pin clears the game's waypoint: one place to head for")
+    check(not Marker.layer:IsShown() and Marker.win:IsShown() and plain(Marker.win.where:GetText()) == "Far",
+        "nothing drawn over the pin, and the arrow named for it")
+    Marker:Set(1429, 0.3, 0.3)
+    check(SET ~= nil and db.marker == nil and not Marker:PinID(), "and a waypoint set after replaces the pin")
+    slash("clear")
+    C_GameRules.IsGameRuleActive = function(rule) return rule == 77 end
+end
+Pins:Remove(far)
+clearChat()
+noErrors("pins")
 
 io.write("== nothing of ours on the game's map ==\n")
 local function added(t, was)
