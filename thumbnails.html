@@ -1191,6 +1191,7 @@ const SOCIAL = {
   poisons: { label: 'POISONS AND THINGS', title: true, tagline: 'The rogue kit: coatings, combo points and weapon swaps.', features: ['What coats each blade, and how long is left', 'One key per hand to recoat', 'Combo points over your target, energy under them', 'Weapon swap keys for a dagger opener'] },
   seals: { label: 'SEALS AND THINGS', title: true, tagline: 'The paladin kit: the seal key, blessings and weapon swaps.', features: ['One seal key: Crusader, fighting seal and back', 'A blessing key, friend first', 'Two-hander and sword-and-board swap keys', 'Talents, checklist and racials'] },
   reminders: { label: 'REMINDERS', title: true, tagline: 'Set it once. It keeps counting, even while you are logged out.', features: ['Timers, alarms and event reminders', 'Anything missed goes off when you log in', 'Snooze or Done on every alert', 'TBC Anniversary and Forever'] },
+  map: { label: 'MAP', title: true, tagline: 'Scroll from the world down to the ground, and pin the places worth finding again.', features: ['A smooth zoom between map levels', 'Terrain past the painted map', 'Your own pins, and an arrow to them', 'TBC Anniversary and Forever'] },
   ui: { label: 'UI', title: true, tagline: 'The whole interface, in one look.', features: ['Bars, frames, nameplates and chat', "The game's own windows, dressed to match", 'Ten looks, Classic among them', 'Take the tour at wicksmods.com/ui'] },
 };
 
@@ -1247,6 +1248,12 @@ function AddonSocial({ which }) {
             <div style={{fontFamily:FM,fontSize:14,letterSpacing:'0.3em',color:MDIM,textAlign:'center',textTransform:'uppercase'}}>
               Ten looks <span style={{color:G}}>&middot;</span> or your own
             </div>
+          </div>
+        ) : which === 'map' ? (
+          // The painted zone over the terrain close in, as on the thumbnail.
+          <div style={{height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',gap:16}}>
+            <div style={{height:244}}><Shot which="map_zone" size="cover" origin="center 85%" glowAt="40% 75%"/></div>
+            <div style={{height:244}}><Shot which="map_terrain" size="cover" origin="center 40%" glowAt="55% 40%"/></div>
           </div>
         ) : which === 'reminders' ? (
           // The list over the card it pops, as on the thumbnail.
@@ -1915,6 +1922,7 @@ const ONLY_COMPONENTS = {
   social_poisons: { Comp: () => <AddonSocial which="poisons"/>, w: 1200, h: 630 },
   social_seals: { Comp: () => <AddonSocial which="seals"/>, w: 1200, h: 630 },
   social_reminders: { Comp: () => <AddonSocial which="reminders"/>, w: 1200, h: 630 },
+  social_map: { Comp: () => <AddonSocial which="map"/>, w: 1200, h: 630 },
   social_ui: { Comp: () => <AddonSocial which="ui"/>, w: 1200, h: 630 },
   ui_looks:    { Comp: UILooks,                                            w: 1200, h: 630 },
   milestone:   { Comp: Milestone,                                          w: 1200, h: 630 },
