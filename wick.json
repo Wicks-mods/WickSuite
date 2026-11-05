@@ -715,7 +715,7 @@
     },
     "forever": {
       "label": "World of Warcraft: Forever",
-      "addons_root": "C:\\Program Files (x86)\\World of Warcraft\\_classic_beta_\\Interface\\AddOns",
+      "addons_root": "C:\\Program Files (x86)\\World of Warcraft\\_forever_\\Interface\\AddOns",
       "cf_game_version_id": 17053,
       "cf_game_version_type_id": 88568,
       "interface": "16001"

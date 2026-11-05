@@ -11,8 +11,8 @@ import re
 import sys
 from lupa import LuaRuntime
 
-SV = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\WTF\Account\51031842#1\SavedVariables\WicksUI.lua"
-OUT = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns\WicksUI\Core\Layout.lua"
+SV = r"C:\Program Files (x86)\World of Warcraft\_forever_\WTF\Account\WICKIDSPLIFF\SavedVariables\WicksUI.lua"
+OUT = r"C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\WicksUI\Core\Layout.lua"
 NAME = sys.argv[1] if len(sys.argv) > 1 else "safe"
 
 L = LuaRuntime()

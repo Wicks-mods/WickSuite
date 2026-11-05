@@ -17,7 +17,7 @@ over an icon or the minimap.
 """
 from PIL import Image, ImageDraw
 
-OUT = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns\WickCore\Media\Textures"
+OUT = r"C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\WickCore\Media\Textures"
 K = 8
 WHITE = (255, 255, 255, 255)
 CLEAR = (255, 255, 255, 0)

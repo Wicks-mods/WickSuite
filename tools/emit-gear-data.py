@@ -16,7 +16,7 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.normpath(os.path.join(HERE, "..", "data", "forever"))
-ADDON = ("C:/Program Files (x86)/World of Warcraft/_classic_beta_"
+ADDON = ("C:/Program Files (x86)/World of Warcraft/_forever_"
          "/Interface/AddOns/WicksGear")
 
 

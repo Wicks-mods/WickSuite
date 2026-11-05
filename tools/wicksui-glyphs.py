@@ -3,7 +3,7 @@ and scaled down for clean edges. Tinted in game with SetVertexColor."""
 import math
 from PIL import Image, ImageDraw
 
-OUT = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns\WicksUI\Media\Textures"
+OUT = r"C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\WicksUI\Media\Textures"
 S = 32
 K = 8
 N = S * K

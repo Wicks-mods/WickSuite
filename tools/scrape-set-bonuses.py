@@ -27,7 +27,7 @@ import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "..", "data", "forever")
-ADDON = ("C:/Program Files (x86)/World of Warcraft/_classic_beta_/Interface/"
+ADDON = ("C:/Program Files (x86)/World of Warcraft/_forever_/Interface/"
          "AddOns/WicksGear")
 OUT = os.path.join(DATA, "set-bonuses.json")
 UA = "Wicksmods BIS data collector (https://github.com/Wicksmods)"

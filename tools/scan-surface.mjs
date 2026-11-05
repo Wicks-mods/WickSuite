@@ -11,11 +11,11 @@ import path from "node:path";
 
 // Both clients' AddOns folders: the TBC suite lives in _anniversary_, and
 // WickCore, Wick's UI (with its vendored oUF and LibActionButton under
-// Libs/) and the Forever products live in _classic_beta_. A folder that is
+// Libs/) and the Forever products live in _forever_. A folder that is
 // a junction into the other client is scanned once, by real path.
 const ROOTS = [
   "C:/Program Files (x86)/World of Warcraft/_anniversary_/Interface/AddOns",
-  "C:/Program Files (x86)/World of Warcraft/_classic_beta_/Interface/AddOns",
+  "C:/Program Files (x86)/World of Warcraft/_forever_/Interface/AddOns",
 ];
 
 const seenReal = new Set();

@@ -15,7 +15,7 @@ import os
 import re
 import zipfile
 
-ADDONS = "C:/Program Files (x86)/World of Warcraft/_classic_beta_/Interface/AddOns"
+ADDONS = "C:/Program Files (x86)/World of Warcraft/_forever_/Interface/AddOns"
 OUT = "C:/Users/jspli/Projects/Wick/Wicksmods.github.io/download/WicksMods-Forever-beta.zip"
 FOLDERS = [
     "WickCore", "WicksBags", "WicksComforts", "WicksGear", "WicksTradeHall",
@@ -61,7 +61,7 @@ INSTALL
 -------
 Close the game. Copy every folder in this zip into:
 
-    World of Warcraft\\_classic_beta_\\Interface\\AddOns
+    World of Warcraft\\_forever_\\Interface\\AddOns
 
 Start the game and make sure they are all ticked in the AddOns list.
 

@@ -32,7 +32,7 @@ import time
 
 WOW = "C:/Program Files (x86)/World of Warcraft"
 SRC = WOW + "/_anniversary_/WTF/Account/WICKIDSPLIFF"
-DST = WOW + "/_classic_beta_/WTF/Account/51031842#1"
+DST = WOW + "/_forever_/WTF/Account/WICKIDSPLIFF"
 
 # Character macros only make sense on a character of the same class, so
 # the mapping is written down rather than guessed from a name at runtime.

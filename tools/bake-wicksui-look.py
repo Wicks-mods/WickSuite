@@ -17,8 +17,8 @@ import re
 import sys
 from lupa import LuaRuntime
 
-SV = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\WTF\Account\51031842#1\SavedVariables\WicksUI.lua"
-LAYOUT = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns\WicksUI\Core\Layout.lua"
+SV = r"C:\Program Files (x86)\World of Warcraft\_forever_\WTF\Account\WICKIDSPLIFF\SavedVariables\WicksUI.lua"
+LAYOUT = r"C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\WicksUI\Core\Layout.lua"
 LOOKS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "wicksui-looks")
 
 args = [a for a in sys.argv[1:] if not a.startswith("--")]

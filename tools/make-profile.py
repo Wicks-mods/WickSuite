@@ -19,7 +19,7 @@ import re
 import sys
 import time
 
-BETA = "C:/Program Files (x86)/World of Warcraft/_classic_beta_"
+BETA = "C:/Program Files (x86)/World of Warcraft/_forever_"
 ADDONS = BETA + "/Interface/AddOns"
 TARGET = ADDONS + "/!WicksProfile"
 

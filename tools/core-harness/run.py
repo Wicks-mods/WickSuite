@@ -23,7 +23,7 @@ try:
 except ImportError:
     sys.exit("lupa is not installed. pip install lupa")
 
-BETA_ADDONS = r"C:/Program Files (x86)/World of Warcraft/_classic_beta_/Interface/AddOns"
+BETA_ADDONS = r"C:/Program Files (x86)/World of Warcraft/_forever_/Interface/AddOns"
 ANNIV_ADDONS = r"C:/Program Files (x86)/World of Warcraft/_anniversary_/Interface/AddOns"
 HERE = os.path.dirname(os.path.abspath(__file__)).replace("\\", "/")
 

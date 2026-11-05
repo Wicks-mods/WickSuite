@@ -13,7 +13,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = r"C:\Users\jspli\Projects\Wick\design-handoff\images\screenshots"
 OUT = os.path.join(ROOT, "titled")
-FONTS = r"C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns\WickCore\Media\Fonts"
+FONTS = r"C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\WickCore\Media\Fonts"
 
 # file name -> (title as the style writes it, heading font, accent colour)
 LOOKS = {
