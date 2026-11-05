@@ -171,6 +171,26 @@ if MODERN then
     WB.Bag:Refresh()
     check(late and not red(late), "the option off leaves every icon plain")
     WB.db.options.showUnusable = true
+    WB.Bag:Refresh()
+    -- In combat: a new item is not read, a level does not forget, and the
+    -- tints already known stay. After: the item is read and the level
+    -- forgets.
+    S.ITEMS[9103] = { name = "Mail of Soon", quality = 2, sellPrice = 100 }
+    S.SLOT_ITEMS[2][3] = { id = 9103, count = 1, quality = 2, tip = { { text = "Requires Level 60", red = true } } }
+    COMBAT = true
+    scans = S.TIP_SCANS
+    WB.Bag:Refresh()
+    local soon = slotFor(2, 3)
+    check(soon and not red(soon), "in combat a new item is left plain")
+    check(S.TIP_SCANS == scans, "and no tooltip is read")
+    S.fire("PLAYER_LEVEL_UP", 41)
+    check(S.TIP_SCANS == scans, "a level gained in combat reads nothing")
+    late = slotFor(2, 1)   -- a third item in the bag moved the buttons along
+    check(late and red(late), "and the tints already known stay")
+    COMBAT = false
+    S.fire("PLAYER_REGEN_ENABLED")
+    check(soon and red(soon), "when combat ends the new item is read and tinted")
+    check(S.TIP_SCANS >= scans + 3, "and the level gained is taken, every item read again: " .. (S.TIP_SCANS - scans))
     S.SLOT_ITEMS[2] = nil
 end
 

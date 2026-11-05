@@ -14,6 +14,10 @@ over an icon or the minimap.
              and a glass bar texture for health and power
   Foundry    corners chamfered 6 px with a bevelled steel rim (slice 8), a
              rivet for panel corners, and a bevelled metal bar
+  Cartridge  16-bit, every dot two screen pixels: a solid panel with a
+             black dot round it and the corner dots knocked out (slice 10),
+             a three-dot bevel inside it (bright, mid, dim), one bright dot
+             for tiles, and a flat bar with a lit top and a dark base
 """
 from PIL import Image, ImageDraw
 
@@ -29,9 +33,9 @@ def canvas(w, h=None):
     return img, ImageDraw.Draw(img)
 
 
-def save(img, name):
+def save(img, name, hard=False):
     w, h = img.size
-    img.resize((w // K, h // K), Image.LANCZOS).save(f"{OUT}\\{name}.png")
+    img.resize((w // K, h // K), Image.NEAREST if hard else Image.LANCZOS).save(f"{OUT}\\{name}.png")
 
 
 def poly_pts(s, cuts, inset=0):
@@ -174,5 +178,54 @@ for y in range(G):
             a = max(0.0, 1 - inside / 4.0) * 0.7
         glow.putpixel((x, y), (255, 255, 255, int(255 * a)))
 glow.save(f"{OUT}\\glow.png")
+
+# Cartridge: the console drew at a quarter of today's resolution, so every
+# dot here is two screen pixels (D). Saved pixel for pixel, no resampling,
+# so the edges stay hard once the game stretches the 9-slice.
+D = 2
+
+
+def dot_rect(d, x0, y0, x1, y1, fill):
+    """A rectangle in dots, inclusive, at K scale."""
+    d.rectangle([x0 * D * K, y0 * D * K, (x1 + 1) * D * K - 1, (y1 + 1) * D * K - 1], fill=fill)
+
+
+S = 32            # screen px; 16 dots
+N = S // D - 1    # the last dot
+# The panel: a black dot round it, the corner dots knocked out (the
+# console's rounded window), white inside to take the panel colour.
+img, d = canvas(S)
+dot_rect(d, 0, 0, N, N, (0, 0, 0, 255))
+dot_rect(d, 1, 1, N - 1, N - 1, WHITE)
+for x, y in ((0, 0), (N, 0), (0, N), (N, N)):
+    dot_rect(d, x, y, x, y, CLEAR)
+save(img, "panel-pixel", hard=True)
+
+# The bevel inside the black dot, tinted in the text colour in game: a
+# bright dot, a mid dot, a dim dot, then the window. The outer corner dot
+# of the bright line is knocked out to follow the panel's.
+img, d = canvas(S)
+dot_rect(d, 1, 1, N - 1, N - 1, WHITE)
+dot_rect(d, 2, 2, N - 2, N - 2, (255, 255, 255, 150))
+dot_rect(d, 3, 3, N - 3, N - 3, (255, 255, 255, 70))
+dot_rect(d, 4, 4, N - 4, N - 4, CLEAR)
+for x, y in ((1, 1), (N - 1, 1), (1, N - 1), (N - 1, N - 1)):
+    dot_rect(d, x, y, x, y, CLEAR)
+save(img, "ring-pixel", hard=True)
+
+# Tiles (buttons, bag slots): one bright dot inside the black one.
+img, d = canvas(S)
+dot_rect(d, 1, 1, N - 1, N - 1, WHITE)
+dot_rect(d, 2, 2, N - 2, N - 2, CLEAR)
+save(img, "ring-pixel-thin", hard=True)
+
+# The bar: a lit dot along the top, a bright one under it, a dark dot
+# along the bottom.
+bar = Image.new("RGBA", (16, 32), CLEAR)
+for y in range(32):
+    v = 255 if y < 2 else (236 if y < 4 else (112 if y >= 28 else 208))
+    for x in range(16):
+        bar.putpixel((x, y), (v, v, v, 255))
+bar.save(f"{OUT}\\bar-pixel.png")
 
 print("ok")

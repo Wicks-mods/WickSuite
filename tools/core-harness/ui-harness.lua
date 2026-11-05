@@ -461,11 +461,80 @@ COMBAT = false
 S.fire("PLAYER_REGEN_ENABLED")
 check(bar1.buttons[7]:GetAttribute("statehidden") == true, "queued layout applied after combat")
 
+io.write("== scale ==" .. string.char(10))
+do
+    local g = ns:G()
+    local saved = g.uiScale
+    -- The game: its scale setting stops at 0.64 and puts that scale on
+    -- the root frame, then says so.
+    local rawSet = C_CVar.SetCVar
+    C_CVar.SetCVar = function(n, v)
+        if n == "uiScale" then
+            local num = math.max(0.64, math.min(1.15, tonumber(v) or 1))
+            rawSet(n, tostring(num))
+            UIParent:SetScale(num)
+            S.fire("UI_SCALE_CHANGED")
+            return
+        end
+        return rawSet(n, v)
+    end
+    local function near(a, b) return math.abs((a or 0) - b) < 1e-6 end
+    local function root() return UIParent:GetScale() end
+
+    UIParent:SetScale(0.71)
+    g.uiScale = 0; ns:ApplyScale()
+    check(near(root(), 0.71), "left to the game, the root frame keeps the game's scale")
+
+    g.uiScale = 0.5; ns:ApplyScale()
+    check(C_CVar.GetCVar("uiScale") == "0.64", "below the floor the game's setting sits at its floor: " .. tostring(C_CVar.GetCVar("uiScale")))
+    check(near(root(), 0.5), "and the root frame goes the rest of the way: " .. tostring(root()))
+    UIParent:SetScale(0.64); S.fire("UI_SCALE_CHANGED")
+    check(near(root(), 0.5), "the game putting its scale back is undone")
+    UIParent:SetScale(0.64); S.fire("DISPLAY_SIZE_CHANGED")
+    check(near(root(), 0.5), "and after a new screen size")
+    UIParent:SetScale(0.64); S.fire("PLAYER_ENTERING_WORLD")
+    check(near(root(), 0.5), "and after a loading screen")
+
+    COMBAT = true
+    g.uiScale = 0.42; ns:ApplyScale()
+    check(near(root(), 0.5), "nothing is rescaled in combat")
+    COMBAT = false
+    S.fire("PLAYER_REGEN_ENABLED")
+    check(near(root(), 0.42), "the new scale lands when the fight ends: " .. tostring(root()))
+
+    g.uiScale = 0.1; ns:ApplyScale()
+    check(g.uiScale == ns.SCALE_MIN and near(root(), ns.SCALE_MIN), "a typed 0.1 is held to the smallest scale: " .. tostring(g.uiScale))
+    g.uiScale = 3; ns:ApplyScale()
+    check(g.uiScale == ns.SCALE_MAX and near(root(), ns.SCALE_MAX), "a typed 3 is held to the largest: " .. tostring(root()))
+
+    g.uiScale = 0.8; ns:ApplyScale()
+    check(C_CVar.GetCVar("uiScale") == "0.8" and near(root(), 0.8), "above the floor it is the game's setting, as before")
+
+    g.uiScale = 0.5; ns:ApplyScale()
+    g.uiScale = 0; ns:ApplyScale()
+    check(near(root(), 0.64), "use the game's scale hands the root frame back to the game's setting: " .. tostring(root()))
+    UIParent:SetScale(0.7); S.fire("UI_SCALE_CHANGED")
+    check(near(root(), 0.7), "and then the game's changes stand")
+
+    local aside = ns.Pad.standingAside
+    ns.Pad.standingAside = true
+    g.uiScale = 0.5; ns:ApplyScale()
+    check(near(root(), 0.64), "standing aside for the controller, nothing goes below the game's floor: " .. tostring(root()))
+    ns.Pad.standingAside = aside
+
+    C_CVar.SetCVar = rawSet
+    g.uiScale = saved; ns:ApplyScale()
+    UIParent:SetScale(1)
+end
+
 io.write("== chat ==\n")
 if ns.modules.chat:Enabled() then
     local CH, f, d = ns.Chat, _G.ChatFrame1, A.db.profile.chat
     local face, size = f:GetFont()
-    check(face == ns.Media:Font(d.font) and size == d.fontSize,
+    -- A pixel look draws the setting on its ladder; the setting stays.
+    local snap = ns.Core.Chrome:StyleDef().snap
+    local function drawn(n) return snap and snap(n) or n end
+    check(face == ns.Media:Font(d.font) and size == drawn(d.fontSize),
         "the chat text takes the profile's font and size: " .. tostring(face) .. " " .. tostring(size))
     -- Something else sets the size; a chat window update puts the
     -- profile's size back. (The client's update events read the saved
@@ -473,7 +542,7 @@ if ns.modules.chat:Enabled() then
     f:SetFont(face, 11, "")
     S.fire("UPDATE_CHAT_WINDOWS")
     local _, s2 = f:GetFont()
-    check(s2 == d.fontSize, "a chat window update puts the profile's size back: " .. tostring(s2))
+    check(s2 == drawn(d.fontSize), "a chat window update puts the profile's size back: " .. tostring(s2))
     -- A size picked from the game's own Font Size menu becomes the setting,
     -- so it is kept across sessions instead of being put back.
     local was = d.fontSize
@@ -481,7 +550,7 @@ if ns.modules.chat:Enabled() then
     local _, s3 = f:GetFont()
     S.fire("UPDATE_CHAT_WINDOWS")
     local _, s4 = f:GetFont()
-    check(d.fontSize == 16 and s3 == 16 and s4 == 16,
+    check(d.fontSize == 16 and s3 == drawn(16) and s4 == drawn(16),
         "a size picked from the game's menu becomes the setting and survives an update: " .. tostring(d.fontSize) .. " " .. tostring(s4))
     d.fontSize = was
     CH:Update()
@@ -701,7 +770,38 @@ do
     local flags
     local fs2 = { SetFont = function(_, _, _, f) flags = f end, SetShadowOffset = function() end, SetShadowColor = function() end }
     ns.Media:SetFont(fs2, 12, "look", "Wick", true)
-    check(flags == (st.textOutline or ""), "the look's own outline: an outline in Rebel, none elsewhere: " .. tostring(flags))
+    check(flags == (st.textOutline or st.textFlags or ""), "the look's own outline: an outline in Rebel, the look's flags in a pixel look, none elsewhere: " .. tostring(flags))
+    -- Code that names the font file itself (the skins): the look's face on
+    -- its ladder with its flags in a pixel look, exactly as asked otherwise,
+    -- and a pass that reads the size back and sets it again stays put.
+    local Ch = ns.Core.Chrome
+    local rec = {}
+    local fs3 = { SetFont = function(self, p, sz, f) rec.p, rec.s, rec.f = p, sz, f; self.__f = { p, sz, f } end,
+                  GetFont = function(self) local x = self.__f or {} return x[1], x[2], x[3] end,
+                  SetShadowOffset = function(_, x, y) rec.sx, rec.sy = x, y end, SetShadowColor = function() end }
+    ns.Media:Face(fs3, ns.Media:Font(), 12, "")
+    if st.snap then
+        check(rec.s == st.snap(12) and rec.f == st.textFlags, "a skin's own font call goes on the pixel ladder with the look's flags: " .. tostring(rec.s) .. " " .. tostring(rec.f))
+        local _, back = fs3:GetFont()
+        ns.Media:Face(fs3, ns.Media:Font(), back, "")
+        check(rec.s == back, "a refresh that sets the size it read back does not climb the ladder: " .. tostring(rec.s))
+        ns.Media:Face(fs3, ns.Media:Font(), 12, "MONOCHROMEOUTLINE")
+        check(rec.f == "MONOCHROMEOUTLINE", "flags that already carry the look's are left alone: " .. tostring(rec.f))
+        ns.Media:Shadow(fs3)
+        check(rec.sx == (st.shadowOffset or 1), "the skins' shadow is the look's on its face: " .. tostring(rec.sx))
+        ns.Media:Face(fs3, "Fonts\\FRIZQT__.TTF", 12, "")
+        check(rec.s == 12 and rec.f == "", "another font is set as asked, even in a pixel look")
+        ns.Media:SetFontIn(fs3, 18, 20)
+        check(rec.s == 19, "text in a 20 px box takes the largest ladder step that fits: " .. tostring(rec.s))
+        ns.Media:SetFontIn(fs3, 18, 8)
+        check(rec.s == Ch.PixelLadder[1], "and never less than the smallest step: " .. tostring(rec.s))
+        ns.Media:SetFont(fs3, rec.s)
+        check(rec.s == Ch.PixelLadder[1], "a later refresh keeps the fitted size: " .. tostring(rec.s))
+    else
+        check(rec.s == 12 and rec.f == "", "a skin's own font call is set exactly as asked in a look without a ladder: " .. tostring(rec.s))
+        ns.Media:Shadow(fs3)
+        check(rec.sx == 1 and rec.sy == -1, "and the skins' shadow stays one pixel")
+    end
     check(A.db.profile.unitframes.fontOutline ~= "OUTLINE", "the old hard-outline default has moved to the look's own")
     -- Rebel's name tag: the player's name on a plate, the level uncoloured.
     local pfr
@@ -1239,8 +1339,11 @@ do
         "names and damage numbers over the world take the look's font: " .. tostring(UNIT_NAME_FONT))
     if zone and zone.GetFont then
         local path, size, flags = zone:GetFont()
-        check(path == Ch:HeadingFont() and size == 40 and flags == "THICKOUTLINE",
-            "the zone name takes the look's heading face and keeps its size and outline")
+        local st = Ch:StyleDef()
+        local wantSize, wantFlags = 40, "THICKOUTLINE"
+        if st.snap then wantSize, wantFlags = 44, "THICKOUTLINE, " .. st.textFlags end
+        check(path == Ch:HeadingFont() and size == wantSize and flags == wantFlags,
+            "the zone name takes the look's heading face and keeps its size (whole dots in a pixel look) and outline: " .. tostring(size) .. " " .. tostring(flags))
     end
     ZoneTextFont = was
 end
@@ -1616,8 +1719,10 @@ do
         end
         check(okT and is(l1, "text") and is(l2, "text") and is(l3, "fel") and is(l4, "muted"),
             "tracker lines in the palette: a quest in progress in the text colour, one to hand in in the accent, a done objective muted: " .. tostring(errT or ""))
-        check(l1.__font and l1.__font[1] == ns.Media:Font() and l1.__font[2] == SK:db().trackerFontSize + 1
-            and l2.__font and l2.__font[2] == SK:db().trackerFontSize, "and in the look's font, a title a size up")
+        local snapT = ns.Core.Chrome:StyleDef().snap or function(n) return n end
+        local tsz = SK:db().trackerFontSize
+        check(l1.__font and l1.__font[1] == ns.Media:Font() and l1.__font[2] == snapT(tsz + 1)
+            and l2.__font and l2.__font[2] == snapT(tsz), "and in the look's font, a title a size up (a ladder step in a pixel look)")
         local hdr = SK.questHeader
         check(hdr and hdr:IsShown() and hdr.text and hdr.text.__text ~= "", "a header of ours sits above the tracker")
         check((q:GetWidth() or 0) >= l3:GetStringWidth() + 10, "the tracker is widened to its restyled lines: " .. tostring(q:GetWidth()))

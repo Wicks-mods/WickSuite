@@ -298,7 +298,7 @@ rp:Hide()
 
 -- ---------- themes --------------------------------------------------------
 io.write("== themes ==\n")
-check(#Chrome.Themes == 18 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, eight looks' palettes and custom, warlock is fel")
+check(#Chrome.Themes == 19 and Chrome.ThemeByClass.WARLOCK.id == "fel" and Chrome.ThemeByID.custom, "nine class themes, nine looks' palettes and custom, warlock is fel")
 
 do
     -- Classic: the game's own art. The stub has none of the game's
