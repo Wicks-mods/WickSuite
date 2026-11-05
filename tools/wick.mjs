@@ -1028,6 +1028,12 @@ function resolveAddon(config, folder, flags) {
 
 async function cmdRelease(folder, newVer, ...flags) {
   if (!folder || !newVer) die("usage: wick release <folder> <version> [--no-announce]");
+  // A release publishes for real: it has no dry run. A flag it does not
+  // know (a --dry-run typed out of habit) stops it before anything is
+  // committed, pushed, uploaded or posted, rather than being ignored.
+  const known = ["--no-announce", "--no-fb", "--no-x", "--forever", "--tbc"];
+  const unknown = flags.filter((f) => !known.includes(f));
+  if (unknown.length) die(`release does not know ${unknown.join(", ")}; it has no dry run. Flags: ${known.join(" ")}`);
   const noAnnounce = flags.includes("--no-announce");
   // Shipping several addons in one sitting: Discord wants every one of them,
   // because it is the changelog people follow, while a run of near identical
