@@ -139,11 +139,12 @@ local function newMock(kind, name)
         -- about what a theme repaints had nothing to look at: the
         -- things that carry a colour are textures and font strings.
         elseif k == "CreateTexture" or k == "CreateFontString" or k == "CreateLine" then
-            return function(_, _, layer)
+            return function(_, _, layer, _, sub)
                 local r = newMock(k)
                 -- Kept on the frame that made it, as GetRegions reports.
                 r.__parent = t
                 r.__layer = type(layer) == "string" and layer or nil
+                r.__sub = tonumber(sub)
                 t.__regions[#t.__regions + 1] = r
                 -- Which file painted it, so a check can ask about one
                 -- addon rather than about every region at once.
@@ -312,7 +313,8 @@ local function newMock(kind, name)
         elseif k == "GetNumChildren" then return function() return #t.__children end
         elseif k == "GetRegions" then return function() return unpack(t.__regions) end
         elseif k == "GetNumRegions" then return function() return #t.__regions end
-        elseif k == "GetDrawLayer" then return function() return t.__layer or "ARTWORK", 0 end
+        elseif k == "GetDrawLayer" then return function() return t.__layer or "ARTWORK", t.__sub or 0 end
+        elseif k == "SetDrawLayer" then return function(_, layer, sub) t.__layer, t.__sub = layer, tonumber(sub) or 0 end
         elseif k == "IsForbidden" then return function() return false end
         elseif k == "IsProtected" then return function() return false, false end
         elseif k == "RegisterForDrag" then return function(_, ...) t.__drag = { ... } end

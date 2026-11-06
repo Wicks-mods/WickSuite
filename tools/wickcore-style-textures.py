@@ -219,6 +219,50 @@ dot_rect(d, 1, 1, N - 1, N - 1, WHITE)
 dot_rect(d, 2, 2, N - 2, N - 2, CLEAR)
 save(img, "ring-pixel-thin", hard=True)
 
+# Nameplates in Cartridge are capsules, as a 16-bit action game's life bar:
+# the panel's corners rounded to five dots (a half circle at the plate's
+# 20 px, slice 10), its bevel following the curve, and a track inside it
+# rounded to three dots (slice 6).
+def pill_dots(n, r):
+    out = set()
+    for y in range(n):
+        for x in range(n):
+            cx = min(max(x + 0.5, r), n - r)
+            cy = min(max(y + 0.5, r), n - r)
+            if (x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 <= r * r:
+                out.add((x, y))
+    return out
+
+
+def edge_dots(shape_set):
+    return {(x, y) for (x, y) in shape_set
+            if any((x + dx, y + dy) not in shape_set for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))}
+
+
+def draw_dots(d, dots, fill):
+    for x, y in dots:
+        dot_rect(d, x, y, x, y, fill)
+
+
+PILL = pill_dots(S // D, 5)
+PILL_EDGE = edge_dots(PILL)
+img, d = canvas(S)
+draw_dots(d, PILL_EDGE, (0, 0, 0, 255))
+draw_dots(d, PILL - PILL_EDGE, WHITE)
+save(img, "pill-pixel", hard=True)
+
+img, d = canvas(S)
+inner = PILL - PILL_EDGE
+for alpha in (255, 150, 70):
+    e = edge_dots(inner)
+    draw_dots(d, e, (255, 255, 255, alpha))
+    inner = inner - e
+save(img, "pill-ring-pixel", hard=True)
+
+img, d = canvas(16)
+draw_dots(d, pill_dots(16 // D, 3), WHITE)
+save(img, "pill-track-pixel", hard=True)
+
 # The bar: a lit dot along the top, a bright one under it, a dark dot
 # along the bottom.
 bar = Image.new("RGBA", (16, 32), CLEAR)

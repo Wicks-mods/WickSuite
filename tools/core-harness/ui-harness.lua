@@ -532,9 +532,24 @@ if ns.modules.chat:Enabled() then
     local CH, f, d = ns.Chat, _G.ChatFrame1, A.db.profile.chat
     local face, size = f:GetFont()
     -- A pixel look draws the setting on its ladder; the setting stays.
-    local snap = ns.Core.Chrome:StyleDef().snap
-    local function drawn(n) return snap and snap(n) or n end
-    check(face == ns.Media:Font(d.font) and size == drawn(d.fontSize),
+    local st = ns.Core.Chrome:StyleDef()
+    local snap = st.snap
+    -- A look with a face for long text draws chat in it, every dot whole
+    -- screen pixels: at least two, the nearest to the size asked for.
+    -- The stub's scale is not multiplied down from the parents, so the
+    -- chat frame's own stands in for the interface's.
+    local function ppu() local _, h = GetPhysicalScreenSize(); return f:GetEffectiveScale() * h / 768 end
+    local function drawn(n)
+        if st.bodyFont and st.bodyExact then return n end
+        if st.bodyFont and not st.bodyExact then
+            local k = math.max(1, math.floor(n * ppu() / 8 + 0.25))
+            return k * 8 / ppu()
+        end
+        return snap and snap(n) or n
+    end
+    local function same(a, b) return a and b and math.abs(a - b) < 0.001 end
+    local want = st.bodyFont or ns.Media:Font(d.font)
+    check(face == want and same(size, drawn(d.fontSize)),
         "the chat text takes the profile's font and size: " .. tostring(face) .. " " .. tostring(size))
     -- Something else sets the size; a chat window update puts the
     -- profile's size back. (The client's update events read the saved
@@ -542,7 +557,7 @@ if ns.modules.chat:Enabled() then
     f:SetFont(face, 11, "")
     S.fire("UPDATE_CHAT_WINDOWS")
     local _, s2 = f:GetFont()
-    check(s2 == drawn(d.fontSize), "a chat window update puts the profile's size back: " .. tostring(s2))
+    check(same(s2, drawn(d.fontSize)), "a chat window update puts the profile's size back: " .. tostring(s2))
     -- A size picked from the game's own Font Size menu becomes the setting,
     -- so it is kept across sessions instead of being put back.
     local was = d.fontSize
@@ -550,8 +565,36 @@ if ns.modules.chat:Enabled() then
     local _, s3 = f:GetFont()
     S.fire("UPDATE_CHAT_WINDOWS")
     local _, s4 = f:GetFont()
-    check(d.fontSize == 16 and s3 == drawn(16) and s4 == drawn(16),
+    check(d.fontSize == 16 and same(s3, drawn(16)) and same(s4, drawn(16)),
         "a size picked from the game's menu becomes the setting and survives an update: " .. tostring(d.fontSize) .. " " .. tostring(s4))
+    if st.bodyFont and st.bodyExact then
+        check(same(s4, 16), "chat in the look's face is drawn at exactly the size picked: " .. tostring(s4))
+    end
+    if st.bodyFont and not st.bodyExact then
+        local px = s4 * ppu()
+        check(math.abs(px / 8 - math.floor(px / 8 + 0.5)) < 0.001, "every dot of the chat text is whole screen pixels: " .. tostring(px))
+        local _, _, fl = f:GetFont()
+        check(fl and fl:find("MONOCHROME"), "and drawn without smoothing: " .. tostring(fl))
+        f:SetScale(0.6); S.fire("UI_SCALE_CHANGED")
+        local _, s5 = f:GetFont()
+        check(same(s5, drawn(16)) and not same(s5, s4), "a new interface scale sizes the chat again, in whole pixels: " .. tostring(s5))
+        f:SetScale(1); S.fire("UI_SCALE_CHANGED")
+        local _, s6 = f:GetFont()
+        check(same(s6, s4), "and back again, nothing drifts: " .. tostring(s6))
+        -- The game copies a window's drawn size to a new one (a whisper
+        -- tab): that echo is not the player picking a size.
+        local keep = d.fontSize
+        FCF_SetChatWindowFontSize(nil, f, s6)
+        check(d.fontSize == keep, "the game copying the drawn size to a new window keeps the setting: " .. tostring(d.fontSize))
+        FCF_SetChatWindowFontSize(nil, f, 0)
+        check(d.fontSize == keep, "and a size of none is no setting either: " .. tostring(d.fontSize))
+        d.font = "Friz"
+        ns.Chat:Update()
+        local f2 = f:GetFont()
+        check(f2 ~= st.bodyFont, "a font the player picked is kept: " .. tostring(f2))
+        d.font = "Wick"
+        ns.Chat:Update()
+    end
     d.fontSize = was
     CH:Update()
     -- The tab glow switch: off is done through the game's own stop, so
@@ -788,15 +831,35 @@ do
         ns.Media:Face(fs3, ns.Media:Font(), 12, "MONOCHROMEOUTLINE")
         check(rec.f == "MONOCHROMEOUTLINE", "flags that already carry the look's are left alone: " .. tostring(rec.f))
         ns.Media:Shadow(fs3)
-        check(rec.sx == (st.shadowOffset or 1), "the skins' shadow is the look's on its face: " .. tostring(rec.sx))
+        check(math.abs(rec.sx - Ch:ShadowFor(rec.s)) < 0.001, "the skins' shadow is the look's on its face: " .. tostring(rec.sx))
         ns.Media:Face(fs3, "Fonts\\FRIZQT__.TTF", 12, "")
         check(rec.s == 12 and rec.f == "", "another font is set as asked, even in a pixel look")
+        -- Whole screen pixels a dot, worked out here on its own: the
+        -- harness screen is 1440 tall, so a unit is 1.875 pixels.
+        local ppu = UIParent:GetEffectiveScale() * 1440 / 768
+        local em = st.pixelEm
+        local function whole(v) local d = v * ppu / em; return math.abs(d - math.floor(d + 0.5)) < 0.001 end
+        ns.Media:Face(fs3, ns.Media:Font(), 12, "")
+        check(whole(rec.s) and rec.s <= 12 + em / ppu, "a size lands on whole screen pixels a dot: " .. tostring(rec.s * ppu))
         ns.Media:SetFontIn(fs3, 18, 20)
-        check(rec.s == 19, "text in a 20 px box takes the largest ladder step that fits: " .. tostring(rec.s))
-        ns.Media:SetFontIn(fs3, 18, 8)
-        check(rec.s == Ch.PixelLadder[1], "and never less than the smallest step: " .. tostring(rec.s))
+        check(whole(rec.s) and rec.s <= 20 and rec.s + em / ppu > 20, "text in a 20 px box takes the largest whole-pixel size that fits: " .. tostring(rec.s))
+        ns.Media:SetFontIn(fs3, 18, 2)
+        check(math.abs(rec.s - em / ppu) < 0.001, "and never less than one pixel a dot: " .. tostring(rec.s))
+        local fitted = rec.s
         ns.Media:SetFont(fs3, rec.s)
-        check(rec.s == Ch.PixelLadder[1], "a later refresh keeps the fitted size: " .. tostring(rec.s))
+        check(math.abs(rec.s - fitted) < 0.001, "a later refresh keeps the fitted size: " .. tostring(rec.s))
+        ns.Media:Face(fs3, ns.Media:Font(), 16, "")
+        ns.Media:Shadow(fs3)
+        check(math.abs(rec.sx - rec.s / em) < 0.001, "the shadow is one dot of the text, whatever its size: " .. tostring(rec.sx))
+        if st.compactDots then
+            local fs4 = { SetFont = fs3.SetFont, GetFont = fs3.GetFont, SetShadowOffset = fs3.SetShadowOffset, SetShadowColor = fs3.SetShadowColor }
+            Ch:Compact(fs4)
+            ns.Media:Face(fs4, ns.Media:Font(), 24, "")
+            check(math.abs(rec.s - st.compactDots * em / ppu) < 0.001, "text in a tight slot stays at the look's compact size: " .. tostring(rec.s * ppu))
+            check(math.abs(Ch:CompactSize(24) - st.compactDots * em / ppu) < 0.001, "and so do the button texts the library sets: " .. tostring(Ch:CompactSize(24)))
+            ns.Media:Face(fs3, ns.Media:Font(), 24, "")
+            check(rec.s > st.compactDots * em / ppu, "text not marked keeps its own size: " .. tostring(rec.s * ppu))
+        end
     else
         check(rec.s == 12 and rec.f == "", "a skin's own font call is set exactly as asked in a look without a ladder: " .. tostring(rec.s))
         ns.Media:Shadow(fs3)
@@ -1341,7 +1404,10 @@ do
         local path, size, flags = zone:GetFont()
         local st = Ch:StyleDef()
         local wantSize, wantFlags = 40, "THICKOUTLINE"
-        if st.snap then wantSize, wantFlags = 44, "THICKOUTLINE, " .. st.textFlags end
+        if st.snap then
+            local em = st.pixelEm
+            wantSize, wantFlags = math.max(em * 2, math.floor(40 / em + 0.5) * em), "THICKOUTLINE, " .. st.textFlags
+        end
         check(path == Ch:HeadingFont() and size == wantSize and flags == wantFlags,
             "the zone name takes the look's heading face and keeps its size (whole dots in a pixel look) and outline: " .. tostring(size) .. " " .. tostring(flags))
     end
@@ -2865,6 +2931,163 @@ check(A.db.profile.movers.bar1 == nil, "reset clears it")
 ns.Movers:Lock()
 check(not ns.Movers:IsUnlocked(), "lock")
 
+io.write("== game fonts ==\n")
+do
+    -- The game's own font objects, as a look with gameFonts dresses them.
+    local function mk(name, path, size, flags, shadow)
+        local f = { __f = { path, size, flags }, __sx = shadow and 1 or 0 }
+        function f:GetObjectType() return "Font" end
+        function f:GetFont() return self.__f[1], self.__f[2], self.__f[3] end
+        function f:SetFont(fp, fs, ff) self.__f = { fp, fs, ff } end
+        function f:GetShadowOffset() return self.__sx, -self.__sx end
+        function f:SetShadowOffset(x) self.__sx = x end
+        _G[name] = f
+        return f
+    end
+    local small = mk("WickTest_GameFontSmall", "Fonts\\FRIZQT__.TTF", 12, "", true)
+    local title = mk("WickTest_GameFontTitle", "Fonts\\FRIZQT__.TTF", 20, "OUTLINE", false)
+    local theirs = mk("WickTest_OtherAddonFont", "Interface\\AddOns\\Other\\font.ttf", 12, "", false)
+    local okG, errG = pcall(ns.Media.GameFonts, ns.Media)
+    check(okG, "the game's fonts are dressed without an error: " .. tostring(errG or ""))
+    local Ch = ns.Core.Chrome
+    local st = Ch:StyleDef()
+    if st.gameFonts then
+        local ppu = UIParent:GetEffectiveScale() * 1440 / 768
+        local em = st.pixelEm
+        local p1, s1, f1 = small:GetFont()
+        check(p1 == Ch:Font() and math.abs(s1 - em / ppu) < 0.001 and tostring(f1):find("MONOCHROME"),
+            "the game's ordinary text takes the look's face at one pixel a dot, unsmoothed: " .. tostring(s1 and s1 * ppu))
+        local _, s2, f2 = title:GetFont()
+        check(math.abs(s2 - 2 * em / ppu) < 0.001 and tostring(f2):find("OUTLINE"),
+            "its big titles two pixels a dot, their outline kept: " .. tostring(s2 and s2 * ppu) .. " " .. tostring(f2))
+        check(math.abs(small.__sx - s1 / em) < 0.001 and title.__sx == 0, "a shadow one dot, and none where there was none")
+        check(theirs:GetFont() == "Interface\\AddOns\\Other\\font.ttf", "another addon's own font is left alone")
+    else
+        local p1, s1 = small:GetFont()
+        check(p1 == "Fonts\\FRIZQT__.TTF" and s1 == 12, "other looks leave the game's fonts alone")
+    end
+    _G.WickTest_GameFontSmall, _G.WickTest_GameFontTitle, _G.WickTest_OtherAddonFont = nil, nil, nil
+end
+
+io.write("== pixel icons ==\n")
+do
+    -- An icon of ours, drawn in dots where the look asks for it.
+    local Ch = ns.Core.Chrome
+    local st = Ch:StyleDef()
+    local host = CreateFrame("Button", nil, UIParent)
+    host:SetSize(40, 40)
+    local icon = host:CreateTexture(nil, "ARTWORK")
+    icon:SetSize(36, 36)
+    icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+    icon:Show()
+    local before = select("#", host:GetRegions())
+    local okP, errP = pcall(function() ns:PixelIcon(icon); icon:SetTexture(134400) end)
+    check(okP, "an icon of ours takes the look's dots without an error: " .. tostring(errP or ""))
+    local regions = { host:GetRegions() }
+    if st.iconDots then
+        local N = st.iconDots
+        check(#regions - before == N * N, "it is drawn again as a grid of dots, " .. N .. " square: " .. tostring(#regions - before))
+        local cell = regions[before + 1]
+        local last = regions[#regions]
+        check(cell and cell:GetTexture() == 134400 and last:GetTexture() == 134400, "each dot shows the game's own icon")
+        local ulx, _, _, _, _, _, lrx = cell:GetTexCoord()
+        local want = 0.08 + 0.5 / N * 0.84
+        check(ulx and lrx - ulx < 0.01 and math.abs((ulx + lrx) / 2 - want) < 0.001,
+            "zoomed in on one point of it, inside the icon's crop: " .. tostring(ulx))
+        icon:SetVertexColor(1, 0.12, 0.12)
+        local r, g = cell:GetVertexColor()
+        check(r == 1 and math.abs((g or 0) - 0.12) < 0.001, "the dots take the icon's tint")
+        icon:Hide()
+        check(not cell:IsShown(), "and hide with it")
+        icon:Show()
+        check(cell:IsShown(), "and come back with it")
+        icon:SetTexture(nil)
+        check(not cell:IsShown(), "an empty icon shows no dots")
+        -- Without hooks (an icon on the game's own template): only a sync moves it.
+        local icon2 = host:CreateTexture(nil, "ARTWORK")
+        icon2:SetSize(36, 36)
+        icon2:Show()
+        icon2:SetTexture(111)
+        Ch:PixelIcon(icon2, true)
+        local regs2 = { host:GetRegions() }
+        local cell2 = regs2[#regs2]
+        check(cell2:GetTexture() == 111, "an icon without hooks is drawn in dots when it is synced")
+        icon2:SetTexture(222)
+        check(cell2:GetTexture() == 111, "and changes only on the next sync, as no hook was put on it")
+        Ch:PixelIconSync(icon2)
+        check(cell2:GetTexture() == 222, "which brings it up to date")
+        -- An icon on the top sublevel of its layer (the action buttons put
+        -- theirs on BACKGROUND 7): the dots go one layer up, and follow it.
+        local icon4 = host:CreateTexture(nil, "BACKGROUND", nil, 7)
+        icon4:SetSize(36, 36)
+        icon4:Show()
+        ns:PixelIcon(icon4)
+        icon4:SetTexture(444)
+        local regs4 = { host:GetRegions() }
+        local cell4 = regs4[#regs4]
+        local l4, s4b = cell4:GetDrawLayer()
+        check(l4 == "BORDER" and s4b == -8, "dots over an icon on the top sublevel go one layer up: " .. tostring(l4) .. " " .. tostring(s4b))
+        icon4:SetDrawLayer("ARTWORK", 2)
+        l4, s4b = cell4:GetDrawLayer()
+        check(l4 == "ARTWORK" and s4b == 3, "and follow the icon when it moves: " .. tostring(l4) .. " " .. tostring(s4b))
+        -- An icon given its texture before its frame is laid out has no
+        -- size: its dots are placed once it has one.
+        local icon3 = host:CreateTexture(nil, "ARTWORK")
+        icon3:Show()
+        local okZ, errZ = pcall(function() ns:PixelIcon(icon3); icon3:SetTexture(333) end)
+        check(okZ, "an icon with no size yet takes the dots without an error: " .. tostring(errZ or ""))
+        local regs3 = { host:GetRegions() }
+        local cell3 = regs3[#regs3]
+        icon3:SetSize(36, 36)
+        Ch:PixelIconSync(icon3)
+        check(cell3.__points and #cell3.__points > 0, "and its dots are placed once it has a size")
+    else
+        check(#regions == before, "other looks leave the icon as it is")
+    end
+end
+
+io.write("== capsule plates ==\n")
+do
+    -- A panel that asks for the pill (a nameplate's card): the look's
+    -- capsule where it has one, its usual panel everywhere else.
+    local Ch = ns.Core.Chrome
+    local fr = CreateFrame("Frame", nil, UIParent)
+    fr:SetSize(158, 20)
+    local okS, errS = pcall(ns.SetTemplate, ns, fr, "Default", { shape = "pill", shadow = false })
+    check(okS, "a panel asking for the pill is drawn without an error: " .. tostring(errS or ""))
+    if ns:Modern() and Ch.Media.pill then
+        check(fr.wuiBG:GetTexture() == Ch.Media.pill and fr.wuiRing:GetTexture() == Ch.Media.pillRing,
+            "in a look with a capsule, the plate's card and ring are the capsule: " .. tostring(fr.wuiBG:GetTexture()))
+    elseif ns:Modern() then
+        check(fr.wuiBG:GetTexture() == Ch:PanelTex(CreateFrame("Frame")), "elsewhere it is the look's usual panel: " .. tostring(fr.wuiBG:GetTexture()))
+    end
+end
+
+do
+    -- The plates the game is handed: their cards in the look's capsule.
+    local Ch = ns.Core.Chrome
+    local NPm = ns.Nameplates
+    local plate = NPm and NPm.plates and next(NPm.plates)
+    if plate and plate.Health and plate.Health.backdrop and ns:Modern() then
+        local bd = plate.Health.backdrop
+        local tex = bd.wuiBG and bd.wuiBG:GetTexture()
+        local ring = bd.wuiRing and bd.wuiRing:GetTexture()
+        if Ch.Media.pill then
+            check(tex == Ch.Media.pill and ring == Ch.Media.pillRing, "a nameplate's card is the look's capsule: " .. tostring(tex) .. " " .. tostring(ring))
+        end
+    end
+end
+
+io.write("== suite options page ==\n")
+do
+    -- The theme and style section sizes itself to its text; built here in
+    -- full, as the Wick's Mods page builds it, in every look.
+    local O = ns.Core.Options
+    local host = CreateFrame("Frame", nil, UIParent)
+    local okT, yT = pcall(O.ThemeSection, O, host, 16, -16, { width = 640 })
+    check(okT and type(yT) == "number" and yT < -16, "the theme and style section builds in this look: " .. tostring(yT))
+end
+
 io.write("== minimap buttons ==\n")
 do
     local MM = ns.Minimap
@@ -2916,6 +3139,25 @@ do
     local launcher = rawget(_G, "WickCoreMinimapButton")
     if launcher then launcher:Show() end
     local d = MM:db()
+    -- A look that asks for a framed square map gets one, round set or not;
+    -- every other look keeps the player's shape and no frame.
+    do
+        local st = ns.Core.Chrome:StyleDef()
+        d.square = false
+        local okF, errF = pcall(function() MM:Shape() end)
+        local fr = rawget(_G, "WicksUI_MinimapFrame")
+        if st.minimapShape == "square" and not ns:Game() then
+            local p1 = fr and fr.__points and fr.__points[1] or {}
+            local fx, fy = p1[4], p1[5]
+            check(okF and GetMinimapShape() == "SQUARE" and Minimap.__maskTex == ns.Media.roundmask,
+                "this look makes the minimap square even when round is set: " .. tostring(errF or Minimap.__maskTex))
+            check(fr and fr:IsShown() and fx == -st.minimapFrame and fy == st.minimapFrame and fr:GetFrameLevel() < Minimap:GetFrameLevel(),
+                "and puts its window round it, under the map: " .. tostring(fx))
+        else
+            check(okF and GetMinimapShape() == (ns:Game() and "ROUND" or "ROUND") and not (fr and fr:IsShown()),
+                "other looks keep the round map the player set, with no window round it: " .. tostring(errF or ""))
+        end
+    end
     d.square, d.strip = true, true
     if ns:Game() then
         -- Classic keeps the game's own minimap: round, its buttons where
@@ -3339,7 +3581,7 @@ do
     ab.fontOutline = "look"
     AB:Update()
     local flags = b1.config and b1.config.text.hotkey.font.flags
-    check(flags ~= "look" and (flags == "" or flags == "OUTLINE"), "\"the look's own\" outline is a font flag on the bars: " .. tostring(flags))
+    check(flags ~= "look" and (flags == "" or flags == "OUTLINE" or flags == ns.Core.Chrome:WithLookFlags("")), "\"the look's own\" outline is a font flag on the bars: " .. tostring(flags))
     ab.fontOutline = outWas
     AB:Update()
 
