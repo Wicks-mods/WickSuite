@@ -11,12 +11,18 @@ is 86;2 but leatherworking is 86;8, tailoring 86;10 and engineering 86;5.
 Taking one of those for all four joins four professions' recipes against
 one profession's items and quietly comes out blacksmithing only.
 
-Two requests per profession, eight in total.
+Two pages per profession, eight in total.
 
-    python WickSuite/tools/scrape-forever-crafted.py
-    python WickSuite/tools/scrape-forever-crafted.py --one blacksmithing
+    python WickSuite/tools/scrape-forever-crafted.py --from-crawl data/forever/raw/<file>.json
 
 Writes WickSuite/data/forever/crafted.json.
+
+Since the release (checked 2026-11-15) www.wowhead.com answers HTTP 403
+to a plain request, so the pages are read in a browser and saved as one
+json file, which --from-crawl reads. Without it this still tries the
+network and fails.
+In the browser both lists are plain globals on their pages,
+window.listviewspells and window.listviewitems.
 
 The rows are nearly JSON but the page appends an unquoted `quality:` and
 `popularity:` to each one, so bare keys are quoted before parsing. That
@@ -93,25 +99,41 @@ def recipes(html):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--one", help="a single profession, for a quick look")
+    ap.add_argument("--from-crawl",
+                    help="json saved from a browser: professions -> name -> { spells, items }")
     args = ap.parse_args()
+
+    crawl, crawl_date = None, None
+    if args.from_crawl:
+        doc = json.loads(io.open(args.from_crawl, encoding="utf-8").read())
+        crawl = doc.get("professions") or {}
+        crawl_date = doc.get("collected")
 
     wanted = [args.one] if args.one else PROFESSIONS
     out, totals = {}, {}
 
     for prof in wanted:
         url = "https://www.wowhead.com/forever/spells/professions/%s" % prof
-        print("fetching %-16s " % prof, end="", flush=True)
-        try:
-            page = get(url)
-            rows = recipes(page)
-        except (urllib.error.URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
-            print("failed: %s" % exc)
-            continue
+        print("%-16s " % prof, end="", flush=True)
+        meta, link = {}, None
+        if crawl is not None:
+            if prof not in crawl:
+                print("not in the crawl")
+                continue
+            rows = crawl[prof].get("spells") or []
+            for it in crawl[prof].get("items") or []:
+                meta[it["id"]] = it
+        else:
+            try:
+                page = get(url)
+                rows = recipes(page)
+            except (urllib.error.URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+                print("failed: %s" % exc)
+                continue
+            link = crafted_items_link(page)
 
         # The items this profession makes, with the fields a recipe has
         # no room for.
-        meta = {}
-        link = crafted_items_link(page)
         if link:
             time.sleep(PAUSE)
             try:
@@ -152,7 +174,7 @@ def main():
         out[prof] = made
         totals[prof] = len(made)
         print("%d recipes, %d make something" % (len(rows), len(made)))
-        if prof != wanted[-1]:
+        if crawl is None and prof != wanted[-1]:
             time.sleep(PAUSE)
 
     # item id -> profession, the question the emitter asks.
@@ -165,8 +187,8 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     io.open(OUT, "w", encoding="utf-8", newline="\n").write(json.dumps({
         "source": "wowhead.com/forever/spells/professions, listviewspells arrays",
-        "collected": datetime.date.today().isoformat(),
-        "note": "slot and item level are not on a recipe; the item stats pass fills those",
+        "collected": crawl_date or datetime.date.today().isoformat(),
+        "note": "slot and item level are not on a recipe; the profession's item list fills those",
         "professions": out,
         "index": index,
     }, indent=1, ensure_ascii=False) + "\n")

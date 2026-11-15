@@ -46,6 +46,87 @@ local ids = ns.AllItemIDs()
 check(#ids > 200, #ids .. " distinct items, deduplicated")
 check(ns.WEIGHTS.ROGUE ~= nil and ns.PROFICIENCY.ROGUE ~= nil, "weights and proficiencies came with it")
 
+-- The release roster. The data was first collected in a beta that had
+-- fewer dungeons and thinner loot tables than the game shipped with:
+-- five of the nine new dungeons were missing outright and Dire Maul held
+-- two items. Shaper's Terrace is absent on purpose, because nobody has
+-- recorded what it drops yet and a guess is worse than a gap.
+local RELEASE = {
+    "The Hall of Thanes", "Ragefire Chasm", "Ruins of Lordaeron", "Wailing Caverns",
+    "The Deadmines", "Shadowfang Keep", "The Stockade", "Excavation Site: Wetlands",
+    "Blackfathom Deeps", "City of Dalaran", "Scarlet Monastery", "Gnomeregan",
+    "Razorfen Kraul", "The Drowned City", "Krol'dok Stronghold", "Razorfen Downs",
+    "Uldaman", "Zul'Farrak", "Maraudon", "Alcaz Prison", "Temple of Atal'Hakkar",
+    "Blackrock Depths", "Blackmaw Hold", "Blackrock Spire", "Dire Maul",
+    "Scholomance", "Stratholme",
+}
+local absent = {}
+for _, name in ipairs(RELEASE) do
+    if not ns.DUNGEONS[name] then absent[#absent + 1] = name end
+end
+check(#absent == 0, "every release dungeon with loot on record is carried"
+    .. (#absent > 0 and (", missing: " .. table.concat(absent, ", ")) or ""))
+
+-- In the order you would run them, each with the release's own bracket.
+-- A bracket worked out from the loot is a guess, and the release guide
+-- publishes one for all of these.
+local lastLow, inOrder, guessed = 0, true, {}
+for _, name in ipairs(ns.DUNGEON_ORDER) do
+    local d = ns.DUNGEONS[name]
+    local low = tonumber((d.levels or ""):match("^(%d+)%-%d+$"))
+    if not low or low < lastLow then inOrder = false end
+    lastLow = low or lastLow
+    if d.levelsDerived then guessed[#guessed + 1] = name end
+end
+check(inOrder, "the dungeons read from the lowest bracket up")
+check(#guessed == 0, "none of them carries a guessed bracket"
+    .. (#guessed > 0 and (": " .. table.concat(guessed, ", ")) or ""))
+check(ns.DUNGEONS["The Deadmines"].levels == "18-23",
+    "the brackets are the release's: Deadmines is " .. tostring(ns.DUNGEONS["The Deadmines"].levels))
+check(ns.DUNGEONS["Temple of Atal'Hakkar"].zone == 1477,
+    "the Temple of Atal'Hakkar is read from its own page, zone "
+    .. tostring(ns.DUNGEONS["Temple of Atal'Hakkar"].zone))
+
+-- Every row is whole. A row with no slot cannot be offered for a slot,
+-- one with no class cannot be checked against a proficiency, and the
+-- emitter writes whatever the scrape hands it.
+local QUALITY = { uncommon = true, rare = true, epic = true, legendary = true }
+local broken, twice, pieces = {}, {}, 0
+for name, d in pairs(ns.DUNGEONS) do
+    local seen = {}
+    for _, e in ipairs(d.items) do
+        pieces = pieces + 1
+        if type(e.id) ~= "number" or type(e.name) ~= "string" or e.name == ""
+           or type(e.slot) ~= "string" or not QUALITY[e.q]
+           or (e.how ~= "drop" and e.how ~= "quest")
+           or type(e.req) ~= "number" or type(e.ilvl) ~= "number"
+           or type(e.cls) ~= "number" or type(e.sub) ~= "number" then
+            broken[#broken + 1] = name .. " " .. tostring(e.id)
+        end
+        local key = e.how .. e.id
+        if seen[key] then twice[#twice + 1] = name .. " " .. tostring(e.id) end
+        seen[key] = true
+    end
+end
+check(pieces > 1300, pieces .. " dungeon pieces, where the beta's data had 430")
+check(#broken == 0, "each with an id, a name, a slot, a quality, a source and its levels"
+    .. (#broken > 0 and (", not so: " .. table.concat(broken, ", ", 1, math.min(#broken, 8))) or ""))
+check(#twice == 0, "and none listed twice in one dungeon"
+    .. (#twice > 0 and (": " .. table.concat(twice, ", ", 1, math.min(#twice, 8))) or ""))
+
+-- The new dungeons carry what their bosses drop, not only what their
+-- quests hand out. The beta's pages had quest rewards alone for two.
+local function drops(name)
+    local n = 0
+    for _, e in ipairs((ns.DUNGEONS[name] or { items = {} }).items) do
+        if e.how == "drop" then n = n + 1 end
+    end
+    return n
+end
+check(drops("The Hall of Thanes") > 0 and drops("Ruins of Lordaeron") > 0,
+    "the Hall of Thanes and the Ruins of Lordaeron list boss drops: "
+    .. drops("The Hall of Thanes") .. " and " .. drops("Ruins of Lordaeron"))
+
 -- The client answers item queries from the server and throttles hard,
 -- so they leave in small batches rather than all at once. Asking for
 -- everything the moment the window opened got most of them dropped.

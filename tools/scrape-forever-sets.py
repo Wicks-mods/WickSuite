@@ -5,7 +5,13 @@ catalogue into a plain `itemSets = [...]` variable before it builds the
 Listview, so unlike the dungeon pages there is nothing to page through
 and no per-set request to make: one fetch, 500-odd sets, 3000-odd pieces.
 
-    python WickSuite/tools/scrape-forever-sets.py
+    python WickSuite/tools/scrape-forever-sets.py --from-crawl data/forever/raw/<file>.json
+
+Since the release (checked 2026-11-15) www.wowhead.com answers HTTP 403
+to a plain request, so the pages are read in a browser and saved as one
+json file, which --from-crawl reads. Without it this still tries the
+network and fails.
+In the browser the array is the global window.itemSets.
 
 Writes WickSuite/data/forever/item-sets.json, holding both the sets and a
 flat item id to set name index, which is what the emitter actually wants:
@@ -46,13 +52,19 @@ def parse(html):
 
 
 def main():
-    print("fetching %s" % URL)
-    try:
-        html = get(URL)
-    except (urllib.error.URLError, TimeoutError) as exc:
-        raise SystemExit("fetch failed: %s" % exc)
-
-    raw = parse(html)
+    crawl_date = None
+    if len(sys.argv) == 3 and sys.argv[1] == "--from-crawl":
+        doc = json.loads(io.open(sys.argv[2], encoding="utf-8").read())
+        raw, crawl_date = doc.get("sets") or [], doc.get("collected")
+        if not raw:
+            raise SystemExit("no sets in that crawl")
+    else:
+        print("fetching %s" % URL)
+        try:
+            html = get(URL)
+        except (urllib.error.URLError, TimeoutError) as exc:
+            raise SystemExit("fetch failed: %s" % exc)
+        raw = parse(html)
 
     sets, index, skipped = {}, {}, 0
     for s in raw:
@@ -77,7 +89,7 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     io.open(OUT, "w", encoding="utf-8", newline="\n").write(json.dumps({
         "source": "wowhead.com/forever/item-sets, itemSets array",
-        "collected": __import__("datetime").date.today().isoformat(),
+        "collected": crawl_date or __import__("datetime").date.today().isoformat(),
         "note": "index maps item id to set name; that is the question the emitter asks",
         "sets": sets,
         "index": index,

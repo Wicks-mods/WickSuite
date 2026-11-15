@@ -9,10 +9,16 @@ exactly like the dungeon loot does.
 So this walks the outdoor zones the way the dungeon scrape walks the
 instances. One request per zone.
 
-    python WickSuite/tools/scrape-forever-questrewards.py
-    python WickSuite/tools/scrape-forever-questrewards.py --min 2
+    python WickSuite/tools/scrape-forever-questrewards.py --from-crawl data/forever/raw/<file>.json
 
 Writes WickSuite/data/forever/quest-rewards.json.
+
+Since the release (checked 2026-11-15) www.wowhead.com answers HTTP 403
+to a plain request, so the pages are read in a browser and saved as one
+json file, which --from-crawl reads. Without it this still tries the
+network and fails.
+A crawl saved for this tool usually holds rare and better only, so
+--min 2 needs a crawl that kept the greens.
 
 Blue and above by default. A zone hands out dozens of greens and they are
 not worth planning a route around; a blue is. Pass --min to widen it.
@@ -37,14 +43,24 @@ PAUSE = 1.5
 # The outdoor levelling zones, both factions and the shared ones. Zone
 # ids are Wowhead's. Instances are deliberately absent: the dungeon
 # scrape already has their quest rewards and would double them up.
+#
+# Reviewed against wowhead.com/forever/zones on 2026-11-15, after the
+# release: the four new zones (Zephras Isle, Riverglades, Shen'dralas,
+# Mount Hyjal), Alterac Mountains and the other four capitals joined, and
+# zone 33 is Stranglethorn Vale, one zone, not the northern half.
 ZONES = [
+    (16593, "Zephras Isle"),     (16591, "Riverglades"),
+    (16651, "Shen'dralas"),      (616,  "Mount Hyjal"),
+    (36,   "Alterac Mountains"), (1537, "Ironforge"),
+    (1638, "Thunder Bluff"),     (1497, "Undercity"),
+    (1657, "Darnassus"),
     (1,    "Dun Morogh"),        (3,    "Badlands"),
     (4,    "Blasted Lands"),     (8,    "Swamp of Sorrows"),
     (10,   "Duskwood"),          (11,   "Wetlands"),
     (12,   "Elwynn Forest"),     (14,   "Durotar"),
     (15,   "Dustwallow Marsh"),  (16,   "Azshara"),
     (17,   "The Barrens"),       (28,   "Western Plaguelands"),
-    (33,   "Northern Stranglethorn"), (38, "Loch Modan"),
+    (33,   "Stranglethorn Vale"), (38,   "Loch Modan"),
     (40,   "Westfall"),          (41,   "Deadwind Pass"),
     (44,   "Redridge Mountains"),(45,   "Arathi Highlands"),
     (46,   "Burning Steppes"),   (47,   "The Hinterlands"),
@@ -97,18 +113,33 @@ def main():
     ap.add_argument("--min", type=int, default=3,
                     help="lowest quality to keep; 3 is rare (blue), 2 uncommon")
     ap.add_argument("--one", type=int, help="a single zone id, for a quick look")
+    ap.add_argument("--from-crawl",
+                    help="json saved from a browser: zones -> zone id -> { questRewards }")
     args = ap.parse_args()
+
+    crawl, crawl_date = None, None
+    if args.from_crawl:
+        doc = json.loads(io.open(args.from_crawl, encoding="utf-8").read())
+        crawl = {int(k): v for k, v in (doc.get("zones") or {}).items()}
+        crawl_date = doc.get("collected")
 
     zones = [(z, n) for z, n in ZONES if not args.one or z == args.one]
     out, kept, seen = {}, 0, 0
 
     for zid, name in zones:
         print("  %-26s " % name, end="", flush=True)
-        try:
-            rows = quest_rewards(get("https://www.wowhead.com/forever/zone=%d" % zid))
-        except (urllib.error.URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
-            print("failed: %s" % exc)
-            continue
+        if crawl is not None:
+            if zid not in crawl:
+                print("not in the crawl")
+                continue
+            rows = crawl[zid].get("questRewards") or []
+            seen += (crawl[zid].get("questRewardsSeen") or len(rows)) - len(rows)
+        else:
+            try:
+                rows = quest_rewards(get("https://www.wowhead.com/forever/zone=%d" % zid))
+            except (urllib.error.URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+                print("failed: %s" % exc)
+                continue
 
         seen += len(rows)
         good = []
@@ -133,8 +164,11 @@ def main():
         if good:
             out[name] = {"zoneId": zid, "rewards": good}
         kept += len(good)
-        print("%3d rewards, %2d kept" % (len(rows), len(good)))
-        time.sleep(PAUSE)
+        print("%3d rewards, %2d kept" % (
+            (crawl[zid].get("questRewardsSeen") or len(rows)) if crawl is not None else len(rows),
+            len(good)))
+        if crawl is None:
+            time.sleep(PAUSE)
 
     index = {}
     for zone, d in out.items():
@@ -144,7 +178,7 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     io.open(OUT, "w", encoding="utf-8", newline="\n").write(json.dumps({
         "source": "wowhead.com/forever zone pages, quest-rewards listviews",
-        "collected": datetime.date.today().isoformat(),
+        "collected": crawl_date or datetime.date.today().isoformat(),
         "note": "outdoor zones only; the dungeon scrape already holds instance quest rewards",
         "minQuality": args.min,
         "zones": out,

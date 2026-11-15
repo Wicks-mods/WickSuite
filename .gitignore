@@ -30,3 +30,7 @@ exports/
 !logo*.png
 
 __pycache__/
+
+# Raw Wowhead crawls saved from a browser (see tools/scrape-forever-dungeons.py).
+# Kept on this machine as the record of a collection, not published.
+data/forever/raw/

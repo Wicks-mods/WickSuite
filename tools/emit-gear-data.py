@@ -135,12 +135,17 @@ def main():
         "ns.DUNGEONS = {",
     ]
 
-    order = []
+    order, held_back = [], []
     for name, d in loot["dungeons"].items():
         rows = []
         for bucket, how in (("drops", "drop"), ("questRewards", "quest")):
             for it in d.get(bucket, []):
                 if not it.get("id"):
+                    continue
+                # The stats pass marks an id whose tooltip Wowhead does
+                # not have. An item nobody could confirm does not ship.
+                if it.get("unconfirmed"):
+                    held_back.append("%s (%d, %s)" % (it.get("name"), it["id"], name))
                     continue
                 frm = (it.get("droppedBy") or [None])[0]
                 st = it.get("stats") or {}
@@ -226,8 +231,11 @@ def main():
     os.makedirs(ADDON, exist_ok=True)
     path = os.path.join(ADDON, "Data.lua")
     io.open(path, "w", encoding="utf-8", newline="\n").write("\n".join(out))
-    items = sum(len(d.get("drops", [])) + len(d.get("questRewards", []))
-                for d in loot["dungeons"].values())
+    items = sum(1 for d in loot["dungeons"].values()
+                for b in ("drops", "questRewards") for it in d.get(b, [])
+                if it.get("id") and not it.get("unconfirmed"))
+    if held_back:
+        print("  left out, no tooltip to confirm them: %s" % "; ".join(held_back))
     print("Wrote %s" % path)
     print("  %d dungeons, %d items, %d classes weighted" % (
         len(order), items, len([k for k in weights["weights"]])))

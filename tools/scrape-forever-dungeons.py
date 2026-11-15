@@ -1,19 +1,28 @@
-"""Collect the loot tables of Forever's levelling dungeons from Wowhead.
+"""Collect the loot tables of Forever's dungeons from Wowhead.
 
 Wowhead's Forever database carries real stats and real drop sources, and a
 dungeon's zone page embeds its drop list as JSON inside a Listview. That
-is far kinder than scraping rendered pages: one request per dungeon, no
-browser, and the fields come out typed.
+is far kinder than scraping rendered pages: one read per dungeon, and the
+fields come out typed.
 
-    python WickSuite/tools/scrape-forever-dungeons.py
-    python WickSuite/tools/scrape-forever-dungeons.py --one 1581
+    python WickSuite/tools/scrape-forever-dungeons.py --from-crawl data/forever/raw/<file>.json
+    python WickSuite/tools/scrape-forever-dungeons.py --from-crawl <file> --only 1583
 
 Writes WickSuite/data/forever/dungeon-loot.json.
 
+Since the release (checked 2026-11-15) www.wowhead.com answers HTTP 403
+to a plain request, so this can no longer fetch the pages itself. The
+pages are read in a browser instead and their Listview rows saved as one
+json file, zone id -> { title, drops, questRewards }, which --from-crawl
+reads. Running without it still tries the network, and says so when it is
+refused. Wowhead also puts up a human check after about 35 zone pages
+read by script in a tab, so a crawl is a few pages at a time and never
+worked around.
+
 Stat values are not in the listview, only on each item's own tooltip, so
 this collects the roster: what drops, from whom, at what item level and
-for which slot. Stats are a second pass, deliberately separate so this
-one stays a single cheap request per dungeon.
+for which slot. Stats are a second pass (scrape-forever-item-stats.py),
+and the tooltip host still answers a plain request.
 """
 import argparse
 import io
@@ -30,51 +39,61 @@ OUT_DIR = os.path.join(HERE, "..", "data", "forever")
 UA = "Wicksmods BIS data collector (https://github.com/Wicksmods)"
 PAUSE = 1.5      # be a good guest; this is someone else's bandwidth
 
-# Every five-player dungeon Forever has, from
-# wowhead.com/forever/zones/instances. That page is rendered by script so
-# it cannot be fetched here; it was read once in a browser and the ids
-# written down. Re-read it when the beta adds dungeons, which it does:
-# this list was hand-written from Classic knowledge to begin with and was
-# missing Ruins of Lordaeron, the Hall of Thanes, Karazhan Crypts, and
-# all four of Dire Maul, Stratholme, Scholomance and Blackrock Depths.
+# Every dungeon in Forever's release, in the order of Wowhead's dungeon
+# overview guide (wowhead.com/forever/guide/dungeons-overview-locations-details,
+# updated 2026-11-15 for patch 1.60.1), which is also where the level
+# ranges come from. They are Forever's own, not Classic's: most were
+# retuned. Wowhead's database list (/forever/zones/instances) still shows
+# some of the older ranges, and its roadmap guide gives the new dungeons
+# slightly different ones; the dungeon guide is the newest of the three.
+# A dungeon with wings carries the span of all of them.
 #
-# Level ranges are Forever's own, not Classic's; several have been
-# retuned. None means Wowhead does not give one yet, and a range is
-# worked out from what the loot requires instead.
+# Zone ids are Wowhead's, read off /forever/zones/instances. Two to
+# watch: the Temple of Atal'Hakkar is 1477 (1417, "Sunken Temple", is an
+# empty page and is what this list asked for until 2026-11-15), and
+# City of Dalaran has two ids, of which 16544 is the dungeon. 16560 hands
+# out level 44 rewards, which no level 28 dungeon does, so it is left out
+# until someone can say what it is.
 #
-# Zones with nothing in them are kept on purpose. Wowhead's Forever data
-# is crowdsourced, so an empty dungeon today is a filled one later, and
-# the emitter drops anything still empty.
+# None means nothing is published, and a range is worked out from what
+# the loot requires instead.
 DUNGEONS = [
-    (2437,  "Ragefire Chasm",          "15-25"),
-    (1581,  "The Deadmines",           "15-25"),
-    (718,   "Wailing Caverns",         "17-27"),
-    (209,   "Shadowfang Keep",         "22-30"),
-    (719,   "Blackfathom Deeps",       "22-32"),
-    (717,   "The Stockade",            "22-32"),
-    (721,   "Gnomeregan",              "26-36"),
-    (796,   "Scarlet Monastery",       "26-45"),
-    (491,   "Razorfen Kraul",          "32-42"),
-    (722,   "Razorfen Downs",          "37-47"),
-    (1337,  "Uldaman",                 "42-52"),
-    (2100,  "Maraudon",                "42-52"),
-    (2557,  "Dire Maul",               "44-54"),
-    (1176,  "Zul'Farrak",              "46-56"),
-    (2017,  "Stratholme",              "48-58"),
-    (1417,  "Temple of Atal'Hakkar",   "50-60"),
-    (1584,  "Blackrock Depths",        "52-60"),
-    (1583,  "Blackrock Spire",         "55-60"),
-    (2057,  "Scholomance",             "55-60"),
-    # New in Forever. No level range published yet.
-    (16611, "Ruins of Lordaeron",      None),
-    (16919, "The Hall of Thanes",      None),
-    (16074, "Karazhan Crypts",         None),
-    (16732, "Excavation Site: Wetlands", "24-29"),   # Wowhead's dungeon overview guide
-    (15828, "The Burning of Andorhal", None),
-    (17191, "Manor Mistmantle",        None),
-    (16632, "Half-Pint Tavern",        None),
-    (16295, "The Scarab Dais",         None),
-    (16544, "City of Dalaran",         None),
+    (16919, "The Hall of Thanes",        "13-18"),   # new in Forever
+    (2437,  "Ragefire Chasm",            "13-18"),
+    (16611, "Ruins of Lordaeron",        "15-20"),   # new
+    (718,   "Wailing Caverns",           "15-25"),
+    (1581,  "The Deadmines",             "18-23"),
+    (209,   "Shadowfang Keep",           "22-30"),
+    (717,   "The Stockade",              "22-30"),
+    (16732, "Excavation Site: Wetlands", "24-29"),   # new
+    (719,   "Blackfathom Deeps",         "24-32"),
+    (16544, "City of Dalaran",           "28-33"),   # new
+    (796,   "Scarlet Monastery",         "28-45"),   # four wings, 28-38 to 35-45
+    (721,   "Gnomeregan",                "29-38"),
+    (491,   "Razorfen Kraul",            "30-40"),
+    (16550, "The Drowned City",          "35-40"),   # new
+    (16842, "Krol'dok Stronghold",       "40-45"),   # new
+    (722,   "Razorfen Downs",            "40-50"),
+    (1337,  "Uldaman",                   "42-52"),
+    (1176,  "Zul'Farrak",                "44-54"),
+    (2100,  "Maraudon",                  "45-57"),   # three wings, 45-53 to 48-57
+    (16620, "Alcaz Prison",              "48-53"),   # new
+    (1477,  "Temple of Atal'Hakkar",     "50-60"),
+    (1584,  "Blackrock Depths",          "52-60"),
+    (16554, "Blackmaw Hold",             "55-60"),   # new
+    (1583,  "Blackrock Spire",           "55-60"),   # lower 55-60, upper 58-60
+    (16667, "The Shaper's Terrace",      "58-60"),   # new; no loot on Wowhead yet
+    (2557,  "Dire Maul",                 "58-60"),
+    (2057,  "Scholomance",               "58-60"),
+    (2017,  "Stratholme",                "58-60"),
+    # On Wowhead's instance list but not in the release guide. Kept so a
+    # later crawl notices if one of them fills in; the emitter drops
+    # anything still empty.
+    (16074, "Karazhan Crypts",           None),
+    (15828, "The Burning of Andorhal",   None),
+    (17191, "Manor Mistmantle",          None),
+    (16632, "Half-Pint Tavern",          None),
+    (16295, "The Scarab Dais",           None),
 ]
 
 # Sort key for "the order you would actually run them": the bottom of the
@@ -172,7 +191,7 @@ def tidy(row):
     for sm in row.get("sourcemore") or []:
         if sm.get("n"):
             sources.append(sm["n"])
-    return {
+    out = {
         "id": row.get("id"),
         "name": row.get("name") or row.get("displayName"),
         "ilvl": row.get("level"),
@@ -186,19 +205,55 @@ def tidy(row):
         "speed": row.get("speed") or None,
         "droppedBy": sources,
     }
+    # Wowhead's faction flag (1 Alliance, 2 Horde) and class mask. Kept
+    # in the json for whoever wants them; the addon's rows do not carry
+    # either yet.
+    if row.get("side"):
+        out["side"] = row["side"]
+    if row.get("reqclass"):
+        out["reqClass"] = row["reqclass"]
+    return out
+
+
+def from_here(row, zone):
+    """Whether a drop row really belongs to this dungeon.
+
+    A zone page's drop list is fed by what players loot there, so it
+    picks up world drops too: Staff of Jordan on Krol'dok Stronghold,
+    Hibernal Armor in Blackrock Depths. Those rows carry no sourcemore at
+    all. A real drop names the creature it comes from, or, when several
+    creatures in the dungeon share it, the dungeon itself.
+    """
+    for sm in row.get("sourcemore") or []:
+        if sm.get("n") or sm.get("z") == zone:
+            return True
+    return False
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="comma-separated zone ids; the rest of the file is left alone")
     ap.add_argument("--one", type=int, help="a single zone id, for a quick check")
+    ap.add_argument("--from-crawl", action="append", default=[],
+                    help="json saved from a browser: zone id -> { drops, questRewards }. "
+                         "May be given more than once; a later file wins for a zone it holds.")
     args = ap.parse_args()
+
+    crawl, crawl_date = {}, None
+    for path in args.from_crawl:
+        doc = json.loads(io.open(path, encoding="utf-8").read())
+        crawl.update({int(k): v for k, v in (doc.get("zones") or {}).items()})
+        crawl_date = max(crawl_date or "", doc.get("collected") or "")
 
     wanted = None
     if args.only:
         wanted = {int(z.strip()) for z in args.only.split(",") if z.strip()}
     elif args.one:
         wanted = {args.one}
+    if crawl:
+        # A crawl seldom holds every dungeon. The ones it lacks keep what
+        # is on file instead of being asked for over a network that says no.
+        wanted = (wanted & set(crawl)) if wanted else set(crawl)
     targets = [d for d in DUNGEONS if d[0] in wanted] if wanted else DUNGEONS
     if not targets:
         sys.exit("No dungeon in the list with that zone id.")
@@ -218,15 +273,28 @@ def main():
 
     out, total, equippable = {}, 0, 0
     for i, (zone, name, levels) in enumerate(targets):
-        if i:
-            time.sleep(PAUSE)
         try:
-            html = fetch(zone)
-            drops = [tidy(r) for r in listview(html, "drops")]
-            quests = [tidy(r) for r in listview(html, "quest-rewards")]
-        except (urllib.error.URLError, ValueError, json.JSONDecodeError) as exc:
-            print("  %-24s FAILED: %s" % (name, exc))
+            if crawl:
+                raw_drops = crawl[zone].get("drops") or []
+                raw_quests = crawl[zone].get("questRewards") or []
+            else:
+                if i:
+                    time.sleep(PAUSE)
+                html = fetch(zone)
+                raw_drops = listview(html, "drops")
+                raw_quests = listview(html, "quest-rewards")
+        except urllib.error.HTTPError as exc:
+            print("  %-26s FAILED: %s%s" % (name, exc, (
+                "  (Wowhead refuses plain requests now; read the page in a "
+                "browser and pass --from-crawl)") if exc.code == 403 else ""))
             continue
+        except (urllib.error.URLError, ValueError, json.JSONDecodeError) as exc:
+            print("  %-26s FAILED: %s" % (name, exc))
+            continue
+        strays = [r for r in raw_drops if (r.get("slot") and (r.get("quality") or 0) >= 2
+                                           and not from_here(r, zone))]
+        drops = [tidy(r) for r in raw_drops if from_here(r, zone)]
+        quests = [tidy(r) for r in raw_quests]
         # Gear only. The rest is cloth, recipes and vendor trash.
         def gear_only(items):
             g = [i for i in items
@@ -265,7 +333,9 @@ def main():
         out[name] = entry
         total += len(drops) + len(quests)
         equippable += len(d) + len(q)
-        print("  %-24s %3d dropped, %3d from quests" % (name, len(d), len(q)))
+        print("  %-26s %3d dropped, %3d from quests%s" % (
+            name, len(d), len(q),
+            ("   (%d world drops left out)" % len(strays)) if strays else ""))
 
     if wanted:
         # Only some were asked for, so keep what was already on file for
@@ -275,19 +345,23 @@ def main():
         merged.update(out)
         out = merged
 
-    # Keep the file in run order whichever subset was scraped.
-    out = dict(sorted(out.items(), key=lambda kv: level_key(kv[1].get("levels"))))
+    # Keep the file in run order whichever subset was scraped: the order
+    # of the list above, which is the guide's, and anything the list no
+    # longer names after that by the bottom of its range.
+    place = {name: n for n, (_, name, _) in enumerate(DUNGEONS)}
+    out = dict(sorted(out.items(), key=lambda kv: (
+        place.get(kv[0], len(place)), level_key(kv[1].get("levels")))))
 
     os.makedirs(OUT_DIR, exist_ok=True)
     path = os.path.normpath(os.path.join(OUT_DIR, "dungeon-loot.json"))
     io.open(path, "w", encoding="utf-8", newline="\n").write(
         json.dumps({
             "source": "wowhead.com/forever, zone drop listviews",
-            "collected": time.strftime("%Y-%m-%d"),
+            "collected": crawl_date or time.strftime("%Y-%m-%d"),
             "note": ("Roster only; stat values live on each item's tooltip and need a "
-                 "second pass. Coverage is uneven, because Wowhead's Forever data "
-                 "grows from what players actually see: the early dungeons are well "
-                 "filled in and the later ones are thin. Re-run as the beta goes on."),
+                 "second pass. Wowhead's Forever data grows from what players "
+                 "actually loot, so a new dungeon can be thin for a while. A drop is "
+                 "kept only when its row names a creature or the dungeon as its source."),
             "dungeons": out,
         }, indent=2, ensure_ascii=False) + "\n")
     print("\n%d entries across %d dungeons, %d of them gear" % (total, len(out), equippable))
