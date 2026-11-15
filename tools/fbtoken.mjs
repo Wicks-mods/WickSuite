@@ -105,13 +105,34 @@ export async function checkSaved(config) {
   if (!token) return { state: "missing", detail: "no fb_page_token in Wicksmodsinfo.txt" };
   const r = await graph(v, `${pageId}?fields=id,name&access_token=${enc(token)}`);
   if (r.error?.offline) return { state: "unreachable", detail: r.error.message };
-  const seen = await inspect(token, apps(), v);
-  const app = seen.app ? { id: seen.data.app_id, name: seen.data.application || null } : null;
+  const d = await describe(token, v);
+  const app = d.known ? d.app : null;
   if (r.error) {
     return { state: "refused", code: r.error.code ?? null, subcode: r.error.error_subcode ?? null, detail: scrub(r.error.message), app };
   }
-  const ends = seen.app && seen.data.expires_at ? day(seen.data.expires_at) : null;
-  return { state: "ok", page: r.name, app, expires: ends };
+  // A User token can read the page's name too, so being answered is not
+  // enough: only a Page token for this page can post as it.
+  if (d.known && d.kind !== "PAGE") {
+    return { state: "refused", code: null, subcode: null, app, detail: `the saved fb_page_token is a ${d.kind === "USER" ? "User" : d.kind} token, not a Page token, so it cannot post as the page` };
+  }
+  if (d.known && d.profile && d.profile !== String(pageId)) {
+    return { state: "refused", code: null, subcode: null, app, detail: "the saved fb_page_token is for another page" };
+  }
+  return { state: "ok", page: r.name, app, expires: d.known ? d.expires : null };
+}
+
+// What Facebook says a token is, in the few facts that matter here.
+async function describe(token, v) {
+  const seen = await inspect(token, apps(), v);
+  if (!seen.app) return { known: false, detail: seen.error };
+  const d = seen.data;
+  return {
+    known: true, valid: !!d.is_valid, kind: d.type || null,
+    app: { id: d.app_id, name: d.application || null },
+    profile: d.profile_id ? String(d.profile_id) : null,
+    scopes: d.scopes || [], expires: d.expires_at ? day(d.expires_at) : null,
+    detail: d.is_valid ? null : scrub(d.error?.message),
+  };
 }
 
 // The secrets file with new values on the two token lines and nothing else
@@ -158,6 +179,7 @@ const HELP = `wick fb-token                 renew the Facebook Page token from a
 wick fb-token --check         is the saved Page token still accepted? (read-only)
 wick fb-token --dry-run       every step except writing Wicksmodsinfo.txt
 wick fb-token --from-env      take the fresh token from FB_FRESH_TOKEN instead of the clipboard
+wick fb-token --from-saved    take it from the fb_user_token line already in Wicksmodsinfo.txt
 
 First, by hand (the one step that needs your Facebook login):
   1. Open https://developers.facebook.com/tools/explorer
@@ -174,15 +196,19 @@ async function renew(config, args) {
   if (!pageId) stop("wick.json has no social.fb_page_id");
   const dry = args.includes("--dry-run");
   const fromEnv = args.includes("--from-env");
+  // The token already pasted into the file as fb_user_token: the case of a
+  // renewal started by hand and left at "now read the Page token out".
+  const fromSaved = args.includes("--from-saved");
 
   // 1. The fresh token.
-  const fresh = (fromEnv ? process.env.FB_FRESH_TOKEN || "" : clipboard()).trim();
+  const source = fromSaved ? "the fb_user_token line of Wicksmodsinfo.txt" : fromEnv ? "FB_FRESH_TOKEN" : "the clipboard";
+  const fresh = (fromSaved ? value(read(SECRETS), "fb_user_token") : fromEnv ? process.env.FB_FRESH_TOKEN || "" : clipboard()).trim();
   if (!TOKEN.test(fresh)) {
-    stop(fromEnv
-      ? "FB_FRESH_TOKEN does not hold a Facebook token (they start with EA)"
+    stop(fromSaved || fromEnv
+      ? `${source} does not hold a Facebook token (they start with EA)`
       : "the clipboard does not hold a Facebook token (they start with EA).\n  Copy the Access Token from the Graph API Explorer, then run this again. Steps: wick fb-token --help");
   }
-  ok(`token read from ${fromEnv ? "FB_FRESH_TOKEN" : "the clipboard"} (${fresh.length} characters)`);
+  ok(`token read from ${source} (${fresh.length} characters)`);
 
   // 2. Whose it is and what it may do.
   const candidates = apps();
@@ -250,13 +276,13 @@ async function renew(config, args) {
   }
   ok(`saved in Wicksmodsinfo.txt: ${done.join(", ")} (the old file is Wicksmodsinfo.txt.bak)`);
   if (process.env.FB_WICKS_MODS_PAGE_TOKEN) console.log("  note: FB_WICKS_MODS_PAGE_TOKEN is set and wins over the file; clear it or set it to the new token");
-  if (!fromEnv && clearClipboard()) ok("clipboard cleared");
+  if (!fromEnv && !fromSaved && clearClipboard()) ok("clipboard cleared");
   console.log("\nFacebook posting is back. Check any time with: wick fb-token --check");
 }
 
 export async function run(args = []) {
   if (args.includes("--help") || args.includes("-h")) { console.log(HELP); return; }
-  const known = ["--check", "--dry-run", "--from-env"];
+  const known = ["--check", "--dry-run", "--from-env", "--from-saved"];
   const unknown = args.filter((a) => !known.includes(a));
   if (unknown.length) { console.error(`✗ fb-token does not know ${unknown.join(", ")}. Flags: ${known.join(" ")}`); process.exitCode = 1; return; }
   const config = JSON.parse(fs.readFileSync(path.join(SUITE, "wick.json"), "utf8"));
@@ -264,6 +290,17 @@ export async function run(args = []) {
     if (args.includes("--check")) {
       const c = await checkSaved(config);
       sayCheck(c);
+      // The saved User token too: a live one is all --from-saved needs.
+      const u = value(read(SECRETS), "fb_user_token");
+      if (TOKEN.test(u)) {
+        const d = await describe(u, config.social?.fb_graph_version || "v21.0");
+        const lacks = d.known ? NEEDED.filter((s) => !d.scopes.includes(s)) : [];
+        console.log(!d.known ? `  saved fb_user_token: Facebook does not accept it (${d.detail})`
+          : !d.valid ? `  saved fb_user_token: no longer valid (${d.detail})`
+          : `  saved fb_user_token: a live ${d.kind === "USER" ? "User" : d.kind} token from ${d.app.name || d.app.id}, ${d.expires ? `until ${d.expires}` : "no end date"}`
+            + (lacks.length ? `; lacks ${lacks.join(", ")}` : "; has the permissions")
+            + (c.state !== "ok" && d.kind === "USER" && !lacks.length ? "\n  That is enough to finish: wick fb-token --from-saved" : ""));
+      }
       if (c.state !== "ok") process.exitCode = 1;
       return;
     }
