@@ -287,6 +287,17 @@ check(shownRows() >= 10, "clearing the box puts the dungeon list back")
 check(#(ns.CRAFTED_ORDER or {}) == 4, "four gear professions, got " .. #(ns.CRAFTED_ORDER or {}))
 check(#(ns.QUESTS_ORDER or {}) > 10, "quest rewards across the zones, got " .. #(ns.QUESTS_ORDER or {}))
 
+-- The release's own zones hand out blues too, and the first list was
+-- collected in a beta that did not have them. Zephras Isle is absent
+-- because a starting zone gives no rare rewards, not by oversight.
+check(ns.QUESTS["Riverglades"] ~= nil and ns.QUESTS["Mount Hyjal"] ~= nil
+    and ns.QUESTS["Shen'dralas"] ~= nil, "the release's new zones are in the quest list")
+check(ns.QUESTS["Northern Stranglethorn"] == nil and ns.QUESTS["Stranglethorn Vale"] ~= nil,
+    "Stranglethorn is one zone in this game and is named as one")
+local made = 0
+for _, rows in pairs(ns.CRAFTED or {}) do made = made + #rows end
+check(made >= 1350, made .. " crafted pieces, the release's recipes on top of the beta's 1294")
+
 local order, groups = ns.UI:Groups("crafted")
 check(#order == 4 and groups[order[1]] ~= nil, "the crafted source offers its professions")
 check(groups[order[1]][1].skill ~= nil, "and a recipe carries the skill it is learned at")
@@ -612,6 +623,79 @@ do
     local okDbl = pcall(m.SetScript, m, "OnDoubleClick", function() end)
     check(not okDbl, "and a model still refuses a double-click handler")
     GetCursorPosition = realCursor
+end
+
+-- Putting the unit on a model blanks it for a moment. The column is
+-- redrawn whenever item data arrives, about three times a second while
+-- the lists load, and every redraw rebuilt the model: with the release's
+-- three thousand items the character flashed for a minute after the
+-- window opened. It is rebuilt when what it wears changes, and once when
+-- the window opens, and not otherwise.
+io.write("== the model is left alone ==\n")
+do
+    local m = ns.Doll.model
+    local units = 0
+    local realSetUnit = m.SetUnit
+    rawset(m, "SetUnit", function(self, ...) units = units + 1 return realSetUnit(self, ...) end)
+    local wasEquipped = S.EQUIPPED
+
+    ns.Doll:ClearAll()
+    ns.Doll:Refresh()
+    units = 0
+    for _ = 1, 5 do ns.Doll:Refresh() end
+    check(units == 0, "redrawing the column leaves the model alone when it wears the same: " .. units)
+
+    -- The real path: item data turning up while the window is open.
+    if not ns.UI.panel:IsShown() then ns.UI.panel:Show() end
+    units = 0
+    local drawn = 0
+    local realDollRefresh = ns.Doll.Refresh
+    ns.Doll.Refresh = function(self) drawn = drawn + 1 return realDollRefresh(self) end
+    ns.UI.redrawQueued = nil
+    ns.UI:ItemArrived()
+    ns.UI.redrawQueued = nil
+    ns.UI:ItemArrived()
+    ns.Doll.Refresh = realDollRefresh
+    check(drawn == 2 and units == 0,
+        ("so does item data arriving: the column redrew %d times and the model was rebuilt %d"):format(drawn, units))
+
+    S.fire("UNIT_STATS", "player")
+    check(units == 0, "and a stat moving, which a buff does every few seconds: " .. units)
+
+    ns.Doll:TryOn(7719)
+    check(units == 1, "trying a piece on rebuilds it, once: " .. units)
+    ns.Doll:Refresh()
+    check(units == 1, "and not again while the piece stays on: " .. units)
+
+    S.EQUIPPED = { [5] = "|cff1eff00|Hitem:6463:0:0:0:0:0:0:0:60:0:0:0:0:0:0:0:0|h[Worn Thing]|h|r" }
+    S.fire("PLAYER_EQUIPMENT_CHANGED", 5)
+    check(units == 2, "changing what you wear rebuilds it: " .. units)
+
+    -- A piece the client had not loaded cannot be drawn. When it turns
+    -- up, the model has to be told, or the slot stays bare.
+    -- UNKNOWN rather than UNCACHED: the stub loads an uncached item the
+    -- instant it is asked for, and this one has to stay away for a while.
+    ns.Doll:ClearAll()
+    S.UNKNOWN = S.UNKNOWN or {}
+    S.UNKNOWN[7719] = true
+    check(ns.Doll:TryOn(7719) and not ns.Score:Cached(7719), "a piece the client has not loaded can still go on")
+    local before = units
+    for _ = 1, 3 do ns.Doll:Refresh() end
+    check(units == before, "a piece still loading does not rebuild it over and over: " .. (units - before))
+    S.UNKNOWN[7719] = nil
+    ns.Doll:Refresh()
+    check(units == before + 1, "but its arriving does, once: " .. (units - before))
+
+    -- Closed and opened again: one rebuild, since a hidden model is not
+    -- promised to have kept its picture.
+    before = units
+    ns.UI.panel:Hide()
+    ns.UI.panel:Show()
+    check(units == before + 1, "opening the window rebuilds it once: " .. (units - before))
+
+    ns.Doll:ClearAll()
+    S.EQUIPPED = wasEquipped
+    rawset(m, "SetUnit", nil)
 end
 
 

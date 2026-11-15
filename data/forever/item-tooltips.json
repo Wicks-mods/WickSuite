@@ -1,6 +1,15 @@
 {
  "collected": "2026-11-15",
  "items": {
+  "10152": {
+   "itemLevel": 63,
+   "name": "Mighty Leggings",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 140
+   }
+  },
   "10157": {
    "itemLevel": 64,
    "name": "Mercurial Breastplate",
@@ -8,6 +17,15 @@
    "requiresLevel": 59,
    "stats": {
     "armor": 342
+   }
+  },
+  "10163": {
+   "itemLevel": 62,
+   "name": "Mercurial Pauldrons",
+   "read": "2026-11-15",
+   "requiresLevel": 57,
+   "stats": {
+    "armor": 249
    }
   },
   "10220": {
@@ -2985,6 +3003,16 @@
     "speed": 2.9
    }
   },
+  "12344": {
+   "itemLevel": 61,
+   "name": "Seal of Ascension",
+   "read": "2026-11-15",
+   "stats": {
+    "fireRes": 10,
+    "frostRes": 10,
+    "natureRes": 10
+   }
+  },
   "12462": {
    "droppedBy": "Shade of Hakkar",
    "itemLevel": 55,
@@ -3292,6 +3320,64 @@
     "strength": 8
    }
   },
+  "12582": {
+   "droppedBy": "War Master Voone",
+   "itemLevel": 60,
+   "name": "Keris of Zul'Serak",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "dps": 39.44,
+    "maxDamage": 93,
+    "minDamage": 49,
+    "speed": 1.8
+   }
+  },
+  "12583": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Blackhand Doomsaw",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "dps": 54.0,
+    "maxDamage": 227,
+    "minDamage": 151,
+    "speed": 3.5
+   }
+  },
+  "12587": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Eye of Rend",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 143,
+    "equip": [
+     "Equip: Improves your chance to hit by 0.5%.",
+     "Equip: Improves your chance to get a critical strike by 1.5%."
+    ],
+    "stamina": 17,
+    "strength": 15
+   }
+  },
+  "12589": {
+   "droppedBy": "Solakar Flamewreath",
+   "itemLevel": 61,
+   "name": "Dustfeather Sash",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 49,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 9.",
+     "Equip: Your spells pierce 3 Magical Resistance."
+    ],
+    "intellect": 17,
+    "stamina": 10
+   }
+  },
   "12602": {
    "droppedBy": "General Drakkisath",
    "itemLevel": 63,
@@ -3305,6 +3391,124 @@
     ],
     "fireRes": 8,
     "stamina": 7
+   }
+  },
+  "12603": {
+   "droppedBy": "Solakar Flamewreath",
+   "itemLevel": 61,
+   "name": "Nightbrace Tunic",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "agility": 6,
+    "armor": 172,
+    "equip": [
+     "Equip: +50 Attack Power."
+    ],
+    "fireRes": 10,
+    "shadowRes": 10,
+    "stamina": 10
+   }
+  },
+  "12604": {
+   "droppedBy": "Jed Runewatcher",
+   "itemLevel": 60,
+   "name": "Starfire Tiara",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 69,
+    "equip": [
+     "Equip: Increases damage done by Arcane spells and effects by up to 37."
+    ],
+    "fireRes": 10,
+    "intellect": 10,
+    "spirit": 10
+   }
+  },
+  "12605": {
+   "droppedBy": "Jed Runewatcher",
+   "itemLevel": 60,
+   "name": "Serpentine Skuller",
+   "read": "2026-11-15",
+   "requiresLevel": 51,
+   "stats": {
+    "dps": 59.64,
+    "equip": [
+     "Equip: Your spells pierce 2 Magical Resistance."
+    ],
+    "shadowRes": 9,
+    "speed": 1.4
+   }
+  },
+  "12606": {
+   "droppedBy": "Solakar Flamewreath",
+   "itemLevel": 61,
+   "name": "Crystallized Girdle",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 97,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 13."
+    ],
+    "intellect": 19,
+    "spirit": 6,
+    "stamina": 6
+   }
+  },
+  "12608": {
+   "droppedBy": "Spirestone Butcher",
+   "itemLevel": 58,
+   "name": "Butcher's Apron",
+   "read": "2026-11-15",
+   "requiresLevel": 53,
+   "stats": {
+    "armor": 41,
+    "equip": [
+     "Equip: Increases healing done by up to 9 and damage done by up to 3 for all magical spells and effects."
+    ],
+    "spirit": 15,
+    "stamina": 7
+   }
+  },
+  "12609": {
+   "droppedBy": "Solakar Flamewreath",
+   "itemLevel": 61,
+   "name": "Polychromatic Visionwrap",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 87,
+    "stamina": 14
+   }
+  },
+  "12621": {
+   "droppedBy": "Bannok Grimaxe",
+   "itemLevel": 59,
+   "name": "Demonfork",
+   "read": "2026-11-15",
+   "requiresLevel": 54,
+   "stats": {
+    "dps": 38.93,
+    "maxDamage": 142,
+    "minDamage": 76,
+    "speed": 2.8
+   }
+  },
+  "12626": {
+   "droppedBy": "Shadow Hunter Vosh'gajin",
+   "itemLevel": 59,
+   "name": "Funeral Cuffs",
+   "read": "2026-11-15",
+   "requiresLevel": 54,
+   "stats": {
+    "armor": 37,
+    "equip": [
+     "Equip: Increases healing done by up to 18 and damage done by up to 6 for all magical spells and effects."
+    ],
+    "intellect": 14,
+    "shadowRes": 7
    }
   },
   "1263": {
@@ -3321,6 +3525,37 @@
     "minDamage": 158,
     "speed": 3.5,
     "stamina": 16
+   }
+  },
+  "12634": {
+   "droppedBy": "Bannok Grimaxe",
+   "itemLevel": 60,
+   "name": "Chiselbrand Girdle",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 199,
+    "equip": [
+     "Equip: +44 Attack Power."
+    ],
+    "spirit": 6,
+    "stamina": 6
+   }
+  },
+  "12637": {
+   "droppedBy": "Bannok Grimaxe",
+   "itemLevel": 60,
+   "name": "Backusarian Gauntlets",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 392,
+    "equip": [
+     "Equip: Increased Defense +7."
+    ],
+    "intellect": 9,
+    "stamina": 15,
+    "strength": 9
    }
   },
   "1264": {
@@ -3354,6 +3589,40 @@
     "speed": 3.2
    }
   },
+  "12653": {
+   "droppedBy": "Shadow Hunter Vosh'gajin",
+   "itemLevel": 59,
+   "name": "Riphook",
+   "read": "2026-11-15",
+   "requiresLevel": 54,
+   "stats": {
+    "dps": 30.23,
+    "equip": [
+     "Equip: +22 Attack Power."
+    ],
+    "maxDamage": 87,
+    "minDamage": 46,
+    "speed": 2.2
+   }
+  },
+  "12709": {
+   "droppedBy": "The Beast",
+   "itemLevel": 63,
+   "name": "Pip's Skinner",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "dps": 41.15,
+    "equip": [
+     "Equip: Increased Skinning +10.",
+     "Equip: +20 Attack Power.",
+     "Equip: +30 Attack Power against Beasts."
+    ],
+    "maxDamage": 70,
+    "minDamage": 37,
+    "speed": 1.3
+   }
+  },
   "12791": {
    "droppedBy": "Plugger Spazzring",
    "itemLevel": 55,
@@ -3380,6 +3649,17 @@
     "strength": 18
    }
   },
+  "12905": {
+   "droppedBy": "Pyroguard Emberseer",
+   "itemLevel": 61,
+   "name": "Wildfire Cape",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 43,
+    "fireRes": 20
+   }
+  },
   "1292": {
    "droppedBy": "Razorclaw the Butcher",
    "itemLevel": 25,
@@ -3395,6 +3675,126 @@
     "strength": 5
    }
   },
+  "12926": {
+   "droppedBy": "Pyroguard Emberseer",
+   "itemLevel": 61,
+   "name": "Flaming Band",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "equip": [
+     "Equip: Increases damage done by Fire spells and effects by up to 24."
+    ]
+   }
+  },
+  "12927": {
+   "droppedBy": "Pyroguard Emberseer",
+   "itemLevel": 61,
+   "name": "Truestrike Shoulders",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 129,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.5%.",
+     "Equip: +24 Attack Power."
+    ],
+    "stamina": 10
+   }
+  },
+  "12929": {
+   "droppedBy": "Pyroguard Emberseer",
+   "itemLevel": 61,
+   "name": "Emberfury Talisman",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "equip": [
+     "Equip: Improves your chance to get a critical strike by 1.0%.",
+     "Equip: Increases damage and healing done by magical spells and effects by up to 6."
+    ],
+    "fireRes": 7,
+    "stamina": 8
+   }
+  },
+  "12930": {
+   "droppedBy": "Jed Runewatcher",
+   "itemLevel": 60,
+   "name": "Briarwood Reed",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 15. This effect is doubled in Marsh and Swamp areas.",
+     "Equip: Unable to be tracked."
+    ]
+   }
+  },
+  "12935": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Warmaster Legguards",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 575,
+    "equip": [
+     "Equip: Increases your chance to Dodge an attack by 2.0%.",
+     "Equip: Increases your chance to Parry an attack by 0.4%."
+    ],
+    "stamina": 16,
+    "strength": 13
+   }
+  },
+  "12936": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Battleborn Armbraces",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 287,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.0%.",
+     "Equip: Improves your chance to get a critical strike by 1.0%."
+    ],
+    "spirit": 7
+   }
+  },
+  "12939": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Dal'Rend's Tribal Guardian",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 100,
+    "dps": 41.39,
+    "equip": [
+     "Equip: Increased Defense +7."
+    ],
+    "maxDamage": 97,
+    "minDamage": 52,
+    "speed": 1.8
+   }
+  },
+  "12940": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Dal'Rend's Sacred Charge",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "dps": 41.43,
+    "equip": [
+     "Equip: Improves your chance to get a critical strike by 1.0%."
+    ],
+    "maxDamage": 151,
+    "minDamage": 81,
+    "speed": 2.8,
+    "strength": 4
+   }
+  },
   "12952": {
    "droppedBy": "Gyth",
    "itemLevel": 60,
@@ -3407,6 +3807,141 @@
      "Equip: Increased Defense +9."
     ],
     "stamina": 20
+   }
+  },
+  "12953": {
+   "droppedBy": "Gyth",
+   "itemLevel": 60,
+   "name": "Dragoneye Coif",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 288,
+    "equip": [
+     "Equip: +38 Attack Power."
+    ],
+    "stamina": 17
+   }
+  },
+  "12960": {
+   "droppedBy": "Gyth",
+   "itemLevel": 60,
+   "name": "Tribal War Feathers",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 137,
+    "equip": [
+     "Equip: Increases healing done by up to 33 and damage done by up to 11 for all magical spells and effects."
+    ],
+    "intellect": 15,
+    "stamina": 12
+   }
+  },
+  "12963": {
+   "droppedBy": "The Beast",
+   "itemLevel": 63,
+   "name": "Blademaster Leggings",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 154,
+    "equip": [
+     "Equip: Increases your chance to Dodge an attack by 2.0%.",
+     "Equip: Improves your chance to hit by 1.0%.",
+     "Equip: Improves your chance to get a critical strike by 1.0%.",
+     "Equip: +24 Attack Power."
+    ]
+   }
+  },
+  "12964": {
+   "droppedBy": "The Beast",
+   "itemLevel": 63,
+   "name": "Tristam Legguards",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 324,
+    "equip": [
+     "Equip: Increases your chance to Dodge an attack by 1.5%.",
+     "Equip: +38 Attack Power."
+    ],
+    "stamina": 18
+   }
+  },
+  "12965": {
+   "droppedBy": "The Beast",
+   "itemLevel": 63,
+   "name": "Spiritshroud Leggings",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 78,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 19."
+    ],
+    "intellect": 16,
+    "spirit": 16,
+    "stamina": 13
+   }
+  },
+  "12966": {
+   "droppedBy": "The Beast",
+   "itemLevel": 63,
+   "name": "Blackmist Armguards",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 77,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.0%."
+    ],
+    "shadowRes": 7,
+    "stamina": 13,
+    "strength": 5
+   }
+  },
+  "12967": {
+   "droppedBy": "The Beast",
+   "itemLevel": 63,
+   "name": "Bloodmoon Cloak",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "arcaneRes": 5,
+    "armor": 45,
+    "equip": [
+     "Equip: Increased Defense +3."
+    ],
+    "stamina": 17
+   }
+  },
+  "12968": {
+   "droppedBy": "The Beast",
+   "itemLevel": 63,
+   "name": "Frostweaver Cape",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 45,
+    "equip": [
+     "Equip: Increases damage done by Frost spells and effects by up to 13."
+    ],
+    "frostRes": 10,
+    "intellect": 13
+   }
+  },
+  "12969": {
+   "droppedBy": "The Beast",
+   "itemLevel": 63,
+   "name": "Seeping Willow",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "dps": 53.89,
+    "maxDamage": 233,
+    "minDamage": 155,
+    "speed": 3.6
    }
   },
   "13044": {
@@ -3425,6 +3960,34 @@
     "speed": 3.1
    }
   },
+  "13098": {
+   "droppedBy": "General Drakkisath",
+   "itemLevel": 63,
+   "name": "Painweaver Band",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "equip": [
+     "Equip: Improves your chance to get a critical strike by 1.0%.",
+     "Equip: +12 Attack Power."
+    ],
+    "stamina": 9
+   }
+  },
+  "13141": {
+   "droppedBy": "General Drakkisath",
+   "itemLevel": 63,
+   "name": "Tooth of Gnarr",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "equip": [
+     "Equip: Increases healing done by up to 15 and damage done by up to 5 for all magical spells and effects."
+    ],
+    "intellect": 11,
+    "stamina": 7
+   }
+  },
   "13142": {
    "droppedBy": "General Drakkisath",
    "itemLevel": 63,
@@ -3440,6 +4003,59 @@
     "strength": 14
    }
   },
+  "13161": {
+   "droppedBy": "Overlord Wyrmthalak",
+   "itemLevel": 61,
+   "name": "Trindlehaven Staff",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "dps": 38.81,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 70."
+    ],
+    "intellect": 25,
+    "maxDamage": 98,
+    "minDamage": 65,
+    "speed": 2.1,
+    "stamina": 12
+   }
+  },
+  "13162": {
+   "droppedBy": "Overlord Wyrmthalak",
+   "itemLevel": 61,
+   "name": "Reiver Claws",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 398,
+    "equip": [
+     "Equip: Improves your chance to get a critical strike by 1.0%."
+    ],
+    "stamina": 15,
+    "strength": 11
+   }
+  },
+  "13163": {
+   "droppedBy": "Overlord Wyrmthalak",
+   "itemLevel": 62,
+   "name": "Relentless Scythe",
+   "read": "2026-11-15",
+   "requiresLevel": 57,
+   "stats": {
+    "agility": 9,
+    "dps": 53.03,
+    "equip": [
+     "Equip: Increases your chance to Parry an attack by 1.0%.",
+     "Equip: Reduces chance to be Dodged or Parried by 1.0%."
+    ],
+    "maxDamage": 210,
+    "minDamage": 140,
+    "speed": 3.3,
+    "stamina": 11,
+    "strength": 20
+   }
+  },
   "13164": {
    "droppedBy": "Overlord Wyrmthalak",
    "itemLevel": 61,
@@ -3447,6 +4063,68 @@
    "read": "2026-11-15",
    "requiresLevel": 56,
    "stats": {}
+  },
+  "13166": {
+   "droppedBy": "Highlord Omokk",
+   "itemLevel": 60,
+   "name": "Slamshot Shoulders",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 470,
+    "equip": [
+     "Equip: Improves your chance to hit by 0.5%.",
+     "Equip: +20 Attack Power."
+    ],
+    "stamina": 21
+   }
+  },
+  "13167": {
+   "droppedBy": "Highlord Omokk",
+   "itemLevel": 60,
+   "name": "Fist of Omokk",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "dps": 51.36,
+    "maxDamage": 204,
+    "minDamage": 135,
+    "speed": 3.3,
+    "stamina": 12,
+    "strength": 29
+   }
+  },
+  "13168": {
+   "droppedBy": "Highlord Omokk",
+   "itemLevel": 60,
+   "name": "Plate of the Shaman King",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 627,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 18."
+    ],
+    "intellect": 14,
+    "stamina": 15,
+    "strength": 12
+   }
+  },
+  "13169": {
+   "droppedBy": "Highlord Omokk",
+   "itemLevel": 60,
+   "name": "Tressermane Leggings",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 148,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 19."
+    ],
+    "intellect": 14,
+    "spirit": 15,
+    "stamina": 13
+   }
   },
   "1317": {
    "itemLevel": 27,
@@ -3464,11 +4142,82 @@
     "strength": 1
    }
   },
+  "13170": {
+   "droppedBy": "Highlord Omokk",
+   "itemLevel": 60,
+   "name": "Skyshroud Leggings",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 75,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 30."
+    ],
+    "intellect": 12,
+    "stamina": 11
+   }
+  },
   "13171": {
    "itemLevel": 61,
    "name": "Smokey's Lighter",
    "read": "2026-11-15",
    "stats": {}
+  },
+  "13173": {
+   "droppedBy": "War Master Voone",
+   "itemLevel": 60,
+   "name": "Flightblade Throwing Axe",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "dps": 35.45,
+    "maxDamage": 102,
+    "minDamage": 54,
+    "speed": 2.2,
+    "spirit": 6,
+    "strength": 9
+   }
+  },
+  "13177": {
+   "droppedBy": "War Master Voone",
+   "itemLevel": 60,
+   "name": "Talisman of Evasion",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "agility": 8,
+    "equip": [
+     "Equip: Increased Defense +6.",
+     "Equip: Increases your chance to Dodge an attack by 1.0%."
+    ]
+   }
+  },
+  "13178": {
+   "droppedBy": "Urok Doomhowl",
+   "itemLevel": 60,
+   "name": "Rosewine Circle",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "equip": [
+     "Equip: Increases healing done by up to 24 and damage done by up to 8 for all magical spells and effects."
+    ]
+   }
+  },
+  "13179": {
+   "droppedBy": "War Master Voone",
+   "itemLevel": 60,
+   "name": "Brazecore Armguards",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 155,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 8."
+    ],
+    "intellect": 8,
+    "stamina": 10
+   }
   },
   "1318": {
    "itemLevel": 23,
@@ -3482,6 +4231,170 @@
     "speed": 3.3
    }
   },
+  "13181": {
+   "droppedBy": "Burning Felguard",
+   "itemLevel": 57,
+   "name": "Demonskin Gloves",
+   "read": "2026-11-15",
+   "requiresLevel": 52,
+   "stats": {
+    "armor": 51,
+    "equip": [
+     "Equip: Increases damage done by Shadow spells and effects by up to 13."
+    ],
+    "intellect": 9,
+    "spirit": 15,
+    "stamina": 8
+   }
+  },
+  "13182": {
+   "droppedBy": "Burning Felguard",
+   "itemLevel": 57,
+   "name": "Phase Blade",
+   "read": "2026-11-15",
+   "requiresLevel": 52,
+   "stats": {
+    "dps": 37.62,
+    "maxDamage": 103,
+    "minDamage": 55,
+    "speed": 2.1,
+    "stamina": 12,
+    "strength": 7
+   }
+  },
+  "13183": {
+   "droppedBy": "Mother Smolderweb",
+   "itemLevel": 60,
+   "name": "Venomspitter",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "dps": 39.47,
+    "maxDamage": 98,
+    "minDamage": 52,
+    "speed": 1.9
+   }
+  },
+  "13184": {
+   "droppedBy": "Crystal Fang",
+   "itemLevel": 61,
+   "name": "Fallbrush Handgrips",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 107,
+    "equip": [
+     "Equip: Increases healing done by up to 20 and damage done by up to 7 for all magical spells and effects."
+    ],
+    "intellect": 12,
+    "spirit": 11,
+    "stamina": 11
+   }
+  },
+  "13185": {
+   "droppedBy": "Crystal Fang",
+   "itemLevel": 61,
+   "name": "Sunderseer Mantle",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 65,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 8.",
+     "Equip: Your spells pierce 3 Magical Resistance."
+    ],
+    "intellect": 17,
+    "spirit": 11,
+    "stamina": 4
+   }
+  },
+  "13198": {
+   "droppedBy": "Ghok Bashguud",
+   "itemLevel": 60,
+   "name": "Hurd Smasher",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "dps": 39.44,
+    "maxDamage": 93,
+    "minDamage": 49,
+    "speed": 1.8
+   }
+  },
+  "13203": {
+   "droppedBy": "Ghok Bashguud",
+   "itemLevel": 60,
+   "name": "Armswake Cloak",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 43,
+    "equip": [
+     "Equip: +16 Attack Power."
+    ],
+    "stamina": 15
+   }
+  },
+  "13204": {
+   "droppedBy": "Ghok Bashguud",
+   "itemLevel": 60,
+   "name": "Bashguuder",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "dps": 39.44,
+    "maxDamage": 93,
+    "minDamage": 49,
+    "speed": 1.8,
+    "strength": 9
+   }
+  },
+  "13205": {
+   "droppedBy": "Gizrul the Slavener",
+   "itemLevel": 61,
+   "name": "Rhombeard Protector",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 2089,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 12."
+    ],
+    "intellect": 14,
+    "spirit": 7
+   }
+  },
+  "13206": {
+   "droppedBy": "Gizrul the Slavener",
+   "itemLevel": 61,
+   "name": "Wolfshear Leggings",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 76,
+    "equip": [
+     "Equip: Increases healing done by up to 26 and damage done by up to 9 for all magical spells and effects."
+    ],
+    "natureRes": 10,
+    "spirit": 25,
+    "stamina": 10
+   }
+  },
+  "13208": {
+   "droppedBy": "Gizrul the Slavener",
+   "itemLevel": 61,
+   "name": "Bleak Howler Armguards",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 75,
+    "equip": [
+     "Equip: Increases healing done by up to 15 and damage done by up to 5 for all magical spells and effects."
+    ],
+    "intellect": 9,
+    "spirit": 14
+   }
+  },
   "13209": {
    "itemLevel": 61,
    "name": "Seal of the Dawn",
@@ -3490,6 +4403,62 @@
     "equip": [
      "Equip: +78 Attack Power against Undead.  Allows the acquisition of Scourgestones on behalf of the Argent Dawn."
     ]
+   }
+  },
+  "13210": {
+   "droppedBy": "Halycon",
+   "itemLevel": 60,
+   "name": "Pads of the Dread Wolf",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 116,
+    "equip": [
+     "Equip: +40 Attack Power."
+    ],
+    "stamina": 14
+   }
+  },
+  "13211": {
+   "droppedBy": "Halycon",
+   "itemLevel": 60,
+   "name": "Slashclaw Bracers",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "agility": 7,
+    "armor": 155,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.0%."
+    ],
+    "spirit": 9,
+    "stamina": 7
+   }
+  },
+  "13212": {
+   "droppedBy": "Halycon",
+   "itemLevel": 60,
+   "name": "Halycon's Spiked Collar",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "equip": [
+     "Equip: +20 Attack Power."
+    ],
+    "stamina": 7
+   }
+  },
+  "13213": {
+   "droppedBy": "Mother Smolderweb",
+   "itemLevel": 60,
+   "name": "Smolderweb's Eye",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "equip": [
+     "Equip: Improves your chance to hit by 1.0%."
+    ],
+    "natureRes": 5
    }
   },
   "13216": {
@@ -3514,6 +4483,34 @@
     ]
    }
   },
+  "13218": {
+   "droppedBy": "Crystal Fang",
+   "itemLevel": 61,
+   "name": "Fang of the Crystal Spider",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "dps": 40.31,
+    "maxDamage": 84,
+    "minDamage": 45,
+    "speed": 1.6
+   }
+  },
+  "13244": {
+   "droppedBy": "Mother Smolderweb",
+   "itemLevel": 60,
+   "name": "Gilded Gauntlets",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 221,
+    "equip": [
+     "Equip: Increases healing done by up to 22 and damage done by up to 7 for all magical spells and effects."
+    ],
+    "intellect": 10,
+    "stamina": 14
+   }
+  },
   "13245": {
    "droppedBy": "Kresh",
    "itemLevel": 23,
@@ -3525,6 +4522,167 @@
     "equip": [
      "Equip: Increased Defense +5."
     ]
+   }
+  },
+  "13252": {
+   "droppedBy": "Quartermaster Zigris",
+   "itemLevel": 60,
+   "name": "Cloudrunner Girdle",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "agility": 14,
+    "armor": 95,
+    "strength": 13
+   }
+  },
+  "13253": {
+   "droppedBy": "Quartermaster Zigris",
+   "itemLevel": 60,
+   "name": "Hands of Power",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 53,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 23."
+    ],
+    "intellect": 9,
+    "spirit": 8
+   }
+  },
+  "13255": {
+   "droppedBy": "Shadow Hunter Vosh'gajin",
+   "itemLevel": 59,
+   "name": "Trueaim Gauntlets",
+   "read": "2026-11-15",
+   "requiresLevel": 54,
+   "stats": {
+    "armor": 218,
+    "equip": [
+     "Equip: +1 Weapon Damage.",
+     "Equip: Improves your chance to hit with ranged weapons by 3.0%."
+    ]
+   }
+  },
+  "13257": {
+   "droppedBy": "Shadow Hunter Vosh'gajin",
+   "itemLevel": 59,
+   "name": "Demonic Runed Spaulders",
+   "read": "2026-11-15",
+   "requiresLevel": 54,
+   "stats": {
+    "armor": 126,
+    "intellect": 14,
+    "stamina": 12,
+    "strength": 12
+   }
+  },
+  "13258": {
+   "droppedBy": "Urok Doomhowl",
+   "itemLevel": 61,
+   "name": "Slaghide Gauntlets",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 107
+   }
+  },
+  "13259": {
+   "droppedBy": "Urok Doomhowl",
+   "itemLevel": 61,
+   "name": "Ribsteel Footguards",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "agility": 10,
+    "armor": 438,
+    "stamina": 19,
+    "strength": 10
+   }
+  },
+  "13261": {
+   "droppedBy": "Spirestone Lord Magus",
+   "itemLevel": 59,
+   "name": "Globe of D'sak",
+   "read": "2026-11-15",
+   "requiresLevel": 54,
+   "stats": {
+    "equip": [
+     "Equip: Increases damage done by Shadow spells and effects by up to 14."
+    ],
+    "intellect": 11,
+    "shadowRes": 4,
+    "stamina": 5
+   }
+  },
+  "13282": {
+   "droppedBy": "Spirestone Lord Magus",
+   "itemLevel": 59,
+   "name": "Ogreseer Tower Boots",
+   "read": "2026-11-15",
+   "requiresLevel": 54,
+   "stats": {
+    "armor": 58,
+    "equip": [
+     "Equip: Increases healing done by up to 26 and damage done by up to 9 for all magical spells and effects."
+    ],
+    "intellect": 13,
+    "spirit": 13
+   }
+  },
+  "13283": {
+   "droppedBy": "Spirestone Lord Magus",
+   "itemLevel": 59,
+   "name": "Magus Ring",
+   "read": "2026-11-15",
+   "requiresLevel": 54,
+   "stats": {
+    "equip": [
+     "Equip: Improves your chance to hit by 0.5%."
+    ],
+    "intellect": 12,
+    "spirit": 7,
+    "stamina": 8
+   }
+  },
+  "13284": {
+   "droppedBy": "Spirestone Battle Lord",
+   "itemLevel": 58,
+   "name": "Swiftdart Battleboots",
+   "read": "2026-11-15",
+   "requiresLevel": 53,
+   "stats": {
+    "agility": 17,
+    "armor": 236,
+    "intellect": 10,
+    "stamina": 11
+   }
+  },
+  "13285": {
+   "droppedBy": "Spirestone Battle Lord",
+   "itemLevel": 58,
+   "name": "The Blackrock Slicer",
+   "read": "2026-11-15",
+   "requiresLevel": 53,
+   "stats": {
+    "dps": 49.75,
+    "maxDamage": 239,
+    "minDamage": 159,
+    "speed": 4.0
+   }
+  },
+  "13286": {
+   "droppedBy": "Spirestone Butcher",
+   "itemLevel": 58,
+   "name": "Rivenspike",
+   "read": "2026-11-15",
+   "requiresLevel": 53,
+   "stats": {
+    "dps": 38.1,
+    "maxDamage": 144,
+    "minDamage": 77,
+    "speed": 2.9
    }
   },
   "13314": {
@@ -4238,6 +5396,34 @@
     "shadowRes": 11
    }
   },
+  "13498": {
+   "droppedBy": "Goraluk Anvilcrack",
+   "itemLevel": 60,
+   "name": "Handcrafted Mastersmith Leggings",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 548,
+    "equip": [
+     "Equip: Reduces chance to be Dodged or Parried by 1.0%."
+    ],
+    "stamina": 12,
+    "strength": 25
+   }
+  },
+  "13502": {
+   "droppedBy": "Goraluk Anvilcrack",
+   "itemLevel": 63,
+   "name": "Handcrafted Mastersmith Girdle",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "agility": 10,
+    "armor": 369,
+    "stamina": 10,
+    "strength": 11
+   }
+  },
   "13515": {
    "droppedBy": "Ramstein the Gorger",
    "itemLevel": 60,
@@ -4629,6 +5815,32 @@
     "strength": 10
    }
   },
+  "13958": {
+   "itemLevel": 60,
+   "name": "Wyrmthalak's Shackles",
+   "read": "2026-11-15",
+   "stats": {
+    "armor": 37,
+    "equip": [
+     "Equip: Increases healing done by up to 20 and damage done by up to 7 for all magical spells and effects."
+    ],
+    "spirit": 15
+   }
+  },
+  "13959": {
+   "itemLevel": 60,
+   "name": "Omokk's Girth Restrainer",
+   "read": "2026-11-15",
+   "stats": {
+    "armor": 353,
+    "equip": [
+     "Equip: Improves your chance to get a critical strike by 1.0%.",
+     "Equip: Decreases all threat generated by 1%."
+    ],
+    "stamina": 9,
+    "strength": 14
+   }
+  },
   "13960": {
    "droppedBy": "Kirtonos the Herald",
    "itemLevel": 61,
@@ -4641,6 +5853,46 @@
     ],
     "spirit": 10,
     "stamina": 10
+   }
+  },
+  "13961": {
+   "itemLevel": 60,
+   "name": "Halycon's Muzzle",
+   "read": "2026-11-15",
+   "stats": {
+    "arcaneRes": 5,
+    "armor": 127,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 15."
+    ],
+    "intellect": 19
+   }
+  },
+  "13962": {
+   "itemLevel": 60,
+   "name": "Vosh'gajin's Strand",
+   "read": "2026-11-15",
+   "stats": {
+    "armor": 95,
+    "equip": [
+     "Equip: Increased Defense +6.",
+     "Equip: Increases your chance to Dodge an attack by 1.0%.",
+     "Equip: Improves your chance to get a critical strike by 1.0%."
+    ],
+    "stamina": 6
+   }
+  },
+  "13963": {
+   "itemLevel": 60,
+   "name": "Voone's Vice Grips",
+   "read": "2026-11-15",
+   "stats": {
+    "agility": 9,
+    "armor": 221,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.5%."
+    ],
+    "stamina": 15
    }
   },
   "13964": {
@@ -4661,6 +5913,26 @@
     "speed": 1.6
    }
   },
+  "13965": {
+   "itemLevel": 63,
+   "name": "Blackhand's Breadth",
+   "read": "2026-11-15",
+   "stats": {
+    "equip": [
+     "Equip: Improves your chance to get a Critical Strike with Melee and Ranged attacks by 1.0%."
+    ]
+   }
+  },
+  "13966": {
+   "itemLevel": 63,
+   "name": "Mark of Tyranny",
+   "read": "2026-11-15",
+   "stats": {
+    "equip": [
+     "Equip: Increases your chance to Dodge an attack by 1.0%."
+    ]
+   }
+  },
   "13967": {
    "droppedBy": "Kirtonos the Herald",
    "itemLevel": 61,
@@ -4674,6 +5946,16 @@
      "Equip: Improves your chance to hit by 1.0%."
     ],
     "intellect": 4
+   }
+  },
+  "13968": {
+   "itemLevel": 63,
+   "name": "Eye of the Beast",
+   "read": "2026-11-15",
+   "stats": {
+    "equip": [
+     "Equip: Improves your chance to get a Critical Strike with Spells by 1.0%."
+    ]
    }
   },
   "13969": {
@@ -5676,6 +6958,42 @@
     "strength": 9
    }
   },
+  "15824": {
+   "itemLevel": 59,
+   "name": "Astoria Robes",
+   "read": "2026-11-15",
+   "stats": {
+    "armor": 76,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 10."
+    ],
+    "intellect": 20,
+    "spirit": 10
+   }
+  },
+  "15825": {
+   "itemLevel": 59,
+   "name": "Traphook Jerkin",
+   "read": "2026-11-15",
+   "stats": {
+    "agility": 18,
+    "armor": 152,
+    "spirit": 15,
+    "strength": 4
+   }
+  },
+  "15827": {
+   "itemLevel": 59,
+   "name": "Jadescale Breastplate",
+   "read": "2026-11-15",
+   "stats": {
+    "armor": 317,
+    "equip": [
+     "Equip: Increases healing done by up to 15 and damage done by up to 5 for all magical spells and effects."
+    ],
+    "stamina": 23
+   }
+  },
   "15853": {
    "itemLevel": 60,
    "name": "Windreaper",
@@ -5702,6 +7020,67 @@
     "speed": 2.4,
     "spirit": 29
    }
+  },
+  "15858": {
+   "itemLevel": 59,
+   "name": "Freewind Gloves",
+   "read": "2026-11-15",
+   "stats": {
+    "armor": 48,
+    "equip": [
+     "Equip: Increases healing done by up to 20 and damage done by up to 7 for all magical spells and effects."
+    ],
+    "spirit": 14
+   }
+  },
+  "15859": {
+   "itemLevel": 59,
+   "name": "Seapost Girdle",
+   "read": "2026-11-15",
+   "stats": {
+    "armor": 179,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 9."
+    ],
+    "spirit": 13,
+    "stamina": 8
+   }
+  },
+  "15860": {
+   "itemLevel": 60,
+   "name": "Blinkstrike Armguards",
+   "read": "2026-11-15",
+   "stats": {
+    "armor": 249,
+    "equip": [
+     "Equip: Improves your chance to get a critical strike by 0.5%.",
+     "Equip: Increased Daggers +1."
+    ],
+    "strength": 4
+   }
+  },
+  "15861": {
+   "itemLevel": 60,
+   "name": "Swiftfoot Treads",
+   "read": "2026-11-15",
+   "stats": {
+    "agility": 14,
+    "armor": 106,
+    "stamina": 12,
+    "strength": 4
+   }
+  },
+  "15867": {
+   "itemLevel": 60,
+   "name": "Prismcharm",
+   "read": "2026-11-15",
+   "stats": {}
+  },
+  "15873": {
+   "itemLevel": 60,
+   "name": "Ragged John's Neverending Cup",
+   "read": "2026-11-15",
+   "stats": {}
   },
   "16309": {
    "itemLevel": 63,
@@ -7495,6 +8874,39 @@
     "stamina": 12
    }
   },
+  "18047": {
+   "droppedBy": "Goraluk Anvilcrack",
+   "itemLevel": 62,
+   "name": "Flame Walkers",
+   "read": "2026-11-15",
+   "requiresLevel": 57,
+   "stats": {
+    "armor": 251,
+    "equip": [
+     "Equip: Increases your chance to Dodge an attack by 1.0%."
+    ],
+    "fireRes": 18,
+    "stamina": 10
+   }
+  },
+  "18048": {
+   "droppedBy": "Goraluk Anvilcrack",
+   "itemLevel": 60,
+   "name": "Mastersmith's Hammer",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "dps": 26.25,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.0%.",
+     "Equip: Increases damage and healing done by magical spells and effects by up to 68."
+    ],
+    "maxDamage": 82,
+    "minDamage": 44,
+    "speed": 2.4,
+    "stamina": 10
+   }
+  },
   "18082": {
    "droppedBy": "Witch Doctor Zum'rah",
    "itemLevel": 48,
@@ -7527,6 +8939,46 @@
     ],
     "intellect": 7,
     "stamina": 10
+   }
+  },
+  "18102": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Dragonrider Boots",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 61,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 18."
+    ],
+    "fireRes": 8,
+    "intellect": 16,
+    "stamina": 5
+   }
+  },
+  "18103": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Band of Rumination",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "equip": [
+     "Equip: Improves your chance to get a critical strike by 1.0%."
+    ]
+   }
+  },
+  "18104": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Feralsurge Girdle",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 208,
+    "intellect": 11,
+    "strength": 9
    }
   },
   "18289": {
@@ -10733,6 +12185,51 @@
     "strength": 15
    }
   },
+  "22225": {
+   "droppedBy": "Gyth",
+   "itemLevel": 60,
+   "name": "Dragonskin Cowl",
+   "read": "2026-11-15",
+   "requiresLevel": 55,
+   "stats": {
+    "armor": 69,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 18."
+    ],
+    "intellect": 15,
+    "stamina": 12
+   }
+  },
+  "22231": {
+   "droppedBy": "War Master Voone",
+   "itemLevel": 61,
+   "name": "Kayser's Boots of Precision",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 60,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.0%.",
+     "Equip: Increases damage and healing done by magical spells and effects by up to 4."
+    ],
+    "intellect": 18,
+    "stamina": 11
+   }
+  },
+  "22232": {
+   "droppedBy": "Urok Doomhowl",
+   "itemLevel": 61,
+   "name": "Marksman's Girdle",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "agility": 21,
+    "armor": 202,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.0%."
+    ]
+   }
+  },
   "22234": {
    "droppedBy": "Lord Roccor",
    "itemLevel": 53,
@@ -10810,6 +12307,36 @@
     "stamina": 8
    }
   },
+  "22247": {
+   "droppedBy": "Warchief Rend Blackhand",
+   "itemLevel": 63,
+   "name": "Faith Healer's Boots",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 61,
+    "equip": [
+     "Equip: Increases healing done by up to 24 and damage done by up to 8 for all magical spells and effects."
+    ],
+    "intellect": 12,
+    "spirit": 12,
+    "stamina": 10
+   }
+  },
+  "22253": {
+   "droppedBy": "General Drakkisath",
+   "itemLevel": 63,
+   "name": "Tome of the Lost",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 18."
+    ],
+    "intellect": 7,
+    "stamina": 8
+   }
+  },
   "22254": {
    "itemLevel": 57,
    "name": "Wand of Eternal Light",
@@ -10884,6 +12411,46 @@
     "speed": 1.8
    }
   },
+  "22267": {
+   "droppedBy": "General Drakkisath",
+   "itemLevel": 63,
+   "name": "Spellweaver's Turban",
+   "read": "2026-11-15",
+   "requiresLevel": 60,
+   "stats": {
+    "armor": 73,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.0%.",
+     "Equip: Increases damage and healing done by magical spells and effects by up to 33."
+    ],
+    "spirit": 13
+   }
+  },
+  "22268": {
+   "droppedBy": "General Drakkisath",
+   "itemLevel": 63,
+   "name": "Draconic Infused Emblem",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "equip": [
+     "Equip: Chance on harmful spellcast to increase your spell damage and healing by up to 35 for 10 sec. This spell damage increase is doubled against Dragonkin."
+    ],
+    "fireRes": 15
+   }
+  },
+  "22269": {
+   "droppedBy": "General Drakkisath",
+   "itemLevel": 63,
+   "name": "Shadow Prowler's Cloak",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "agility": 16,
+    "armor": 45,
+    "stamina": 9
+   }
+  },
   "22270": {
    "droppedBy": "Grizzle",
    "itemLevel": 55,
@@ -10945,6 +12512,21 @@
     "stamina": 24
    }
   },
+  "22302": {
+   "droppedBy": "Lord Valthalak",
+   "itemLevel": 63,
+   "name": "Ironweave Cowl",
+   "read": "2026-11-15",
+   "requiresLevel": 58,
+   "stats": {
+    "armor": 73,
+    "equip": [
+     "Equip: Increases damage and healing done by magical spells and effects by up to 11."
+    ],
+    "intellect": 15,
+    "stamina": 24
+   }
+  },
   "22303": {
    "droppedBy": "Kormok",
    "itemLevel": 62,
@@ -10990,6 +12572,51 @@
     "stamina": 17
    }
   },
+  "22306": {
+   "droppedBy": "Mor Grayhoof",
+   "itemLevel": 61,
+   "name": "Ironweave Belt",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 49,
+    "equip": [
+     "Equip: Your spells pierce 3 Magical Resistance."
+    ],
+    "intellect": 11,
+    "stamina": 17
+   }
+  },
+  "22311": {
+   "droppedBy": "The Beast",
+   "itemLevel": 61,
+   "name": "Ironweave Boots",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 60,
+    "equip": [
+     "Equip: Improves your chance to hit by 1.0%."
+    ],
+    "intellect": 11,
+    "stamina": 17
+   }
+  },
+  "22313": {
+   "droppedBy": "Halycon",
+   "itemLevel": 61,
+   "name": "Ironweave Bracers",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 38,
+    "equip": [
+     "Equip: Improves your chance to hit by 0.5%."
+    ],
+    "intellect": 8,
+    "stamina": 14
+   }
+  },
   "22317": {
    "itemLevel": 61,
    "name": "Lefty's Brass Knuckle",
@@ -11018,6 +12645,49 @@
     "minDamage": 63,
     "speed": 2.9,
     "stamina": 4
+   }
+  },
+  "22321": {
+   "droppedBy": "Overlord Wyrmthalak",
+   "itemLevel": 61,
+   "name": "Heart of Wyrmthalak",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "equip": [
+     "Equip: Melee and Ranged attacks have a chance to deal 112 to 168 Fire damage. Deals 3 times as much damage to Orcs."
+    ],
+    "fireRes": 13
+   }
+  },
+  "22322": {
+   "droppedBy": "Mor Grayhoof",
+   "itemLevel": 61,
+   "name": "The Jaw Breaker",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "dps": 40.31,
+    "equip": [
+     "Equip: Improves your chance to get a critical strike by 1.0%.",
+     "Equip: +6 Attack Power.",
+     "Equip: +6 Attack Power against Humanoids."
+    ],
+    "maxDamage": 84,
+    "minDamage": 45,
+    "speed": 1.6
+   }
+  },
+  "22325": {
+   "droppedBy": "Mor Grayhoof",
+   "itemLevel": 61,
+   "name": "Belt of the Trickster",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "agility": 22,
+    "armor": 97,
+    "stamina": 9
    }
   },
   "22326": {
@@ -11148,6 +12818,18 @@
    "stats": {
     "equip": [
      "Equip: Reduces the energy cost of Claw and Rake by 2."
+    ]
+   }
+  },
+  "22398": {
+   "droppedBy": "Mor Grayhoof",
+   "itemLevel": 62,
+   "name": "Idol of Rejuvenation",
+   "read": "2026-11-15",
+   "requiresLevel": 57,
+   "stats": {
+    "equip": [
+     "Equip: Increases the initial healing of Regrowth by 5% when cast on a target affected by your Rejuvenation."
     ]
    }
   },
@@ -19101,6 +20783,17 @@
     "minDamage": 38,
     "speed": 2.8,
     "stamina": 4
+   }
+  },
+  "8290": {
+   "itemLevel": 61,
+   "name": "Arcane Robe",
+   "read": "2026-11-15",
+   "requiresLevel": 56,
+   "stats": {
+    "armor": 79,
+    "spirit": 23,
+    "stamina": 7
    }
   },
   "8296": {

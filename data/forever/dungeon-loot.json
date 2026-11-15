@@ -23916,6 +23916,142 @@
       "levels": "55-60",
       "drops": [
         {
+          "id": 12967,
+          "name": "Bloodmoon Cloak",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Back",
+          "slotId": 16,
+          "itemClass": 4,
+          "itemSubclass": -6,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "The Beast"
+          ],
+          "stats": {
+            "arcaneRes": 5,
+            "armor": 45,
+            "equip": [
+              "Equip: Increased Defense +3."
+            ],
+            "stamina": 17
+          }
+        },
+        {
+          "id": 12968,
+          "name": "Frostweaver Cape",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Back",
+          "slotId": 16,
+          "itemClass": 4,
+          "itemSubclass": -6,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "The Beast"
+          ],
+          "stats": {
+            "armor": 45,
+            "equip": [
+              "Equip: Increases damage done by Frost spells and effects by up to 13."
+            ],
+            "frostRes": 10,
+            "intellect": 13
+          }
+        },
+        {
+          "id": 22269,
+          "name": "Shadow Prowler's Cloak",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Back",
+          "slotId": 16,
+          "itemClass": 4,
+          "itemSubclass": -6,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "General Drakkisath"
+          ],
+          "stats": {
+            "agility": 16,
+            "armor": 45,
+            "stamina": 9
+          }
+        },
+        {
+          "id": 12905,
+          "name": "Wildfire Cape",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Back",
+          "slotId": 16,
+          "itemClass": 4,
+          "itemSubclass": -6,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Pyroguard Emberseer"
+          ],
+          "stats": {
+            "armor": 43,
+            "fireRes": 20
+          }
+        },
+        {
+          "id": 13203,
+          "name": "Armswake Cloak",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Back",
+          "slotId": 16,
+          "itemClass": 4,
+          "itemSubclass": -6,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Ghok Bashguud"
+          ],
+          "stats": {
+            "armor": 43,
+            "equip": [
+              "Equip: +16 Attack Power."
+            ],
+            "stamina": 15
+          }
+        },
+        {
+          "id": 12608,
+          "name": "Butcher's Apron",
+          "ilvl": 58,
+          "reqLevel": 53,
+          "quality": "rare",
+          "slot": "Back",
+          "slotId": 16,
+          "itemClass": 4,
+          "itemSubclass": -6,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Spirestone Butcher"
+          ],
+          "stats": {
+            "armor": 41,
+            "equip": [
+              "Equip: Increases healing done by up to 9 and damage done by up to 3 for all magical spells and effects."
+            ],
+            "spirit": 15,
+            "stamina": 7
+          }
+        },
+        {
           "id": 16666,
           "name": "Vest of Elements",
           "ilvl": 63,
@@ -24139,6 +24275,291 @@
           }
         },
         {
+          "id": 8290,
+          "name": "Arcane Robe",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "uncommon",
+          "slot": "Chest",
+          "slotId": 5,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Blackhand Iron Guard"
+          ],
+          "stats": {
+            "armor": 79,
+            "spirit": 23,
+            "stamina": 7
+          }
+        },
+        {
+          "id": 12603,
+          "name": "Nightbrace Tunic",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Chest",
+          "slotId": 5,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Solakar Flamewreath"
+          ],
+          "stats": {
+            "agility": 6,
+            "armor": 172,
+            "equip": [
+              "Equip: +50 Attack Power."
+            ],
+            "fireRes": 10,
+            "shadowRes": 10,
+            "stamina": 10
+          }
+        },
+        {
+          "id": 12609,
+          "name": "Polychromatic Visionwrap",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Chest",
+          "slotId": 5,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Solakar Flamewreath"
+          ],
+          "stats": {
+            "armor": 87,
+            "stamina": 14
+          }
+        },
+        {
+          "id": 13168,
+          "name": "Plate of the Shaman King",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Chest",
+          "slotId": 5,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Highlord Omokk"
+          ],
+          "stats": {
+            "armor": 627,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 18."
+            ],
+            "intellect": 14,
+            "stamina": 15,
+            "strength": 12
+          }
+        },
+        {
+          "id": 18102,
+          "name": "Dragonrider Boots",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "armor": 61,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 18."
+            ],
+            "fireRes": 8,
+            "intellect": 16,
+            "stamina": 5
+          }
+        },
+        {
+          "id": 22247,
+          "name": "Faith Healer's Boots",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "armor": 61,
+            "equip": [
+              "Equip: Increases healing done by up to 24 and damage done by up to 8 for all magical spells and effects."
+            ],
+            "intellect": 12,
+            "spirit": 12,
+            "stamina": 10
+          }
+        },
+        {
+          "id": 18047,
+          "name": "Flame Walkers",
+          "ilvl": 62,
+          "reqLevel": 57,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Goraluk Anvilcrack"
+          ],
+          "stats": {
+            "armor": 251,
+            "equip": [
+              "Equip: Increases your chance to Dodge an attack by 1.0%."
+            ],
+            "fireRes": 18,
+            "stamina": 10
+          }
+        },
+        {
+          "id": 13259,
+          "name": "Ribsteel Footguards",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Urok Doomhowl"
+          ],
+          "stats": {
+            "agility": 10,
+            "armor": 438,
+            "stamina": 19,
+            "strength": 10
+          }
+        },
+        {
+          "id": 22231,
+          "name": "Kayser's Boots of Precision",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "War Master Voone"
+          ],
+          "stats": {
+            "armor": 60,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.0%.",
+              "Equip: Increases damage and healing done by magical spells and effects by up to 4."
+            ],
+            "intellect": 18,
+            "stamina": 11
+          }
+        },
+        {
+          "id": 22311,
+          "name": "Ironweave Boots",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "The Beast"
+          ],
+          "reqClass": 400,
+          "stats": {
+            "armor": 60,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.0%."
+            ],
+            "intellect": 11,
+            "stamina": 17
+          }
+        },
+        {
+          "id": 13210,
+          "name": "Pads of the Dread Wolf",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Halycon"
+          ],
+          "stats": {
+            "armor": 116,
+            "equip": [
+              "Equip: +40 Attack Power."
+            ],
+            "stamina": 14
+          }
+        },
+        {
+          "id": 13282,
+          "name": "Ogreseer Tower Boots",
+          "ilvl": 59,
+          "reqLevel": 54,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Spirestone Lord Magus"
+          ],
+          "stats": {
+            "armor": 58,
+            "equip": [
+              "Equip: Increases healing done by up to 26 and damage done by up to 9 for all magical spells and effects."
+            ],
+            "intellect": 13,
+            "spirit": 13
+          }
+        },
+        {
           "id": 16670,
           "name": "Boots of Elements",
           "ilvl": 59,
@@ -24185,6 +24606,302 @@
             "intellect": 9,
             "spirit": 17,
             "stamina": 10
+          }
+        },
+        {
+          "id": 13284,
+          "name": "Swiftdart Battleboots",
+          "ilvl": 58,
+          "reqLevel": 53,
+          "quality": "rare",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Spirestone Battle Lord"
+          ],
+          "stats": {
+            "agility": 17,
+            "armor": 236,
+            "intellect": 10,
+            "stamina": 11
+          }
+        },
+        {
+          "id": 13098,
+          "name": "Painweaver Band",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Finger",
+          "slotId": 11,
+          "itemClass": 4,
+          "itemSubclass": -2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "General Drakkisath"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Improves your chance to get a critical strike by 1.0%.",
+              "Equip: +12 Attack Power."
+            ],
+            "stamina": 9
+          }
+        },
+        {
+          "id": 18103,
+          "name": "Band of Rumination",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Finger",
+          "slotId": 11,
+          "itemClass": 4,
+          "itemSubclass": -2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Improves your chance to get a critical strike by 1.0%."
+            ]
+          }
+        },
+        {
+          "id": 12926,
+          "name": "Flaming Band",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Finger",
+          "slotId": 11,
+          "itemClass": 4,
+          "itemSubclass": -2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Pyroguard Emberseer"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Increases damage done by Fire spells and effects by up to 24."
+            ]
+          }
+        },
+        {
+          "id": 13178,
+          "name": "Rosewine Circle",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Finger",
+          "slotId": 11,
+          "itemClass": 4,
+          "itemSubclass": -2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Urok Doomhowl"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Increases healing done by up to 24 and damage done by up to 8 for all magical spells and effects."
+            ]
+          }
+        },
+        {
+          "id": 13283,
+          "name": "Magus Ring",
+          "ilvl": 59,
+          "reqLevel": 54,
+          "quality": "rare",
+          "slot": "Finger",
+          "slotId": 11,
+          "itemClass": 4,
+          "itemSubclass": -2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Spirestone Lord Magus"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Improves your chance to hit by 0.5%."
+            ],
+            "intellect": 12,
+            "spirit": 7,
+            "stamina": 8
+          }
+        },
+        {
+          "id": 13162,
+          "name": "Reiver Claws",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Overlord Wyrmthalak"
+          ],
+          "stats": {
+            "armor": 398,
+            "equip": [
+              "Equip: Improves your chance to get a critical strike by 1.0%."
+            ],
+            "stamina": 15,
+            "strength": 11
+          }
+        },
+        {
+          "id": 13184,
+          "name": "Fallbrush Handgrips",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Crystal Fang"
+          ],
+          "stats": {
+            "armor": 107,
+            "equip": [
+              "Equip: Increases healing done by up to 20 and damage done by up to 7 for all magical spells and effects."
+            ],
+            "intellect": 12,
+            "spirit": 11,
+            "stamina": 11
+          }
+        },
+        {
+          "id": 13258,
+          "name": "Slaghide Gauntlets",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Urok Doomhowl"
+          ],
+          "stats": {
+            "armor": 107
+          }
+        },
+        {
+          "id": 12637,
+          "name": "Backusarian Gauntlets",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Bannok Grimaxe"
+          ],
+          "stats": {
+            "armor": 392,
+            "equip": [
+              "Equip: Increased Defense +7."
+            ],
+            "intellect": 9,
+            "stamina": 15,
+            "strength": 9
+          }
+        },
+        {
+          "id": 13244,
+          "name": "Gilded Gauntlets",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Mother Smolderweb"
+          ],
+          "stats": {
+            "armor": 221,
+            "equip": [
+              "Equip: Increases healing done by up to 22 and damage done by up to 7 for all magical spells and effects."
+            ],
+            "intellect": 10,
+            "stamina": 14
+          }
+        },
+        {
+          "id": 13253,
+          "name": "Hands of Power",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Quartermaster Zigris"
+          ],
+          "stats": {
+            "armor": 53,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 23."
+            ],
+            "intellect": 9,
+            "spirit": 8
+          }
+        },
+        {
+          "id": 13255,
+          "name": "Trueaim Gauntlets",
+          "ilvl": 59,
+          "reqLevel": 54,
+          "quality": "rare",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Shadow Hunter Vosh'gajin"
+          ],
+          "stats": {
+            "armor": 218,
+            "equip": [
+              "Equip: +1 Weapon Damage.",
+              "Equip: Improves your chance to hit with ranged weapons by 3.0%."
+            ]
           }
         },
         {
@@ -24260,6 +24977,130 @@
           }
         },
         {
+          "id": 13181,
+          "name": "Demonskin Gloves",
+          "ilvl": 57,
+          "reqLevel": 52,
+          "quality": "rare",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Burning Felguard"
+          ],
+          "stats": {
+            "armor": 51,
+            "equip": [
+              "Equip: Increases damage done by Shadow spells and effects by up to 13."
+            ],
+            "intellect": 9,
+            "spirit": 15,
+            "stamina": 8
+          }
+        },
+        {
+          "id": 12587,
+          "name": "Eye of Rend",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Head",
+          "slotId": 1,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "armor": 143,
+            "equip": [
+              "Equip: Improves your chance to hit by 0.5%.",
+              "Equip: Improves your chance to get a critical strike by 1.5%."
+            ],
+            "stamina": 17,
+            "strength": 15
+          }
+        },
+        {
+          "id": 22267,
+          "name": "Spellweaver's Turban",
+          "ilvl": 63,
+          "reqLevel": 60,
+          "quality": "rare",
+          "slot": "Head",
+          "slotId": 1,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "General Drakkisath"
+          ],
+          "stats": {
+            "armor": 73,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.0%.",
+              "Equip: Increases damage and healing done by magical spells and effects by up to 33."
+            ],
+            "spirit": 13
+          }
+        },
+        {
+          "id": 22302,
+          "name": "Ironweave Cowl",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Head",
+          "slotId": 1,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Lord Valthalak"
+          ],
+          "reqClass": 400,
+          "stats": {
+            "armor": 73,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 11."
+            ],
+            "intellect": 15,
+            "stamina": 24
+          }
+        },
+        {
+          "id": 12604,
+          "name": "Starfire Tiara",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Head",
+          "slotId": 1,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Jed Runewatcher"
+          ],
+          "stats": {
+            "armor": 69,
+            "equip": [
+              "Equip: Increases damage done by Arcane spells and effects by up to 37."
+            ],
+            "fireRes": 10,
+            "intellect": 10,
+            "spirit": 10
+          }
+        },
+        {
           "id": 12952,
           "name": "Gyth's Skull",
           "ilvl": 60,
@@ -24283,6 +25124,768 @@
           }
         },
         {
+          "id": 12953,
+          "name": "Dragoneye Coif",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Head",
+          "slotId": 1,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Gyth"
+          ],
+          "stats": {
+            "armor": 288,
+            "equip": [
+              "Equip: +38 Attack Power."
+            ],
+            "stamina": 17
+          }
+        },
+        {
+          "id": 12960,
+          "name": "Tribal War Feathers",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Head",
+          "slotId": 1,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Gyth"
+          ],
+          "stats": {
+            "armor": 137,
+            "equip": [
+              "Equip: Increases healing done by up to 33 and damage done by up to 11 for all magical spells and effects."
+            ],
+            "intellect": 15,
+            "stamina": 12
+          }
+        },
+        {
+          "id": 22225,
+          "name": "Dragonskin Cowl",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Head",
+          "slotId": 1,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Gyth"
+          ],
+          "stats": {
+            "armor": 69,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 18."
+            ],
+            "intellect": 15,
+            "stamina": 12
+          }
+        },
+        {
+          "id": 22253,
+          "name": "Tome of the Lost",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Held in Off-hand",
+          "slotId": 23,
+          "itemClass": 4,
+          "itemSubclass": -5,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "General Drakkisath"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 18."
+            ],
+            "intellect": 7,
+            "stamina": 8
+          }
+        },
+        {
+          "id": 13261,
+          "name": "Globe of D'sak",
+          "ilvl": 59,
+          "reqLevel": 54,
+          "quality": "rare",
+          "slot": "Held in Off-hand",
+          "slotId": 23,
+          "itemClass": 4,
+          "itemSubclass": -5,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Spirestone Lord Magus"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Increases damage done by Shadow spells and effects by up to 14."
+            ],
+            "intellect": 11,
+            "shadowRes": 4,
+            "stamina": 5
+          }
+        },
+        {
+          "id": 10152,
+          "name": "Mighty Leggings",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "uncommon",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Blackhand Iron Guard"
+          ],
+          "stats": {
+            "armor": 140
+          }
+        },
+        {
+          "id": 12935,
+          "name": "Warmaster Legguards",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "armor": 575,
+            "equip": [
+              "Equip: Increases your chance to Dodge an attack by 2.0%.",
+              "Equip: Increases your chance to Parry an attack by 0.4%."
+            ],
+            "stamina": 16,
+            "strength": 13
+          }
+        },
+        {
+          "id": 12963,
+          "name": "Blademaster Leggings",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "The Beast"
+          ],
+          "stats": {
+            "armor": 154,
+            "equip": [
+              "Equip: Increases your chance to Dodge an attack by 2.0%.",
+              "Equip: Improves your chance to hit by 1.0%.",
+              "Equip: Improves your chance to get a critical strike by 1.0%.",
+              "Equip: +24 Attack Power."
+            ]
+          }
+        },
+        {
+          "id": 12964,
+          "name": "Tristam Legguards",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "The Beast"
+          ],
+          "stats": {
+            "armor": 324,
+            "equip": [
+              "Equip: Increases your chance to Dodge an attack by 1.5%.",
+              "Equip: +38 Attack Power."
+            ],
+            "stamina": 18
+          }
+        },
+        {
+          "id": 12965,
+          "name": "Spiritshroud Leggings",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "The Beast"
+          ],
+          "stats": {
+            "armor": 78,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 19."
+            ],
+            "intellect": 16,
+            "spirit": 16,
+            "stamina": 13
+          }
+        },
+        {
+          "id": 13206,
+          "name": "Wolfshear Leggings",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Gizrul the Slavener"
+          ],
+          "stats": {
+            "armor": 76,
+            "equip": [
+              "Equip: Increases healing done by up to 26 and damage done by up to 9 for all magical spells and effects."
+            ],
+            "natureRes": 10,
+            "spirit": 25,
+            "stamina": 10
+          }
+        },
+        {
+          "id": 13169,
+          "name": "Tressermane Leggings",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Highlord Omokk"
+          ],
+          "stats": {
+            "armor": 148,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 19."
+            ],
+            "intellect": 14,
+            "spirit": 15,
+            "stamina": 13
+          }
+        },
+        {
+          "id": 13170,
+          "name": "Skyshroud Leggings",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Highlord Omokk"
+          ],
+          "stats": {
+            "armor": 75,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 30."
+            ],
+            "intellect": 12,
+            "stamina": 11
+          }
+        },
+        {
+          "id": 13498,
+          "name": "Handcrafted Mastersmith Leggings",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Legs",
+          "slotId": 7,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Goraluk Anvilcrack"
+          ],
+          "stats": {
+            "armor": 548,
+            "equip": [
+              "Equip: Reduces chance to be Dodged or Parried by 1.0%."
+            ],
+            "stamina": 12,
+            "strength": 25
+          }
+        },
+        {
+          "id": 12709,
+          "name": "Pip's Skinner",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Main Hand",
+          "slotId": 21,
+          "itemClass": 2,
+          "itemSubclass": 15,
+          "dps": 41.15,
+          "speed": 1.3,
+          "droppedBy": [
+            "The Beast"
+          ],
+          "stats": {
+            "dps": 41.15,
+            "equip": [
+              "Equip: Increased Skinning +10.",
+              "Equip: +20 Attack Power.",
+              "Equip: +30 Attack Power against Beasts."
+            ],
+            "maxDamage": 70,
+            "minDamage": 37,
+            "speed": 1.3
+          }
+        },
+        {
+          "id": 12940,
+          "name": "Dal'Rend's Sacred Charge",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Main Hand",
+          "slotId": 21,
+          "itemClass": 2,
+          "itemSubclass": 7,
+          "dps": 41.43,
+          "speed": 2.8,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "dps": 41.43,
+            "equip": [
+              "Equip: Improves your chance to get a critical strike by 1.0%."
+            ],
+            "maxDamage": 151,
+            "minDamage": 81,
+            "speed": 2.8,
+            "strength": 4
+          }
+        },
+        {
+          "id": 18048,
+          "name": "Mastersmith's Hammer",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Main Hand",
+          "slotId": 21,
+          "itemClass": 2,
+          "itemSubclass": 4,
+          "dps": 26.25,
+          "speed": 2.4,
+          "droppedBy": [
+            "Goraluk Anvilcrack"
+          ],
+          "stats": {
+            "dps": 26.25,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.0%.",
+              "Equip: Increases damage and healing done by magical spells and effects by up to 68."
+            ],
+            "maxDamage": 82,
+            "minDamage": 44,
+            "speed": 2.4,
+            "stamina": 10
+          }
+        },
+        {
+          "id": 12621,
+          "name": "Demonfork",
+          "ilvl": 59,
+          "reqLevel": 54,
+          "quality": "rare",
+          "slot": "Main Hand",
+          "slotId": 21,
+          "itemClass": 2,
+          "itemSubclass": 0,
+          "dps": 38.93,
+          "speed": 2.8,
+          "droppedBy": [
+            "Bannok Grimaxe"
+          ],
+          "stats": {
+            "dps": 38.93,
+            "maxDamage": 142,
+            "minDamage": 76,
+            "speed": 2.8
+          }
+        },
+        {
+          "id": 13141,
+          "name": "Tooth of Gnarr",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Neck",
+          "slotId": 2,
+          "itemClass": 4,
+          "itemSubclass": -3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "General Drakkisath"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Increases healing done by up to 15 and damage done by up to 5 for all magical spells and effects."
+            ],
+            "intellect": 11,
+            "stamina": 7
+          }
+        },
+        {
+          "id": 12929,
+          "name": "Emberfury Talisman",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Neck",
+          "slotId": 2,
+          "itemClass": 4,
+          "itemSubclass": -3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Pyroguard Emberseer"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Improves your chance to get a critical strike by 1.0%.",
+              "Equip: Increases damage and healing done by magical spells and effects by up to 6."
+            ],
+            "fireRes": 7,
+            "stamina": 8
+          }
+        },
+        {
+          "id": 13177,
+          "name": "Talisman of Evasion",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Neck",
+          "slotId": 2,
+          "itemClass": 4,
+          "itemSubclass": -3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "War Master Voone"
+          ],
+          "stats": {
+            "agility": 8,
+            "equip": [
+              "Equip: Increased Defense +6.",
+              "Equip: Increases your chance to Dodge an attack by 1.0%."
+            ]
+          }
+        },
+        {
+          "id": 13212,
+          "name": "Halycon's Spiked Collar",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Neck",
+          "slotId": 2,
+          "itemClass": 4,
+          "itemSubclass": -3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Halycon"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: +20 Attack Power."
+            ],
+            "stamina": 7
+          }
+        },
+        {
+          "id": 12939,
+          "name": "Dal'Rend's Tribal Guardian",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Off Hand",
+          "slotId": 22,
+          "itemClass": 2,
+          "itemSubclass": 7,
+          "dps": 41.39,
+          "speed": 1.8,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "armor": 100,
+            "dps": 41.39,
+            "equip": [
+              "Equip: Increased Defense +7."
+            ],
+            "maxDamage": 97,
+            "minDamage": 52,
+            "speed": 1.8
+          }
+        },
+        {
+          "id": 13218,
+          "name": "Fang of the Crystal Spider",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 15,
+          "dps": 40.31,
+          "speed": 1.6,
+          "droppedBy": [
+            "Crystal Fang"
+          ],
+          "stats": {
+            "dps": 40.31,
+            "maxDamage": 84,
+            "minDamage": 45,
+            "speed": 1.6
+          }
+        },
+        {
+          "id": 22322,
+          "name": "The Jaw Breaker",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 4,
+          "dps": 40.31,
+          "speed": 1.6,
+          "droppedBy": [
+            "Mor Grayhoof"
+          ],
+          "stats": {
+            "dps": 40.31,
+            "equip": [
+              "Equip: Improves your chance to get a critical strike by 1.0%.",
+              "Equip: +6 Attack Power.",
+              "Equip: +6 Attack Power against Humanoids."
+            ],
+            "maxDamage": 84,
+            "minDamage": 45,
+            "speed": 1.6
+          }
+        },
+        {
+          "id": 12582,
+          "name": "Keris of Zul'Serak",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 15,
+          "dps": 39.44,
+          "speed": 1.8,
+          "droppedBy": [
+            "War Master Voone"
+          ],
+          "stats": {
+            "dps": 39.44,
+            "maxDamage": 93,
+            "minDamage": 49,
+            "speed": 1.8
+          }
+        },
+        {
+          "id": 13183,
+          "name": "Venomspitter",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 4,
+          "dps": 39.47,
+          "speed": 1.9,
+          "droppedBy": [
+            "Mother Smolderweb"
+          ],
+          "stats": {
+            "dps": 39.47,
+            "maxDamage": 98,
+            "minDamage": 52,
+            "speed": 1.9
+          }
+        },
+        {
+          "id": 13198,
+          "name": "Hurd Smasher",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 13,
+          "dps": 39.44,
+          "speed": 1.8,
+          "droppedBy": [
+            "Ghok Bashguud"
+          ],
+          "stats": {
+            "dps": 39.44,
+            "maxDamage": 93,
+            "minDamage": 49,
+            "speed": 1.8
+          }
+        },
+        {
+          "id": 13204,
+          "name": "Bashguuder",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 4,
+          "dps": 39.44,
+          "speed": 1.8,
+          "droppedBy": [
+            "Ghok Bashguud"
+          ],
+          "stats": {
+            "dps": 39.44,
+            "maxDamage": 93,
+            "minDamage": 49,
+            "speed": 1.8,
+            "strength": 9
+          }
+        },
+        {
+          "id": 13286,
+          "name": "Rivenspike",
+          "ilvl": 58,
+          "reqLevel": 53,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 0,
+          "dps": 38.1,
+          "speed": 2.9,
+          "droppedBy": [
+            "Spirestone Butcher"
+          ],
+          "stats": {
+            "dps": 38.1,
+            "maxDamage": 144,
+            "minDamage": 77,
+            "speed": 2.9
+          }
+        },
+        {
+          "id": 13182,
+          "name": "Phase Blade",
+          "ilvl": 57,
+          "reqLevel": 52,
+          "quality": "rare",
+          "slot": "One-Hand",
+          "slotId": 13,
+          "itemClass": 2,
+          "itemSubclass": 7,
+          "dps": 37.62,
+          "speed": 2.1,
+          "droppedBy": [
+            "Burning Felguard"
+          ],
+          "stats": {
+            "dps": 37.62,
+            "maxDamage": 103,
+            "minDamage": 55,
+            "speed": 2.1,
+            "stamina": 12,
+            "strength": 7
+          }
+        },
+        {
+          "id": 12605,
+          "name": "Serpentine Skuller",
+          "ilvl": 60,
+          "reqLevel": 51,
+          "quality": "rare",
+          "slot": "Ranged",
+          "slotId": 15,
+          "itemClass": 2,
+          "itemSubclass": 19,
+          "dps": 59.64,
+          "speed": 1.4,
+          "droppedBy": [
+            "Jed Runewatcher"
+          ],
+          "stats": {
+            "dps": 59.64,
+            "equip": [
+              "Equip: Your spells pierce 2 Magical Resistance."
+            ],
+            "shadowRes": 9,
+            "speed": 1.4
+          }
+        },
+        {
           "id": 12651,
           "name": "Blackcrow",
           "ilvl": 59,
@@ -24292,7 +25895,7 @@
           "slotId": 15,
           "itemClass": 2,
           "itemSubclass": 18,
-          "dps": 50.56,
+          "dps": 30.31,
           "speed": 3.2,
           "droppedBy": [
             "Shadow Hunter Vosh'gajin"
@@ -24306,6 +25909,52 @@
             "maxDamage": 117,
             "minDamage": 77,
             "speed": 3.2
+          }
+        },
+        {
+          "id": 12653,
+          "name": "Riphook",
+          "ilvl": 59,
+          "reqLevel": 54,
+          "quality": "rare",
+          "slot": "Ranged",
+          "slotId": 15,
+          "itemClass": 2,
+          "itemSubclass": 2,
+          "dps": 30.23,
+          "speed": 2.2,
+          "droppedBy": [
+            "Shadow Hunter Vosh'gajin"
+          ],
+          "stats": {
+            "dps": 30.23,
+            "equip": [
+              "Equip: +22 Attack Power."
+            ],
+            "maxDamage": 87,
+            "minDamage": 46,
+            "speed": 2.2
+          }
+        },
+        {
+          "id": 22398,
+          "name": "Idol of Rejuvenation",
+          "ilvl": 62,
+          "reqLevel": 57,
+          "quality": "rare",
+          "slot": "Relic",
+          "slotId": 28,
+          "itemClass": 4,
+          "itemSubclass": 8,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Mor Grayhoof"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Increases the initial healing of Regrowth by 5% when cast on a target affected by your Rejuvenation."
+            ]
           }
         },
         {
@@ -24330,6 +25979,121 @@
             ],
             "fireRes": 8,
             "stamina": 7
+          }
+        },
+        {
+          "id": 13205,
+          "name": "Rhombeard Protector",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Shield",
+          "slotId": 14,
+          "itemClass": 4,
+          "itemSubclass": 6,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Gizrul the Slavener"
+          ],
+          "stats": {
+            "armor": 2089,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 12."
+            ],
+            "intellect": 14,
+            "spirit": 7
+          }
+        },
+        {
+          "id": 10163,
+          "name": "Mercurial Pauldrons",
+          "ilvl": 62,
+          "reqLevel": 57,
+          "quality": "uncommon",
+          "slot": "Shoulder",
+          "slotId": 3,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "armor": 249
+          }
+        },
+        {
+          "id": 12927,
+          "name": "Truestrike Shoulders",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Shoulder",
+          "slotId": 3,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Pyroguard Emberseer"
+          ],
+          "stats": {
+            "armor": 129,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.5%.",
+              "Equip: +24 Attack Power."
+            ],
+            "stamina": 10
+          }
+        },
+        {
+          "id": 13185,
+          "name": "Sunderseer Mantle",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Shoulder",
+          "slotId": 3,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Crystal Fang"
+          ],
+          "stats": {
+            "armor": 65,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 8.",
+              "Equip: Your spells pierce 3 Magical Resistance."
+            ],
+            "intellect": 17,
+            "spirit": 11,
+            "stamina": 4
+          }
+        },
+        {
+          "id": 13166,
+          "name": "Slamshot Shoulders",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Shoulder",
+          "slotId": 3,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Highlord Omokk"
+          ],
+          "stats": {
+            "armor": 470,
+            "equip": [
+              "Equip: Improves your chance to hit by 0.5%.",
+              "Equip: +20 Attack Power."
+            ],
+            "stamina": 21
           }
         },
         {
@@ -24483,6 +26247,74 @@
           }
         },
         {
+          "id": 13257,
+          "name": "Demonic Runed Spaulders",
+          "ilvl": 59,
+          "reqLevel": 54,
+          "quality": "rare",
+          "slot": "Shoulder",
+          "slotId": 3,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Shadow Hunter Vosh'gajin"
+          ],
+          "stats": {
+            "armor": 126,
+            "intellect": 14,
+            "stamina": 12,
+            "strength": 12
+          }
+        },
+        {
+          "id": 13173,
+          "name": "Flightblade Throwing Axe",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Thrown",
+          "slotId": 25,
+          "itemClass": 2,
+          "itemSubclass": 16,
+          "dps": 35.45,
+          "speed": 2.2,
+          "droppedBy": [
+            "War Master Voone"
+          ],
+          "stats": {
+            "dps": 35.45,
+            "maxDamage": 102,
+            "minDamage": 54,
+            "speed": 2.2,
+            "spirit": 6,
+            "strength": 9
+          }
+        },
+        {
+          "id": 22268,
+          "name": "Draconic Infused Emblem",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "General Drakkisath"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Chance on harmful spellcast to increase your spell damage and healing by up to 35 for 10 sec. This spell damage increase is doubled against Dragonkin."
+            ],
+            "fireRes": 15
+          }
+        },
+        {
           "id": 13164,
           "name": "Heart of the Scale",
           "ilvl": 61,
@@ -24498,6 +26330,218 @@
             "Overlord Wyrmthalak"
           ],
           "stats": {}
+        },
+        {
+          "id": 22321,
+          "name": "Heart of Wyrmthalak",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Overlord Wyrmthalak"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Melee and Ranged attacks have a chance to deal 112 to 168 Fire damage. Deals 3 times as much damage to Orcs."
+            ],
+            "fireRes": 13
+          }
+        },
+        {
+          "id": 12930,
+          "name": "Briarwood Reed",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Jed Runewatcher"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 15. This effect is doubled in Marsh and Swamp areas.",
+              "Equip: Unable to be tracked."
+            ]
+          }
+        },
+        {
+          "id": 13213,
+          "name": "Smolderweb's Eye",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Mother Smolderweb"
+          ],
+          "stats": {
+            "equip": [
+              "Equip: Improves your chance to hit by 1.0%."
+            ],
+            "natureRes": 5
+          }
+        },
+        {
+          "id": 12583,
+          "name": "Blackhand Doomsaw",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Two-Hand",
+          "slotId": 17,
+          "itemClass": 2,
+          "itemSubclass": 6,
+          "dps": 54,
+          "speed": 3.5,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "dps": 54.0,
+            "maxDamage": 227,
+            "minDamage": 151,
+            "speed": 3.5
+          }
+        },
+        {
+          "id": 12969,
+          "name": "Seeping Willow",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Two-Hand",
+          "slotId": 17,
+          "itemClass": 2,
+          "itemSubclass": 5,
+          "dps": 53.89,
+          "speed": 3.6,
+          "droppedBy": [
+            "The Beast"
+          ],
+          "stats": {
+            "dps": 53.89,
+            "maxDamage": 233,
+            "minDamage": 155,
+            "speed": 3.6
+          }
+        },
+        {
+          "id": 13163,
+          "name": "Relentless Scythe",
+          "ilvl": 62,
+          "reqLevel": 57,
+          "quality": "rare",
+          "slot": "Two-Hand",
+          "slotId": 17,
+          "itemClass": 2,
+          "itemSubclass": 8,
+          "dps": 53.03,
+          "speed": 3.3,
+          "droppedBy": [
+            "Overlord Wyrmthalak"
+          ],
+          "stats": {
+            "agility": 9,
+            "dps": 53.03,
+            "equip": [
+              "Equip: Increases your chance to Parry an attack by 1.0%.",
+              "Equip: Reduces chance to be Dodged or Parried by 1.0%."
+            ],
+            "maxDamage": 210,
+            "minDamage": 140,
+            "speed": 3.3,
+            "stamina": 11,
+            "strength": 20
+          }
+        },
+        {
+          "id": 13161,
+          "name": "Trindlehaven Staff",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Two-Hand",
+          "slotId": 17,
+          "itemClass": 2,
+          "itemSubclass": 10,
+          "dps": 38.81,
+          "speed": 2.1,
+          "droppedBy": [
+            "Overlord Wyrmthalak"
+          ],
+          "stats": {
+            "dps": 38.81,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 70."
+            ],
+            "intellect": 25,
+            "maxDamage": 98,
+            "minDamage": 65,
+            "speed": 2.1,
+            "stamina": 12
+          }
+        },
+        {
+          "id": 13167,
+          "name": "Fist of Omokk",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Two-Hand",
+          "slotId": 17,
+          "itemClass": 2,
+          "itemSubclass": 5,
+          "dps": 51.36,
+          "speed": 3.3,
+          "droppedBy": [
+            "Highlord Omokk"
+          ],
+          "stats": {
+            "dps": 51.36,
+            "maxDamage": 204,
+            "minDamage": 135,
+            "speed": 3.3,
+            "stamina": 12,
+            "strength": 29
+          }
+        },
+        {
+          "id": 13285,
+          "name": "The Blackrock Slicer",
+          "ilvl": 58,
+          "reqLevel": 53,
+          "quality": "rare",
+          "slot": "Two-Hand",
+          "slotId": 17,
+          "itemClass": 2,
+          "itemSubclass": 1,
+          "dps": 49.75,
+          "speed": 4,
+          "droppedBy": [
+            "Spirestone Battle Lord"
+          ],
+          "stats": {
+            "dps": 49.75,
+            "maxDamage": 239,
+            "minDamage": 159,
+            "speed": 4.0
+          }
         },
         {
           "id": 13142,
@@ -24521,6 +26565,213 @@
             ],
             "stamina": 18,
             "strength": 14
+          }
+        },
+        {
+          "id": 13502,
+          "name": "Handcrafted Mastersmith Girdle",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Goraluk Anvilcrack"
+          ],
+          "stats": {
+            "agility": 10,
+            "armor": 369,
+            "stamina": 10,
+            "strength": 11
+          }
+        },
+        {
+          "id": 18104,
+          "name": "Feralsurge Girdle",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "armor": 208,
+            "intellect": 11,
+            "strength": 9
+          }
+        },
+        {
+          "id": 12589,
+          "name": "Dustfeather Sash",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Solakar Flamewreath"
+          ],
+          "stats": {
+            "armor": 49,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 9.",
+              "Equip: Your spells pierce 3 Magical Resistance."
+            ],
+            "intellect": 17,
+            "stamina": 10
+          }
+        },
+        {
+          "id": 12606,
+          "name": "Crystallized Girdle",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Solakar Flamewreath"
+          ],
+          "stats": {
+            "armor": 97,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 13."
+            ],
+            "intellect": 19,
+            "spirit": 6,
+            "stamina": 6
+          }
+        },
+        {
+          "id": 22232,
+          "name": "Marksman's Girdle",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Urok Doomhowl"
+          ],
+          "stats": {
+            "agility": 21,
+            "armor": 202,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.0%."
+            ]
+          }
+        },
+        {
+          "id": 22306,
+          "name": "Ironweave Belt",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Mor Grayhoof"
+          ],
+          "reqClass": 400,
+          "stats": {
+            "armor": 49,
+            "equip": [
+              "Equip: Your spells pierce 3 Magical Resistance."
+            ],
+            "intellect": 11,
+            "stamina": 17
+          }
+        },
+        {
+          "id": 22325,
+          "name": "Belt of the Trickster",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Mor Grayhoof"
+          ],
+          "stats": {
+            "agility": 22,
+            "armor": 97,
+            "stamina": 9
+          }
+        },
+        {
+          "id": 12634,
+          "name": "Chiselbrand Girdle",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Bannok Grimaxe"
+          ],
+          "stats": {
+            "armor": 199,
+            "equip": [
+              "Equip: +44 Attack Power."
+            ],
+            "spirit": 6,
+            "stamina": 6
+          }
+        },
+        {
+          "id": 13252,
+          "name": "Cloudrunner Girdle",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Quartermaster Zigris"
+          ],
+          "stats": {
+            "agility": 14,
+            "armor": 95,
+            "strength": 13
           }
         },
         {
@@ -24614,6 +26865,177 @@
           }
         },
         {
+          "id": 12936,
+          "name": "Battleborn Armbraces",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Warchief Rend Blackhand"
+          ],
+          "stats": {
+            "armor": 287,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.0%.",
+              "Equip: Improves your chance to get a critical strike by 1.0%."
+            ],
+            "spirit": 7
+          }
+        },
+        {
+          "id": 12966,
+          "name": "Blackmist Armguards",
+          "ilvl": 63,
+          "reqLevel": 58,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "The Beast"
+          ],
+          "stats": {
+            "armor": 77,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.0%."
+            ],
+            "shadowRes": 7,
+            "stamina": 13,
+            "strength": 5
+          }
+        },
+        {
+          "id": 13208,
+          "name": "Bleak Howler Armguards",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Gizrul the Slavener"
+          ],
+          "stats": {
+            "armor": 75,
+            "equip": [
+              "Equip: Increases healing done by up to 15 and damage done by up to 5 for all magical spells and effects."
+            ],
+            "intellect": 9,
+            "spirit": 14
+          }
+        },
+        {
+          "id": 22313,
+          "name": "Ironweave Bracers",
+          "ilvl": 61,
+          "reqLevel": 56,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Halycon"
+          ],
+          "reqClass": 400,
+          "stats": {
+            "armor": 38,
+            "equip": [
+              "Equip: Improves your chance to hit by 0.5%."
+            ],
+            "intellect": 8,
+            "stamina": 14
+          }
+        },
+        {
+          "id": 13179,
+          "name": "Brazecore Armguards",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "War Master Voone"
+          ],
+          "stats": {
+            "armor": 155,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 8."
+            ],
+            "intellect": 8,
+            "stamina": 10
+          }
+        },
+        {
+          "id": 13211,
+          "name": "Slashclaw Bracers",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Halycon"
+          ],
+          "stats": {
+            "agility": 7,
+            "armor": 155,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.0%."
+            ],
+            "spirit": 9,
+            "stamina": 7
+          }
+        },
+        {
+          "id": 12626,
+          "name": "Funeral Cuffs",
+          "ilvl": 59,
+          "reqLevel": 54,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Shadow Hunter Vosh'gajin"
+          ],
+          "stats": {
+            "armor": 37,
+            "equip": [
+              "Equip: Increases healing done by up to 18 and damage done by up to 6 for all magical spells and effects."
+            ],
+            "intellect": 14,
+            "shadowRes": 7
+          }
+        },
+        {
           "id": 16683,
           "name": "Magister's Bindings",
           "ilvl": 57,
@@ -24686,6 +27108,156 @@
       ],
       "questRewards": [
         {
+          "id": 15824,
+          "name": "Astoria Robes",
+          "ilvl": 59,
+          "reqLevel": 55,
+          "quality": "uncommon",
+          "slot": "Chest",
+          "slotId": 5,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "armor": 76,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 10."
+            ],
+            "intellect": 20,
+            "spirit": 10
+          }
+        },
+        {
+          "id": 15827,
+          "name": "Jadescale Breastplate",
+          "ilvl": 59,
+          "reqLevel": 55,
+          "quality": "uncommon",
+          "slot": "Chest",
+          "slotId": 5,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "armor": 317,
+            "equip": [
+              "Equip: Increases healing done by up to 15 and damage done by up to 5 for all magical spells and effects."
+            ],
+            "stamina": 23
+          }
+        },
+        {
+          "id": 15825,
+          "name": "Traphook Jerkin",
+          "ilvl": 59,
+          "reqLevel": 55,
+          "quality": "uncommon",
+          "slot": "Chest",
+          "slotId": 5,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "agility": 18,
+            "armor": 152,
+            "spirit": 15,
+            "strength": 4
+          }
+        },
+        {
+          "id": 15861,
+          "name": "Swiftfoot Treads",
+          "ilvl": 60,
+          "reqLevel": 57,
+          "quality": "uncommon",
+          "slot": "Feet",
+          "slotId": 8,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "agility": 14,
+            "armor": 106,
+            "stamina": 12,
+            "strength": 4
+          }
+        },
+        {
+          "id": 12344,
+          "name": "Seal of Ascension",
+          "ilvl": 61,
+          "reqLevel": 57,
+          "quality": "rare",
+          "slot": "Finger",
+          "slotId": 11,
+          "itemClass": 4,
+          "itemSubclass": -2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Seal of Ascension"
+          ],
+          "stats": {
+            "fireRes": 10,
+            "frostRes": 10,
+            "natureRes": 10
+          }
+        },
+        {
+          "id": 13963,
+          "name": "Voone's Vice Grips",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "agility": 9,
+            "armor": 221,
+            "equip": [
+              "Equip: Improves your chance to hit by 1.5%."
+            ],
+            "stamina": 15
+          }
+        },
+        {
+          "id": 15858,
+          "name": "Freewind Gloves",
+          "ilvl": 59,
+          "reqLevel": 55,
+          "quality": "uncommon",
+          "slot": "Hands",
+          "slotId": 10,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Bijou's Reconnaissance Report"
+          ],
+          "side": 2,
+          "stats": {
+            "armor": 48,
+            "equip": [
+              "Equip: Increases healing done by up to 20 and damage done by up to 7 for all magical spells and effects."
+            ],
+            "spirit": 14
+          }
+        },
+        {
           "id": 16309,
           "name": "Drakefire Amulet",
           "ilvl": 63,
@@ -24701,6 +27273,233 @@
           "stats": {
             "fireRes": 15,
             "stamina": 10
+          }
+        },
+        {
+          "id": 13961,
+          "name": "Halycon's Muzzle",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Shoulder",
+          "slotId": 3,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "arcaneRes": 5,
+            "armor": 127,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 15."
+            ],
+            "intellect": 19
+          }
+        },
+        {
+          "id": 13965,
+          "name": "Blackhand's Breadth",
+          "ilvl": 63,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "equip": [
+              "Equip: Improves your chance to get a Critical Strike with Melee and Ranged attacks by 1.0%."
+            ]
+          }
+        },
+        {
+          "id": 13968,
+          "name": "Eye of the Beast",
+          "ilvl": 63,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "equip": [
+              "Equip: Improves your chance to get a Critical Strike with Spells by 1.0%."
+            ]
+          }
+        },
+        {
+          "id": 13966,
+          "name": "Mark of Tyranny",
+          "ilvl": 63,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "equip": [
+              "Equip: Increases your chance to Dodge an attack by 1.0%."
+            ]
+          }
+        },
+        {
+          "id": 15873,
+          "name": "Ragged John's Neverending Cup",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Mother's Milk"
+          ],
+          "stats": {}
+        },
+        {
+          "id": 15867,
+          "name": "Prismcharm",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "uncommon",
+          "slot": "Trinket",
+          "slotId": 12,
+          "itemClass": 4,
+          "itemSubclass": -4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Urok Doomhowl"
+          ],
+          "stats": {}
+        },
+        {
+          "id": 13959,
+          "name": "Omokk's Girth Restrainer",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "armor": 353,
+            "equip": [
+              "Equip: Improves your chance to get a critical strike by 1.0%.",
+              "Equip: Decreases all threat generated by 1%."
+            ],
+            "stamina": 9,
+            "strength": 14
+          }
+        },
+        {
+          "id": 13962,
+          "name": "Vosh'gajin's Strand",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 2,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "armor": 95,
+            "equip": [
+              "Equip: Increased Defense +6.",
+              "Equip: Increases your chance to Dodge an attack by 1.0%.",
+              "Equip: Improves your chance to get a critical strike by 1.0%."
+            ],
+            "stamina": 6
+          }
+        },
+        {
+          "id": 15859,
+          "name": "Seapost Girdle",
+          "ilvl": 59,
+          "reqLevel": 55,
+          "quality": "uncommon",
+          "slot": "Waist",
+          "slotId": 6,
+          "itemClass": 4,
+          "itemSubclass": 3,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [
+            "Bijou's Reconnaissance Report"
+          ],
+          "side": 2,
+          "stats": {
+            "armor": 179,
+            "equip": [
+              "Equip: Increases damage and healing done by magical spells and effects by up to 9."
+            ],
+            "spirit": 13,
+            "stamina": 8
+          }
+        },
+        {
+          "id": 13958,
+          "name": "Wyrmthalak's Shackles",
+          "ilvl": 60,
+          "reqLevel": 55,
+          "quality": "rare",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 1,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "armor": 37,
+            "equip": [
+              "Equip: Increases healing done by up to 20 and damage done by up to 7 for all magical spells and effects."
+            ],
+            "spirit": 15
+          }
+        },
+        {
+          "id": 15860,
+          "name": "Blinkstrike Armguards",
+          "ilvl": 60,
+          "reqLevel": 57,
+          "quality": "uncommon",
+          "slot": "Wrist",
+          "slotId": 9,
+          "itemClass": 4,
+          "itemSubclass": 4,
+          "dps": null,
+          "speed": null,
+          "droppedBy": [],
+          "stats": {
+            "armor": 249,
+            "equip": [
+              "Equip: Improves your chance to get a critical strike by 0.5%.",
+              "Equip: Increased Daggers +1."
+            ],
+            "strength": 4
           }
         }
       ]
