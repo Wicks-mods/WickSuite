@@ -95,7 +95,7 @@ function checkTree(t) {
   return { ...base(), listed: true, issues };
 
   function base() {
-    return { folder: t.folder, client: t.client, home: t.home, repo: e?.repo || null, cf_project_id: e?.cf_project_id || null,
+    return { folder: t.folder, dir: t.dir, client: t.client, home: t.home, repo: e?.repo || null, cf_project_id: e?.cf_project_id || null,
              branch, version, tag, changelog: logHead, dirty, ahead, behind, pending };
   }
 }
@@ -118,7 +118,16 @@ async function remote(config, rows) {
       r.cf = { newest: ver, date: (mine?.dateCreated || "").slice(0, 10) };
       const tagVer = r.tag ? r.tag.replace(/^(forever-)?v/, "") : null;
       if (!files.length) { if (tagVer) r.issues.push("tagged, but CurseForge has no file"); }
-      else if (tagVer && ver && ver !== tagVer) r.issues.push(`CurseForge's newest is ${ver}, newest tag is ${r.tag}`);
+      else if (tagVer && ver && ver !== tagVer) {
+        // An upload sits in CurseForge's review queue before the public file
+        // list shows it. A tag under two days old is waiting, not adrift.
+        let age = Infinity;
+        try {
+          age = Date.now() / 1000 - Number(execFileSync("git", ["-C", r.dir, "log", "-1", "--format=%ct", r.tag], { encoding: "utf8" }).trim());
+        } catch {}
+        if (age < 2 * 86400) r.cf.awaiting = tagVer;
+        else r.issues.push(`CurseForge's newest is ${ver}, newest tag is ${r.tag}`);
+      }
     } catch { r.cf = { state: "unreachable" }; }
   }
   try {
@@ -155,6 +164,7 @@ export async function run(args = []) {
       with_issues: rows.filter(r => r.issues.length).length,
       issues: rows.reduce((n, r) => n + r.issues.length, 0),
       pending_release: listed.filter(r => r.pending).map(r => `${r.folder}${r.home === "forever" && r.client !== "both" ? " (forever)" : ""}`),
+      awaiting_curseforge: listed.filter(r => r.cf?.awaiting).map(r => `${r.folder}${r.home === "forever" && r.client !== "both" ? " (forever)" : ""} ${r.cf.awaiting}`),
     },
     addons: rows,
   };
@@ -167,13 +177,14 @@ export async function run(args = []) {
   if (args.includes("--json")) { console.log(JSON.stringify(report, null, 2)); }
   else {
     for (const r of rows) {
-      const state = r.issues.length ? "ISSUE  " : !r.listed ? "unlisted" : r.benched ? "benched" : r.pending ? "pending" : "ok     ";
+      const state = r.issues.length ? "ISSUE  " : !r.listed ? "unlisted" : r.benched ? "benched" : r.pending ? "pending" : r.cf?.awaiting ? "cf wait" : "ok     ";
       const where = `${r.folder}${r.home === "forever" ? " [forever]" : ""}`;
       console.log(`${state.padEnd(8)} ${where.padEnd(36)} ${String(r.version || "-").padEnd(8)} ${String(r.tag || "-").padEnd(16)} ${r.branch}${r.dirty ? `  ${r.dirty} changed` : ""}${r.ahead ? `  ${r.ahead} unpushed` : ""}`);
       for (const i of r.issues) console.log(`           - ${i}`);
     }
     const s = report.summary;
-    console.log(`\n${s.folders} folders, ${s.checked} checked, ${s.issues} issue(s) in ${s.with_issues}, ${s.pending_release.length} with unreleased work`);
+    console.log(`\n${s.folders} folders, ${s.checked} checked, ${s.issues} issue(s) in ${s.with_issues}, ${s.pending_release.length} with unreleased work`
+      + (s.awaiting_curseforge.length ? `, ${s.awaiting_curseforge.length} uploaded and waiting on CurseForge's review` : ""));
     console.log(`state written to ${outFile}`);
   }
   if (report.summary.issues) process.exitCode = 1;

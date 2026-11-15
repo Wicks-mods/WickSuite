@@ -438,7 +438,14 @@ function composeDiscordEmbed(addon, version, changelogBody, config) {
       descLines.push("**What's new**");
       descLines.push(...headlines(cleaned, 10));
       descLines.push("");
-      descLines.push(`[Full changelog](https://github.com/${config.github_user}/${addon.repo || addon.folder}/blob/main/CHANGELOG.md)`);
+      // The branch this build ships from: Ledger, Survivors and Wardrobe are
+      // on master, and the Forever builds of Bags, Trade Hall and Stances on
+      // their own branch, so a fixed "main" was a dead or wrong link there.
+      let branch = "main";
+      try {
+        branch = runCapture(`git -C "${path.join(rootOf(config, addon), addon.folder)}" rev-parse --abbrev-ref HEAD`) || "main";
+      } catch (_) {}
+      descLines.push(`[Full changelog](https://github.com/${config.github_user}/${addon.repo || addon.folder}/blob/${branch}/CHANGELOG.md)`);
     }
   }
   // Parse accent hex → decimal int for Discord's color field.
