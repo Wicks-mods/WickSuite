@@ -12,7 +12,8 @@ node "C:/Users/jspli/Projects/Wick/WickSuite/tools/wick.mjs" <subcommand> [args]
 |---|---|
 | `wick list` | Print the active addon roster from `wick.json` |
 | `wick scaffold "Wick's X Y"` | Create a new addon — folder, files, junction, git, GitHub repo, register in `wick.json` |
-| `wick audit [--remote] [--json]` | Read-only state of every addon folder: git, versions, TOC header, files, README. `--remote` adds CurseForge's newest file and the GitHub repo settings. Writes `shared-memory/state/suite-audit.json` for Claude, Codex and dashboards; exits 1 on a failed check |
+| `wick audit [--remote] [--json]` | Read-only state of every addon folder: git, versions, TOC header, files, README. `--remote` adds CurseForge's newest file and the GitHub repo settings. Writes `shared-memory/state/suite-audit.json` for Claude, Codex and dashboards; exits 1 on a failed check. `--remote` also asks Facebook whether the saved Page token still works |
+| `wick fb-token [--check] [--dry-run] [--from-env]` | Renew the Facebook Page token. Copy a fresh User token from the Graph API Explorer (posting app, permissions `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`, the page ticked), then run it: it extends the token, derives the Page token, checks it and saves both in the secrets file, printing neither, and clears the clipboard. Refuses a token from any app but the posting app in `wick.json` (`social.fb_posting_app_id`), since posts through an app in Development mode are hidden from the public. `--check` is read-only |
 | `wick sync` | Regenerate the suite-table cross-link block in every `README.md` (delimited by `<!-- wick:suite-table:start -->` ... `end`) |
 | `wick render` | Shortcut to `grab-artboards.mjs` — render all thumbnails + banner (1× and 2× PNGs) |
 | `wick release <folder> <ver>` | Version bump → CHANGELOG append → commit + tag + push → zip → upload to CurseForge |

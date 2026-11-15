@@ -152,7 +152,13 @@ async function remote(config, rows) {
 export async function run(args = []) {
   const config = JSON.parse(fs.readFileSync(path.join(SUITE, "wick.json"), "utf8"));
   const rows = trees(config).map(checkTree).sort((a, b) => a.folder.localeCompare(b.folder) || a.home.localeCompare(b.home));
-  if (args.includes("--remote")) await remote(config, rows);
+  // A dead Facebook token fails every post of a release round, and nothing
+  // says so until the round is under way. Ask Facebook up front.
+  let social = null;
+  if (args.includes("--remote")) {
+    await remote(config, rows);
+    try { social = { facebook: await (await import("./fbtoken.mjs")).checkSaved(config) }; } catch { social = null; }
+  }
 
   const listed = rows.filter(r => r.listed && !r.benched);
   const report = {
@@ -166,8 +172,10 @@ export async function run(args = []) {
       pending_release: listed.filter(r => r.pending).map(r => `${r.folder}${r.home === "forever" && r.client !== "both" ? " (forever)" : ""}`),
       awaiting_curseforge: listed.filter(r => r.cf?.awaiting).map(r => `${r.folder}${r.home === "forever" && r.client !== "both" ? " (forever)" : ""} ${r.cf.awaiting}`),
     },
+    social,
     addons: rows,
   };
+  const fbDown = social?.facebook && ["refused", "missing"].includes(social.facebook.state);
   const home = config.project_home || path.dirname(SUITE);
   const outDir = path.join(home, "shared-memory", "state");
   fs.mkdirSync(outDir, { recursive: true });
@@ -185,9 +193,15 @@ export async function run(args = []) {
     const s = report.summary;
     console.log(`\n${s.folders} folders, ${s.checked} checked, ${s.issues} issue(s) in ${s.with_issues}, ${s.pending_release.length} with unreleased work`
       + (s.awaiting_curseforge.length ? `, ${s.awaiting_curseforge.length} uploaded and waiting on CurseForge's review` : ""));
+    const f = social?.facebook;
+    if (f) {
+      console.log(f.state === "ok" ? `Facebook posting: token accepted (${f.page})`
+        : f.state === "unreachable" ? `Facebook posting: not checked (${f.detail})`
+        : `Facebook posting: DOWN, ${f.detail}${f.code ? ` (code ${f.code}${f.subcode ? `/${f.subcode}` : ""})` : ""}. Fix: wick fb-token --help`);
+    }
     console.log(`state written to ${outFile}`);
   }
-  if (report.summary.issues) process.exitCode = 1;
+  if (report.summary.issues || fbDown) process.exitCode = 1;
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await run(process.argv.slice(2));

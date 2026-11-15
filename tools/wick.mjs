@@ -1833,6 +1833,7 @@ switch (sub) {
   case "release":       await cmdRelease(rest[0], rest[1], ...rest.slice(2)); break;
   case "audit-secrets": cmdAuditSecrets(); break;
   case "audit":         await (await import("./audit.mjs")).run(rest); break;
+  case "fb-token":      await (await import("./fbtoken.mjs")).run(rest); break;
   case "milestone":     await cmdMilestone(rest[0], ...rest.slice(1)); break;
   case "breadcrumb":    await cmdBreadcrumb(rest[0], ...rest.slice(1)); break;
   case "obs":           await (await import("./obs.mjs")).run(rest); break;
@@ -1892,6 +1893,10 @@ usage:
                                            TOC header, files, README; --remote adds CurseForge's
                                            newest file and the GitHub repo settings. Writes
                                            shared-memory/state/suite-audit.json; exits 1 on a failed check
+  wick fb-token [--check] [--dry-run]      renew the Facebook Page token from a fresh token on the
+                                           clipboard: extends it, derives the Page token, checks it
+                                           and saves both, printing neither. --check asks Facebook
+                                           whether the saved one still works (wick fb-token --help)
   wick audit-secrets                      scan all suite repos (working tree + full history)
                                            for accidentally committed secrets; exits 1 if found
 
