@@ -686,6 +686,32 @@ local page = A:RegisterOptions(function(body, addon)
     local beforeNote = y
     y = O:Note(body, LONG, y)
     local noteSpan = beforeNote - y
+    -- Choice: one of a short list of named things, stepped through.
+    do
+        local pick = "b"
+        local LIST = { { value = "a", text = "Alpha" }, { value = "b", text = "Beta" }, { value = nil, text = "Auto" } }
+        check(O.Choice ~= nil, "Options:Choice exists")
+        y = O:Choice(body, "Pick", function() return pick end, function(v) pick = v end, y,
+            { options = function() return LIST end, other = function(v) return "other " .. tostring(v) end })
+        local c = body.__controls and body.__controls["Pick"]
+        check(c ~= nil and c.Step ~= nil, "a page keeps each control under its label")
+        check(c.text == "Beta", "Choice shows the current entry's text: " .. tostring(c.text))
+        c.Step(1)
+        check(pick == nil and c.text == "Auto", "Choice steps forward onto the entry with no value")
+        c.Step(1)
+        check(pick == "a" and c.text == "Alpha", "Choice wraps round to the first entry")
+        c.Step(-1)
+        check(pick == nil, "Choice steps back and wraps")
+        pick = "zzz"; c.Refresh()
+        check(c.text == "other zzz", "a value that is not in the list shows through opts.other")
+        c.Step(1)
+        check(pick == "a", "stepping off an unlisted value lands on the first entry")
+        c.Step(-1); pick = "zzz"; c.Step(-1)
+        check(pick == nil, "stepping back off an unlisted value lands on the last entry")
+        LIST = {}; pick = "x"; c.Refresh(); c.Step(1)
+        check(pick == "x", "an empty list changes nothing")
+        check(body.__controls["Lock"] ~= nil, "check boxes are kept by label too")
+    end
     y = O:ProfileSection(body, addon, y)
     check(y < -100, "layout helpers advance y")
     check(noteSpan > 40, "a wrapping note reports its real height, not one line")

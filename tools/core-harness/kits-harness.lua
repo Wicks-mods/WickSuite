@@ -1761,6 +1761,139 @@ S.SPELLBOOK = keepBook
 S.EQUIPPED_IDS = nil
 S.SLOT_ITEMS[1] = nil
 
+-- ---------- kit settings on the options pages ---------------------------
+-- What used to be reachable only by a slash command now has a control on
+-- each kit's page under Wick's Mods.
+io.write("== kit settings on the options pages ==\n")
+do
+    COMBAT = false
+    local function page(name)
+        local entry = WickCore.Options.pages[name]
+        if not entry then check(false, name .. " has an options page") return nil end
+        S.CHAT = {}
+        entry.frame:Show()
+        local bad
+        for _, l in ipairs(S.CHAT) do if l:lower():find("error") then bad = l end end
+        check(entry.frame.built and not bad, name .. " options page builds" .. (bad and (": " .. bad) or ""))
+        local e = WickCore.Launcher.entries[name]
+        return (entry.frame.body and entry.frame.body.__controls) or {}, e and e.addon
+    end
+    local function macroOf(button)
+        local b = _G[button]
+        return b and (b:GetAttribute("macrotext") or b:GetAttribute("macrotext1")) or ""
+    end
+    check(WickCore.Options.Choice ~= nil, "WickCore offers Options:Choice")
+
+    -- Stances: the smart key's ability, from the abilities that need a stance.
+    local ctl, addon = page("WicksStancesAndThings")
+    if ctl and addon then
+        local db = addon.db.profile
+        local c = ctl["Ability on the key"]
+        check(c ~= nil and c.Step ~= nil, "stances: a choice for the smart key's ability")
+        if c then
+            local before = db.smartAbility
+            c.Step(1)
+            check(db.smartAbility ~= nil and db.smartAbility ~= before, "stances: a step puts another ability on the key: " .. tostring(db.smartAbility))
+            check(macroOf("WicksStancesSmartButton"):find(db.smartAbility, 1, true) ~= nil, "stances: the key's macro follows the choice")
+            db.smartAbility = "charge"; c.Refresh()
+            check(tostring(c.text):find("^Charge %(") ~= nil, "stances: a name typed in another case reads as the listed one: " .. tostring(c.text))
+            db.smartAbility = "Hamstring of Doom"; c.Refresh()
+            check(c.text == "Hamstring of Doom", "stances: an ability set by name stays on show")
+            db.smartAbility = before; c.Step(1); c.Step(-1)
+            check(db.smartAbility == (before or "Charge"), "stances: back where it started")
+        end
+    end
+
+    -- Seals: the fighting seal, the blessing, the key on or off, the reset.
+    ctl, addon = page("WicksSealsAndThings")
+    if ctl and addon then
+        local db = addon.db.profile
+        local seal, bless = ctl["Fighting seal"], ctl["Blessing"]
+        local keep, reset = ctl["Keep the seal key loaded"], ctl["Start over after quiet seconds"]
+        check(seal ~= nil and bless ~= nil and keep ~= nil and reset ~= nil, "seals: seal, blessing, on/off and reset controls")
+        if seal and bless and keep and reset then
+            local was = { db.mainSeal, db.blessing, db.cycle, db.cycleReset }
+            db.mainSeal = nil; db.cycle = nil; seal.Refresh()
+            check(seal.text == "The last one I used", "seals: with nothing chosen the key follows you: " .. tostring(seal.text))
+            seal.Step(1)
+            check(type(db.mainSeal) == "string" and db.mainSeal:find("^Seal of") ~= nil, "seals: a step chooses a seal from the book: " .. tostring(db.mainSeal))
+            check(macroOf("WicksSealsCycleButton"):find(db.mainSeal, 1, true) ~= nil, "seals: the seal key's macro ends on it")
+            seal.Step(-1)
+            check(db.mainSeal == nil, "seals: stepping back returns to following you")
+            keep:GetScript("OnClick")()
+            check(db.cycle == false and macroOf("WicksSealsCycleButton") == "", "seals: unticking unloads the key")
+            keep:GetScript("OnClick")()
+            check(db.cycle == nil and macroOf("WicksSealsCycleButton") ~= "", "seals: ticking loads it again with the kit's own steps")
+            db.cycleReset = 120; reset.Nudge(1)
+            check(db.cycleReset == 120, "seals: the reset stops at 120 seconds")
+            db.cycleReset = 5; reset.Nudge(-1)
+            check(db.cycleReset == 5, "seals: and at 5")
+            db.cycleReset = 27; reset.Nudge(3)
+            check(macroOf("WicksSealsCycleButton"):find("reset=30", 1, true) ~= nil, "seals: the macro takes the new reset")
+            db.blessing = nil; bless.Refresh(); bless.Step(1)
+            check(db.blessing == "Blessing of Might", "seals: a step chooses the blessing in the book: " .. tostring(db.blessing))
+            check(macroOf("WicksSealsBlessButton"):find("Blessing of Might", 1, true) ~= nil, "seals: the blessing key casts it")
+            db.mainSeal, db.blessing, db.cycle, db.cycleReset = was[1], was[2], was[3], was[4]
+            seal.Step(1); seal.Step(-1)     -- rebuild the strip from the restored settings
+        end
+    end
+
+    -- Beasts: the food on the feed key and the ammo warning.
+    ctl, addon = page("WicksBeastsAndThings")
+    if ctl and addon then
+        local db = addon.db.profile
+        local feed, ammo = ctl["Feed with"], ctl["Warn below this many shots"]
+        check(feed ~= nil and ammo ~= nil, "beasts: food and ammo controls")
+        if feed and ammo then
+            local was = { db.foodItem, db.ammoWarn }
+            db.foodItem = false; feed.Refresh()
+            check(feed.text == "The best food in bags", "beasts: with nothing chosen the key picks the best food: " .. tostring(feed.text))
+            db.foodItem = 99999; feed.Refresh()
+            check(feed.text == "item 99999 (not in bags)", "beasts: a chosen food you no longer carry says so")
+            feed.Step(1)
+            check(db.foodItem == false, "beasts: stepping off it goes back to the best food")
+            db.ammoWarn = 200; ammo.Nudge(50)
+            check(db.ammoWarn == 250, "beasts: the ammo warning steps by 50")
+            db.ammoWarn = 0; ammo.Nudge(-50)
+            check(db.ammoWarn == 0, "beasts: and stops at 0, which is off")
+            db.foodItem, db.ammoWarn = was[1], was[2]
+        end
+    end
+
+    -- Poisons: the warning cannot be stepped out of its range.
+    ctl, addon = page("WicksPoisonsAndThings")
+    if ctl and addon then
+        local db = addon.db.profile
+        local warn = ctl["Warn under this many minutes"]
+        check(warn ~= nil, "poisons: the warning stepper")
+        if warn then
+            local was = db.warnMinutes
+            db.warnMinutes = 1; warn.Nudge(-1)
+            check(db.warnMinutes == 1, "poisons: the warning stops at 1 minute")
+            db.warnMinutes = 60; warn.Nudge(1)
+            check(db.warnMinutes == 60, "poisons: and at 60")
+            db.warnMinutes = was
+        end
+    end
+
+    -- Conjures: the low mark for rations.
+    ctl, addon = page("WicksConjuresAndThings")
+    if ctl and addon then
+        local db = addon.db.profile
+        local low = ctl["Rations read as low under"]
+        check(low ~= nil, "conjures: the low mark stepper")
+        if low then
+            local was = db.lowRations
+            db.lowRations = 20; low.Nudge(5)
+            check(db.lowRations == 25, "conjures: the low mark steps by 5")
+            db.lowRations = 0; low.Nudge(-5)
+            check(db.lowRations == 0, "conjures: and stops at 0")
+            db.lowRations = was
+        end
+    end
+    dumpErrors()
+end
+
 io.write("== Trade Hall ==\n")
 CLASS = "HUNTER"
 local THNS = S.loadAddon(ADDONS_DIR .. "/WicksTradeHall", "WicksTradeHall")
