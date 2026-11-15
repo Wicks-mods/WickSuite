@@ -1,0 +1,9 @@
+== facebook ==
+The whole suite got an update today. Every Wick addon now shows in the game's addon list with its own icon under a Wick's Mods heading, so they are easy to find and switch on or off together. A few fixes came along too: Trade Hall keeps your newest listing when a category fills up, Macro Builder survives a settings reset, and Totems and Things is quieter at login. The updates are on CurseForge. wicksmods.com
+
+== x ==
+Every Wick addon updated today: each one now shows in the game's addon list with its own icon under a Wick's Mods heading, with fixes for Trade Hall, Macro Builder and Totems and Things.
+
+https://wicksmods.com
+
+#WoWForever #TBCClassic

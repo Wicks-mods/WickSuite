@@ -1699,7 +1699,7 @@ function readBreadcrumbCopy(file) {
 }
 
 async function cmdBreadcrumb(name, ...flags) {
-  if (!name || name.startsWith("--")) die("usage: wick breadcrumb <name> [--dry-run] [--no-fb] [--no-x] [--force]");
+  if (!name || name.startsWith("--")) die("usage: wick breadcrumb <name> [--dry-run] [--no-fb] [--no-x] [--force] [--card=<file under images/>]");
   const config = readConfig();
   const dir = path.join(SUITE_DIR, "social", "breadcrumbs");
   const copyFile = path.join(dir, `${name}.txt`);
@@ -1717,11 +1717,23 @@ async function cmdBreadcrumb(name, ...flags) {
   if (/#/.test(copy.facebook)) die("the facebook copy has a hashtag; those belong on X only");
   if (xLength(copy.x) > 280) die(`the X copy is ${xLength(copy.x)} characters as X counts them, over 280`);
 
-  const card = path.join(SUITE_DIR, "images", "suite", "breadcrumb.png");
-  if (!fs.existsSync(card)) die(`no card at ${card}: set BREADCRUMB in thumbnails.html and run: wick render breadcrumb`);
-  const html = path.join(SUITE_DIR, "thumbnails.html");
-  if (fs.statSync(html).mtimeMs > fs.statSync(card).mtimeMs) {
-    die(`the card is older than thumbnails.html: run wick render breadcrumb`);
+  // A post that is not about one screenshot (a roundup of a release round)
+  // carries another picture from WickSuite/images: --card=suite/site-card.png.
+  // The freshness check is about the Breadcrumb artboard, so it is skipped
+  // for a picture named this way.
+  const cardFlag = flags.find((f) => f.startsWith("--card="));
+  const card = cardFlag
+    ? path.resolve(SUITE_DIR, "images", cardFlag.slice("--card=".length))
+    : path.join(SUITE_DIR, "images", "suite", "breadcrumb.png");
+  if (cardFlag) {
+    if (!fs.existsSync(card)) die(`no picture at ${card}`);
+    if (/-2x\.(png|jpe?g)$/i.test(card)) die("a -2x file is for CurseForge and og:image, not for a post");
+  } else {
+    if (!fs.existsSync(card)) die(`no card at ${card}: set BREADCRUMB in thumbnails.html and run: wick render breadcrumb`);
+    const html = path.join(SUITE_DIR, "thumbnails.html");
+    if (fs.statSync(html).mtimeMs > fs.statSync(card).mtimeMs) {
+      die(`the card is older than thumbnails.html: run wick render breadcrumb`);
+    }
   }
 
   const postedFile = path.join(dir, "posted.json");
@@ -1730,6 +1742,7 @@ async function cmdBreadcrumb(name, ...flags) {
     die(`${name} has gone out already (${JSON.stringify(posted[name])}). Look at the page, then pass --force to post it again`);
   }
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(copy.x)}`;
+  let fbRefused = false;
 
   if (flags.includes("--dry-run")) {
     log(`\n── Facebook ──\n${copy.facebook}`);
@@ -1752,7 +1765,7 @@ async function cmdBreadcrumb(name, ...flags) {
     fs.writeFileSync(postedFile, JSON.stringify(posted, null, 2) + "\n");
     const captionPath = path.join(os.tmpdir(), "wick-breadcrumb-caption.txt");
     fs.writeFileSync(captionPath, copy.facebook);
-    log(`\nPosting to Facebook (${config.social.fb_page_name}) with the breadcrumb card ...`);
+    log(`\nPosting to Facebook (${config.social.fb_page_name}) with ${path.basename(card)} ...`);
     let resp = "";
     try {
       resp = runCapture([
@@ -1774,6 +1787,15 @@ async function cmdBreadcrumb(name, ...flags) {
       // The photos endpoint says this even when the post went up.
       posted[name].fb = "unconfirmed";
       log(`  (FB: answered with its code 1 false alarm. The post has probably gone up: look at the page before running this again.)`);
+    } else if (parsed && parsed.error && parsed.error.code === 190) {
+      // Code 190 is a token Facebook no longer accepts (expired, or every
+      // session ended after a password change). It is refused before anything
+      // happens, so nothing went up: take the record back out, or the next
+      // run would refuse to post, and do not report a post that was not made.
+      delete posted[name];
+      fbRefused = true;
+      log(`  ✗ FB: the page token was refused: ${String(parsed.error.message).slice(0, 160)}`);
+      log(`    Nothing was posted. Put a new fb_page_token in Wicksmodsinfo.txt, then run this again.`);
     } else {
       posted[name].fb = "unknown";
       log(`  (FB: unexpected response: ${String(resp).slice(0, 200)}. Look at the page before running this again.)`);
@@ -1795,6 +1817,7 @@ async function cmdBreadcrumb(name, ...flags) {
       try { spawnSync("rundll32.exe", ["url.dll,FileProtocolHandler", xUrl]); } catch (_) {}
     }
   }
+  if (fbRefused) { process.exitCode = 1; log(`\n✗ Not posted to Facebook.`); return; }
   log(`\n✓ Breadcrumb posted.`);
 }
 
