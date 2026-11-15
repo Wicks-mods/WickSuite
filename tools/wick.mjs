@@ -652,7 +652,10 @@ async function xPost(text, image, { dry = false } = {}) {
   }
 }
 
-const xIntentUrl = (text) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+// The compose page with the post already typed in. The old address,
+// twitter.com/intent/tweet, landed on the X home page with an empty box
+// (2026-11-15, Wick's Gear 0.9.9); this one opened the box filled in.
+const xIntentUrl = (text) => `https://x.com/intent/post?text=${encodeURIComponent(text)}`;
 
 function composeXRelease(addon, version) {
   const cfUrl = `https://www.curseforge.com/wow/addons/${addon.cf_slug}`;
@@ -1741,7 +1744,7 @@ async function cmdBreadcrumb(name, ...flags) {
   if (posted[name] && !flags.includes("--force")) {
     die(`${name} has gone out already (${JSON.stringify(posted[name])}). Look at the page, then pass --force to post it again`);
   }
-  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(copy.x)}`;
+  const xUrl = xIntentUrl(copy.x);
   let fbRefused = false;
 
   if (flags.includes("--dry-run")) {
