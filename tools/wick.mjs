@@ -1495,17 +1495,21 @@ function cmdAuditSecrets() {
 // The card says the true count, the words say the round number. That is
 // how a milestone is told: you cross five thousand, not five thousand
 // and eleven.
-function milestoneCopy(exact) {
+// `note` is one sentence that belongs to this milestone alone (how long the
+// last stretch took, say). It follows the opening on Facebook and Discord;
+// X has no room for it.
+function milestoneCopy(exact, note) {
   const round = Math.floor(exact / 1000) * 1000;
   const r = round.toLocaleString("en-US");
+  const opening = `The counter went past it this week, so here is the ceremony.` + (note ? ` ${note}` : "");
   const fb = [
     `${r} downloads.`,
     ``,
-    `The counter went past it this week, so here is the ceremony.`,
+    opening,
     ``,
     `Every one of these addons started as something missing from my own UI. That other people ended up running them is still the strange and good part. Thank you for installing them, for the bug reports, and for telling me when something looked wrong.`,
     ``,
-    `Precision addons for TBC Classic, and a growing set being built for the Forever beta ahead of launch.`,
+    `Precision addons for TBC Classic and for World of Warcraft: Forever, with more on the way.`,
     ``,
     `https://wicksmods.com`,
   ].join("\n");
@@ -1519,7 +1523,7 @@ function milestoneCopy(exact) {
     `#WoWClassic #WoWForever`,
   ].join("\n");
   const discord = [
-    `The counter went past ${r} this week.`,
+    `The counter went past ${r} this week.` + (note ? ` ${note}` : ""),
     ``,
     `Every one of these addons started as something missing from my own UI. Thank you for installing them, for the bug reports, and for telling me when something looked wrong.`,
     ``,
@@ -1540,9 +1544,15 @@ function readMilestones(config) {
 
 async function cmdMilestone(nArg, ...flags) {
   const exact = parseInt(String(nArg || "").replace(/[^0-9]/g, ""), 10);
-  if (!exact) die("usage: wick milestone <count> [--dry-run] [--no-fb] [--no-discord] [--no-x] [--force]");
+  if (!exact) die("usage: wick milestone <count> [--dry-run] [--no-fb] [--no-discord] [--no-x] [--force] [--note=<one sentence>]");
   const config = readConfig();
-  const { round, r, fb, x, discord } = milestoneCopy(exact);
+  // One sentence of this milestone's own, held to the rules for anything posted.
+  const noteFlag = flags.find((f) => f.startsWith("--note="));
+  const note = noteFlag ? noteFlag.slice("--note=".length).trim() : "";
+  if (/—/.test(note)) die("the note has an em dash");
+  if (/#/.test(note)) die("the note has a hashtag; those belong on X only");
+  if (/(^|\s)\/[a-z]/i.test(note.replace(/https?:\/\/\S+/g, ""))) die("the note has a slash command in it");
+  const { round, r, fb, x, discord } = milestoneCopy(exact, note);
   if (!round) die(`${exact} has not crossed a thousand yet`);
 
   const dry = flags.includes("--dry-run");
