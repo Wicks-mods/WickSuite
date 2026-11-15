@@ -1,6 +1,6 @@
-# {{TITLE}} — Changelog
+# {{TITLE}} Changelog
 
-## 0.1.0 — {{DATE}}
+## 0.1.0 ({{DATE}})
 
 ### Initial release
 

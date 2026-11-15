@@ -743,6 +743,8 @@ function cmdScaffold(rawTitle) {
 
   const vars = {
     TITLE:       title,
+    // The addon list shows the title two-tone, as every Wick TOC does.
+    TITLE_TOC:   title.startsWith("Wick's ") ? `|cffD4C8A1Wick's|r |cff4FC778${title.slice(7)}|r` : title,
     FOLDER:      folder,
     SHORT:       short,
     SHORT_SLUG:  slug,
@@ -1800,6 +1802,7 @@ switch (sub) {
   case "render":   cmdRender(...rest); break;
   case "release":       await cmdRelease(rest[0], rest[1], ...rest.slice(2)); break;
   case "audit-secrets": cmdAuditSecrets(); break;
+  case "audit":         await (await import("./audit.mjs")).run(rest); break;
   case "milestone":     await cmdMilestone(rest[0], ...rest.slice(1)); break;
   case "breadcrumb":    await cmdBreadcrumb(rest[0], ...rest.slice(1)); break;
   case "obs":           await (await import("./obs.mjs")).run(rest); break;
@@ -1855,6 +1858,10 @@ usage:
   wick obs <cmd> [args]                    drive OBS: status, scenes, scene <name>, shot,
                                            capture <slug>, record, replay, stream
                                            (wick obs --help for the full list)
+  wick audit [--remote] [--json]           read-only state of every addon folder: git, versions,
+                                           TOC header, files, README; --remote adds CurseForge's
+                                           newest file and the GitHub repo settings. Writes
+                                           shared-memory/state/suite-audit.json; exits 1 on a failed check
   wick audit-secrets                      scan all suite repos (working tree + full history)
                                            for accidentally committed secrets; exits 1 if found
 

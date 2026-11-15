@@ -12,6 +12,7 @@ node "C:/Users/jspli/Projects/Wick/WickSuite/tools/wick.mjs" <subcommand> [args]
 |---|---|
 | `wick list` | Print the active addon roster from `wick.json` |
 | `wick scaffold "Wick's X Y"` | Create a new addon — folder, files, junction, git, GitHub repo, register in `wick.json` |
+| `wick audit [--remote] [--json]` | Read-only state of every addon folder: git, versions, TOC header, files, README. `--remote` adds CurseForge's newest file and the GitHub repo settings. Writes `shared-memory/state/suite-audit.json` for Claude, Codex and dashboards; exits 1 on a failed check |
 | `wick sync` | Regenerate the suite-table cross-link block in every `README.md` (delimited by `<!-- wick:suite-table:start -->` ... `end`) |
 | `wick render` | Shortcut to `grab-artboards.mjs` — render all thumbnails + banner (1× and 2× PNGs) |
 | `wick release <folder> <ver>` | Version bump → CHANGELOG append → commit + tag + push → zip → upload to CurseForge |
