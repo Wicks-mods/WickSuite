@@ -639,6 +639,21 @@ do
     rawset(m, "SetUnit", function(self, ...) units = units + 1 return realSetUnit(self, ...) end)
     local wasEquipped = S.EQUIPPED
 
+    -- A character with nothing on at all. The client answers an empty
+    -- slot with no value, not nil, and reading what the model wears
+    -- once raised on that: every refresh failed and the character was
+    -- never drawn.
+    check(select("#", GetInventoryItemLink("player", 2)) == 0,
+        "the stub answers an empty slot with nothing, as the client does")
+    S.EQUIPPED = {}
+    ns.Doll:ClearAll()
+    ns.Doll.modelWearing = nil
+    units = 0
+    local bareOk, bareErr = pcall(ns.Doll.Refresh, ns.Doll)
+    check(bareOk, "a character with empty slots still draws: " .. tostring(bareErr))
+    check(units == 1, "and its model is built, once: " .. units)
+    S.EQUIPPED = wasEquipped
+
     ns.Doll:ClearAll()
     ns.Doll:Refresh()
     units = 0

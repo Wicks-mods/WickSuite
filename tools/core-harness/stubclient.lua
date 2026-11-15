@@ -970,7 +970,14 @@ S.TEMPENCH = { [16] = { remainingTimeMs = 1800000, chargesRemaining = 40, enchan
 -- which it is on, so a check has to be able to take them away.
 S.TEMPENCH_API = S.TEMPENCH_API or { paperdoll = true, item = true, classic = true, tooltip = true }
 function GetInventoryItemTexture(unit, inv) return inv and inv >= 20 and inv <= 23 and 133633 or nil end
-function GetInventoryItemLink(_, slot) return S.EQUIPPED and S.EQUIPPED[slot] or nil end
+-- Nothing at all for an empty slot, not nil, which is what the client
+-- does (Forever 1.60.1, read from Logs/General.log on 2026-11-15). The
+-- difference is a call passed straight on: tostring(GetInventoryItemLink())
+-- raises "value expected" on nothing and prints "nil" on nil.
+function GetInventoryItemLink(_, slot)
+    local link = S.EQUIPPED and S.EQUIPPED[slot]
+    if link then return link end
+end
 function GetInventorySlotInfo() return 20 end
 function PickupBagFromSlot() end
 function PutItemInBag() end
