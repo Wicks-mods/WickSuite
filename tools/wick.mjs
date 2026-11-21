@@ -200,6 +200,90 @@ function extractChangelogEntry(changelogPath, version) {
   return text;
 }
 
+// CurseForge shows a file's changelog as HTML, and the CHANGELOGs use only a
+// small part of markdown: ### headings, - bullets wrapped onto two-space
+// continuation lines, plain paragraphs, **bold** and `code`. This covers that
+// part and nothing more, so the release tool needs no markdown package.
+const CF_CHANGELOG_MAX = 20000;
+const CF_CHANGELOG_MORE = "<p>The full changelog is in CHANGELOG.md.</p>";
+
+// Escape first, then mark up. Code spans are split out before bold, so a
+// ** inside backticks stays literal.
+function inlineMarkdownToHtml(s) {
+  const esc = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return esc.split(/`([^`]*)`/).map((part, i) =>
+    i % 2 ? `<code>${part}</code>` : part.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+  ).join("");
+}
+
+// Lines into blocks: { h3, text }, { p, text } or { ul, items }. A wrapped
+// bullet or paragraph is joined into one line. A blank line ends a paragraph
+// but not a list, so bullets spaced apart still make one list.
+function changelogBlocks(md) {
+  const blocks = [];
+  let cur = null, gap = false;
+  for (const raw of md.replace(/\r\n/g, "\n").split("\n")) {
+    const line = raw.trim();
+    if (!line) { gap = true; continue; }
+    // Any heading level becomes h3: inside one version's notes only ###
+    // is expected, and a stray # should not show as a literal mark.
+    const h = line.match(/^#{1,6}\s+(.*)$/);
+    const b = raw.match(/^-\s+(.*)$/);
+    if (h) {
+      blocks.push({ type: "h3", text: h[1] });
+      cur = null;
+    } else if (b) {
+      if (!cur || cur.type !== "ul") blocks.push(cur = { type: "ul", items: [] });
+      cur.items.push(b[1].trim());
+    } else if (cur && cur.type === "ul" && !gap) {
+      cur.items[cur.items.length - 1] += " " + line;
+    } else if (cur && cur.type === "p" && !gap) {
+      cur.text += " " + line;
+    } else {
+      blocks.push(cur = { type: "p", text: line });
+    }
+    gap = false;
+  }
+  return blocks;
+}
+
+// One version's notes as HTML for the upload. Past the size cap it stops at
+// the last whole list item (or block) that fits and says where the rest is.
+function changelogToHtml(md, max = CF_CHANGELOG_MAX) {
+  let html = "";
+  const room = (s) => html.length + s.length + CF_CHANGELOG_MORE.length <= max;
+  for (const blk of changelogBlocks(md)) {
+    if (blk.type !== "ul") {
+      const s = `<${blk.type}>${inlineMarkdownToHtml(blk.text)}</${blk.type}>`;
+      if (!room(s)) return html + CF_CHANGELOG_MORE;
+      html += s;
+      continue;
+    }
+    let lis = "";
+    for (const item of blk.items) {
+      const li = `<li>${inlineMarkdownToHtml(item)}</li>`;
+      if (!room(`<ul>${lis}${li}</ul>`)) {
+        return html + (lis ? `<ul>${lis}</ul>` : "") + CF_CHANGELOG_MORE;
+      }
+      lis += li;
+    }
+    html += `<ul>${lis}</ul>`;
+  }
+  return html;
+}
+
+// The upload's changelog fields: this version's notes as HTML, or the old
+// one line when there are none (a stub, a missing file, an odd heading).
+// Nothing in here may stop a release.
+function cfChangelogFor(changelogPath, version) {
+  try {
+    const md = extractChangelogEntry(changelogPath, version);
+    const html = md ? changelogToHtml(md) : "";
+    if (html) return { changelog: html, changelogType: "html" };
+  } catch (_) { /* fall through to the one line */ }
+  return { changelog: `Release ${version}. See CHANGELOG.md for details.`, changelogType: "markdown" };
+}
+
 // The picture to attach to a social post.
 //
 // A social card first: 1200x630, which is the size Facebook draws a feed
@@ -1259,6 +1343,9 @@ async function cmdRelease(folder, newVer, ...flags) {
         .test(fs.readFileSync(toc, "utf8"));
     } catch (_) {}
   }
+  // The notes for this version. The CHANGELOG step above has already turned
+  // an Unreleased heading into this version's, so the entry is found by number.
+  const notes = cfChangelogFor(changelog, newVer);
   const metadata = JSON.stringify({
     ...(needsCore ? { relations: { projects: [{ slug: "wickcore", type: "requiredDependency" }] } } : {}),
     // An addon that ships one package for several clients lists them all
@@ -1266,8 +1353,8 @@ async function cmdRelease(folder, newVer, ...flags) {
     gameVersions: addon.cf_game_versions || clientOf(config, addon).cf_game_versions
       || [clientOf(config, addon).cf_game_version_id],
     releaseType: "release",
-    changelog: `Release ${newVer}. See CHANGELOG.md for details.`,
-    changelogType: "markdown",
+    changelog: notes.changelog,
+    changelogType: notes.changelogType,
     // Bags and Trade Hall host both flavours on one project, so the file
     // list would otherwise show two files with the same name and nothing
     // to tell them apart. TBC names are left exactly as they were.
@@ -1927,6 +2014,22 @@ switch (sub) {
     if (dry) log(`\n(dry run: nothing posted, nothing recorded)`);
     break;
   }
+  case "changelog-html": {
+    // Print what a release would send CurseForge as the file's changelog.
+    // Read-only: uploads and posts nothing. Notes go to stderr so the HTML
+    // on stdout can be piped or copied as it is.
+    const folder = rest[0], ver = rest[1];
+    if (!folder || !ver) die("usage: wick changelog-html <folder> <version> [--forever] [--tbc]");
+    const cfg = readConfig();
+    const a = resolveAddon(cfg, folder, rest.slice(2));
+    const file = path.join(rootOf(cfg, a), a.folder, "CHANGELOG.md");
+    const notes = cfChangelogFor(file, ver);
+    log(notes.changelog);
+    console.error(notes.changelogType === "html"
+      ? `(${notes.changelog.length} characters of HTML from ${file})`
+      : `(no ${ver} notes in ${file}; a release would send the one line above as markdown)`);
+    break;
+  }
   case undefined:
   case "-h":
   case "--help":
@@ -1941,6 +2044,9 @@ usage:
   wick release <folder> <ver> [--no-announce] [--no-fb] [--no-x]
                                            bump, commit, tag, push, zip, upload to CurseForge,
                                            and post a release announcement to FB + Discord + X
+  wick changelog-html <folder> <ver> [--forever] [--tbc]
+                                           print the HTML a release sends CurseForge as the
+                                           file's changelog; uploads nothing
   wick announce <folder> <ver> [--dry-run] [--no-fb] [--no-discord] [--no-x]
                                            re-post a release announcement to FB + Discord + X
                                            (idempotent; writes marker files to dedupe).
