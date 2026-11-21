@@ -288,6 +288,43 @@ do
     Core.debug = wasDebug
 end
 
+io.write("== one character, however the realm is named ==\n")
+do
+    -- Forever names the realm at one login and not at the next. A key built
+    -- from each made one character two, and a product's first-time setup
+    -- ran again every time the answer flipped.
+    local P = Core.Profiles
+    local realWas, guidWas, nameWas = _G.GetRealmName, _G.UnitGUID, _G.UnitName
+    _G.UnitName = function() return "Keytest" end
+    _G.UnitGUID = function() return "Player-91-0ABC" end
+    local sv = { char = {}, profileKeys = {} }
+    _G.GetRealmName = function() return "" end
+    local k1 = P:CharKey(sv)
+    sv.char[k1] = { setupDone = true }
+    _G.GetRealmName = function() return "Some Realm" end
+    local k2 = P:CharKey(sv)
+    check(sv.char[k2] and sv.char[k2].setupDone == true, "a realm named after a blank one finds the same character: " .. tostring(k1) .. " / " .. tostring(k2))
+    _G.GetRealmName = function() return "" end
+    check(P:CharKey(sv) == k2, "and the blank one again is still that character")
+    -- With no id to go on, the name carries it.
+    _G.UnitGUID = function() return nil end
+    local sv2 = { char = {}, profileKeys = { ["Keytest - "] = "mine" } }
+    sv2.char["Keytest - "] = { setupDone = true }
+    _G.GetRealmName = function() return "Some Realm" end
+    local k3 = P:CharKey(sv2)
+    check(k3 == "Keytest - Some Realm" and sv2.char[k3] and sv2.char[k3].setupDone and sv2.char["Keytest - "] == nil,
+        "an entry filed under the blank realm is moved to the named one")
+    check(sv2.profileKeys[k3] == "mine", "with the profile it had picked")
+    _G.GetRealmName = function() return "" end
+    check(P:CharKey(sv2) == k3, "and a later blank realm reads the named entry")
+    -- Another character of the same name on another realm is its own.
+    _G.GetRealmName = function() return "Other Realm" end
+    local k4 = P:CharKey(sv2)
+    check(k4 == "Keytest - Other Realm" and sv2.char[k4] == nil, "a second realm is a second character: " .. tostring(k4))
+    check(P:CharKey() == "Keytest - Other Realm", "with no saved table the key is the plain one")
+    _G.GetRealmName, _G.UnitGUID, _G.UnitName = realWas, guidWas, nameWas
+end
+
 -- ---------- the reload prompt --------------------------------------------
 io.write("== reload prompt ==\n")
 Chrome:ReloadPrompt("test")
