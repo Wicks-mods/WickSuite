@@ -568,8 +568,51 @@ do
         WB.db.options.showNeeded = false
         check(not N:IsNeeded(2318), "switched off, nothing is marked")
         WB.db.options.showNeeded = true
+
+        -- Nothing needs it: said for junk and for materials, and for a
+        -- material only against recipes that have been read.
+        local FACTS = { [2589] = { 7, 1 }, [2318] = { 7, 1 }, [2592] = { 7, 1 }, [6948] = { 15, 1 }, [9001] = { 15, 0 }, [9002] = { 7, 1 } }
+        NAMES[9001], NAMES[9002] = "Broken Fang", "Coarse Stone"
+        _G.C_Item = setmetatable({
+            GetItemNameByID = function(id) return NAMES[id] end,
+            GetItemInfoInstant = function(id) local f = FACTS[id]; return id, "", "", "", 1, f and f[1], 0 end,
+            GetItemQualityByID = function(id) local f = FACTS[id]; return f and f[2] end,
+        }, { __index = wasName })
+        check(N:Unneeded(2318) == nil, "an item something needs gets no verdict")
+        check(N:Unneeded(6948) == nil, "nor does anything that is not junk or a material")
+        local uj = N:Unneeded(9001)
+        check(type(uj) == "string" and uj:find("Junk", 1, true), "a grey nothing counts is called junk: " .. tostring(uj))
+        local um = N:Unneeded(9002)
+        check(type(um) == "string" and um:find("Altina", 1, true) and um:find(UnitName("player"), 1, true),
+            "a material no recipe uses says whose recipes were read: " .. tostring(um))
         WB.db.recipes = nil
+        local un = N:Unneeded(9002)
+        check(type(un) == "string" and un:find("profession window", 1, true),
+            "with no recipes read it gives no verdict and says how to get one: " .. tostring(un))
         _G.C_QuestLog, _G.C_Item = wasCQ, wasName
+        S.fire("QUEST_LOG_UPDATE")
+
+        -- One alt snapshot per character, however the realm is named.
+        local AVk = WB.AltViewer and WB.AltViewer.CharKey
+        check(type(AVk) == "function", "the alt viewer's key can be asked for")
+        if AVk then
+            local realmWas, dbWas = _G.GetRealmName, WB.altDB
+            local me = UnitName("player")
+            WB.altDB = { ["-" .. me] = { bagsLastSeen = 50, bags = { "old" }, bankLastSeen = 90, bank = { "newbank" } },
+                         ["Some Realm-" .. me] = { bagsLastSeen = 80, bags = { "new" }, bankLastSeen = 10, bank = { "oldbank" } } }
+            _G.GetRealmName = function() return "" end
+            local k = AVk()
+            check(k == "Some Realm-" .. me, "a login with no realm name uses the named entry: " .. tostring(k))
+            local kept = WB.altDB[k]
+            check(WB.altDB["-" .. me] == nil and kept.bags[1] == "new" and kept.bank[1] == "newbank",
+                "and the loose entry is folded in, each half from the newer")
+            WB.altDB = { ["-" .. me] = { bagsLastSeen = 5, bags = { "only" } } }
+            _G.GetRealmName = function() return "Some Realm" end
+            local k2 = AVk()
+            check(k2 == "Some Realm-" .. me and WB.altDB[k2] and WB.altDB[k2].bags[1] == "only" and WB.altDB["-" .. me] == nil,
+                "an entry filed with no realm moves to the named one")
+            _G.GetRealmName, WB.altDB = realmWas, dbWas
+        end
     end
 end
 
