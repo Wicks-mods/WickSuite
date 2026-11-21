@@ -549,7 +549,8 @@ do
         local okN, r = pcall(N.Reasons, N, 2589)
         check(okN and #r == 1 and r[1]:find("Cloth for the Cause", 1, true) and r[1]:find("3/10", 1, true),
             "an item a quest still counts says which quest and how far: " .. tostring(okN and r[1] or r))
-        check(#N:Reasons(2592) == 0, "a finished objective wants nothing more")
+        local rf = N:Reasons(2592)
+        check(#rf == 1 and rf[1]:find("ready to hand in", 1, true), "a finished count is still held for the hand-in: " .. tostring(rf[1]))
         check(N:IsNeeded(2589) and not N:IsNeeded(6948), "needed and not needed are told apart")
         -- Recipes kept for this character and an alt.
         WB.db.recipes = { [UnitName("player")] = { Leatherworking = { [2318] = 4 } }, Altina = { Tailoring = { [2589] = 2 } } }
