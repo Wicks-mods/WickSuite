@@ -527,6 +527,50 @@ ${embed.description || ""}`);
   log(`  (Discord: unexpected response, raw: ${resp.slice(0, 400)})`);
 }
 
+// note <file> [--dry-run]: one post to Discord #announcements that is not a
+// release of any one addon (a round of small releases told once). The
+// file's first line is the title, the rest the body. Discord only: a note
+// is for the people already following along.
+function cmdNote(file, ...flags) {
+  const bad = flags.filter(f => f !== "--dry-run");
+  if (!file || bad.length) die("usage: wick note <file> [--dry-run]");
+  if (!fs.existsSync(file)) die(`no such file: ${file}`);
+  const lines = fs.readFileSync(file, "utf8").replace(/^\uFEFF/, "").trim().split(/\r?\n/);
+  const title = lines[0].trim();
+  const description = lines.slice(1).join("\n").trim();
+  if (!title) die("the file's first line is the title, and it is empty");
+  if (flags.includes("--dry-run")) {
+    log(`\n── Discord ──\n${title}\n${description}\n\n(dry run: nothing posted)`);
+    return;
+  }
+  const config = readConfig();
+  const token = resolveDiscordBotToken();
+  if (!token) die("no Discord bot token");
+  const channelId = resolveDiscordAnnouncementsChannel(config, token);
+  if (!channelId) die("could not resolve the #announcements channel");
+  const payloadPath = path.join(os.tmpdir(), `.wick-discord-note-${Date.now()}.json`);
+  fs.writeFileSync(payloadPath, JSON.stringify({ embeds: [{
+    title, description: description || undefined, color: 0x4FC778,
+    url: "https://wicksmods.com", footer: { text: "Wick's Mods · wicksmods.com" },
+  }] }));
+  let resp = "";
+  try {
+    resp = runCapture([
+      `curl -s -X POST`,
+      `-H "Authorization: Bot ${token}"`,
+      `-H "Content-Type: application/json"`,
+      `--data-binary "@${payloadPath}"`,
+      `"https://discord.com/api/v10/channels/${channelId}/messages"`,
+    ].join(" "));
+  } finally {
+    try { fs.rmSync(payloadPath); } catch (_) {}
+  }
+  let parsed = null;
+  try { parsed = JSON.parse(resp); } catch (_) {}
+  if (parsed && parsed.id) { ok(`Discord: note posted to #announcements (message id ${parsed.id})`); return; }
+  die(`Discord: post failed: ${parsed && parsed.message ? parsed.message : resp.slice(0, 200)}`);
+}
+
 // ── X (Twitter) announce helpers ──────────────────────────────────────────
 //
 // OAuth 1.0a user context: the consumer pair plus the access pair from
@@ -1857,6 +1901,7 @@ switch (sub) {
   case "render":   cmdRender(...rest); break;
   case "release":       await cmdRelease(rest[0], rest[1], ...rest.slice(2)); break;
   case "audit-secrets": cmdAuditSecrets(); break;
+  case "note":          cmdNote(rest[0], ...rest.slice(1)); break;
   case "audit":         await (await import("./audit.mjs")).run(rest); break;
   case "fb-token":      await (await import("./fbtoken.mjs")).run(rest); break;
   case "milestone":     await cmdMilestone(rest[0], ...rest.slice(1)); break;
@@ -1922,6 +1967,9 @@ usage:
                                            clipboard: extends it, derives the Page token, checks it
                                            and saves both, printing neither. --check asks Facebook
                                            whether the saved one still works (wick fb-token --help)
+  wick note <file> [--dry-run]             one post to Discord #announcements that is not a
+                                           release: the file's first line is the title, the
+                                           rest the body. --dry-run prints it and posts nothing
   wick audit-secrets                      scan all suite repos (working tree + full history)
                                            for accidentally committed secrets; exits 1 if found
 
