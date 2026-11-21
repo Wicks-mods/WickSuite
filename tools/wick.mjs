@@ -1204,7 +1204,19 @@ async function cmdRelease(folder, newVer, ...flags) {
   // would otherwise split the JSON on spaces and lose the metadata field.
   setProgress(cmd, 5, TOTAL, "uploading to CurseForge");
   log(`\nUploading to CurseForge project ${addon.cf_project_id} ...`);
+  // An addon whose TOC names WickCore needs it installed. Declared on the
+  // file, so the CurseForge app fetches WickCore with it: without this the
+  // app installs the addon alone, and it loads only far enough to say what
+  // is missing. No file declared it until 2026-11-21.
+  let needsCore = false;
+  if (addon.cf_slug !== "wickcore") {
+    try {
+      needsCore = /^##\s*(Dependencies|RequiredDeps|OptionalDeps)\s*:.*\bWickCore\b/mi
+        .test(fs.readFileSync(toc, "utf8"));
+    } catch (_) {}
+  }
   const metadata = JSON.stringify({
+    ...(needsCore ? { relations: { projects: [{ slug: "wickcore", type: "requiredDependency" }] } } : {}),
     // An addon that ships one package for several clients lists them all
     // in cf_game_versions; everything else takes the suite default.
     gameVersions: addon.cf_game_versions || clientOf(config, addon).cf_game_versions
