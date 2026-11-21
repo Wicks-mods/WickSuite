@@ -150,7 +150,7 @@ def main():
             # reward worth routing a levelling path around.
             if not r.get("slot"):
                 continue
-            good.append({
+            row = {
                 "id": r["id"],
                 "name": r.get("name") or "",
                 "quality": r.get("quality"),
@@ -159,7 +159,15 @@ def main():
                 "reqLevel": r.get("reqlevel"),
                 "cls": r.get("classs"),
                 "sub": r.get("subclass"),
-            })
+            }
+            # Wowhead's faction flag (1 Alliance, 2 Horde, 3 both) and class
+            # mask, when the row has them. A reward from the other faction's
+            # quest is not one to send a player after.
+            if r.get("side"):
+                row["side"] = r["side"]
+            if r.get("reqclass"):
+                row["reqClass"] = r["reqclass"]
+            good.append(row)
 
         if good:
             out[name] = {"zoneId": zid, "rewards": good}

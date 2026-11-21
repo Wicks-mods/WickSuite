@@ -1439,6 +1439,41 @@ ns.Doll:ClearAll()
 CLASS = wasClass
 
 local miss = S.missingReport()
+io.write("== a reward for the other faction or another class ==\n")
+do
+    -- The stub's player is Horde.
+    check(ns.Side() == "H", "the player's faction is read: " .. tostring(ns.Side()))
+    check(ns.ForMe({ side = "H" }) and ns.ForMe({}) and not ns.ForMe({ side = "A" }),
+        "a reward is this faction's, anybody's, or not on offer")
+    local _, _, classID = UnitClass("player")
+    if classID and bit and bit.band then
+        check(ns.ForMyClass({ cm = 2 ^ (classID - 1) }) and ns.ForMyClass({}), "a reward made for this class, or for all, is kept")
+        local other = classID == 1 and 2 or 1
+        check(not ns.ForMyClass({ cm = 2 ^ (other - 1) }), "one made for another class is passed over")
+    end
+    -- An item both factions' quests give is described by this faction's.
+    local seenA, seenH = 0, 0
+    for zone, rows in pairs(ns.QUESTS or {}) do
+        for _, it in ipairs(rows) do
+            if it.side == "A" then seenA = seenA + 1 elseif it.side == "H" then seenH = seenH + 1 end
+            if it.side and ns.ENTRY[it.id] and ns.ENTRY[it.id].side == "A" then
+                -- Only allowed when no Horde row exists for the same item.
+                local horde = false
+                for _, rows2 in pairs(ns.QUESTS) do
+                    for _, it2 in ipairs(rows2) do
+                        if it2.id == it.id and it2.side ~= "A" then horde = true end
+                    end
+                end
+                if horde then check(false, "an item both factions earn is described by the wrong one: " .. tostring(it.name)) end
+            end
+        end
+    end
+    check(seenA > 0 and seenH > 0, ("the quest data carries sides: %d Alliance, %d Horde"):format(seenA, seenH))
+    -- Upgrades never names the other faction's reward.
+    local okU, errU = pcall(function() ns.UI:Toggle("upgrades"); ns.UI:Refresh() end)
+    check(okU, "upgrades still draws with zone quest rewards in the pool: " .. tostring(errU or ""))
+end
+
 if #miss > 0 then
     io.write("== missing globals reached during the run ==\n  ", table.concat(miss, " "), "\n")
 end
