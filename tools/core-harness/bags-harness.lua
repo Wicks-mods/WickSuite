@@ -32,7 +32,7 @@ function OpenAllBags(frame) ContainerFrame1:Show() end
 function CloseAllBags(frame) S.CLOSE_ALL_CALLS = (S.CLOSE_ALL_CALLS or 0) + 1; ContainerFrame1:Hide() end
 function ToggleAllBags() if ContainerFrame1:IsShown() then ContainerFrame1:Hide() else ContainerFrame1:Show() end end
 
-S.loadAddon(BAGS_DIR, "WicksBags", { "Core.lua", "Categories.lua", "UI.lua", "Options.lua", "Bag.lua", "Bank.lua", "GuildBank.lua", "AltViewer.lua" })
+S.loadAddon(BAGS_DIR, "WicksBags", { "Core.lua", "Categories.lua", "UI.lua", "Options.lua", "Bag.lua", "Bank.lua", "GuildBank.lua", "AltViewer.lua", "Needed.lua" })
 check(type(WicksBags) == "table" and WicksBags.A, "WicksBags namespace + WickCore addon object")
 
 io.write("== lifecycle ==\n")
@@ -524,6 +524,53 @@ do
     S.fire("MERCHANT_CLOSED")
     S.fire("MAIL_CLOSED")
 end
+io.write("== still needed ==\n")
+do
+    local N = WB.Needed
+    check(type(N) == "table", "the needed module loads")
+    if N then
+        -- A quest in the log that counts an item, and a recipe a character knows.
+        local wasCQ, wasName = rawget(_G, "C_QuestLog"), rawget(_G, "C_Item")
+        _G.C_QuestLog = {
+            GetNumQuestLogEntries = function() return 2 end,
+            GetInfo = function(i)
+                if i == 1 then return { title = "Zone", isHeader = true } end
+                return { title = "Cloth for the Cause", isHeader = false, questID = 77 }
+            end,
+            GetQuestObjectives = function(id)
+                return { { type = "item", text = "Linen Cloth: 3/10", numFulfilled = 3, numRequired = 10, finished = false },
+                         { type = "item", text = "8/8 Wool Cloth", numFulfilled = 8, numRequired = 8, finished = true },
+                         { type = "monster", text = "Boars slain: 1/5", finished = false } }
+            end,
+        }
+        local NAMES = { [2589] = "Linen Cloth", [2592] = "Wool Cloth", [2318] = "Light Leather", [6948] = "Hearthstone" }
+        _G.C_Item = setmetatable({ GetItemNameByID = function(id) return NAMES[id] end }, { __index = wasName })
+        S.fire("QUEST_LOG_UPDATE")
+        local okN, r = pcall(N.Reasons, N, 2589)
+        check(okN and #r == 1 and r[1]:find("Cloth for the Cause", 1, true) and r[1]:find("3/10", 1, true),
+            "an item a quest still counts says which quest and how far: " .. tostring(okN and r[1] or r))
+        check(#N:Reasons(2592) == 0, "a finished objective wants nothing more")
+        check(N:IsNeeded(2589) and not N:IsNeeded(6948), "needed and not needed are told apart")
+        -- Recipes kept for this character and an alt.
+        WB.db.recipes = { [UnitName("player")] = { Leatherworking = { [2318] = 4 } }, Altina = { Tailoring = { [2589] = 2 } } }
+        local r2 = N:Reasons(2318)
+        check(#r2 == 1 and r2[1]:find("4 of your recipes", 1, true), "a reagent of your own recipes says so: " .. tostring(r2[1]))
+        local r3 = N:Reasons(2589)
+        check(#r3 == 2 and r3[2]:find("Altina's Tailoring", 1, true), "an alt's recipes count too: " .. tostring(r3[2]))
+        -- The mark.
+        local slot = CreateFrame("Button", nil, UIParent)
+        local okM = pcall(N.Mark, N, slot, 2318)
+        check(okM and slot._needMark and slot._needMark:IsShown(), "a needed item's slot is marked")
+        N:Mark(slot, 6948)
+        check(not slot._needMark:IsShown(), "and the mark goes when the slot holds something else")
+        WB.db.options.showNeeded = false
+        check(not N:IsNeeded(2318), "switched off, nothing is marked")
+        WB.db.options.showNeeded = true
+        WB.db.recipes = nil
+        _G.C_QuestLog, _G.C_Item = wasCQ, wasName
+    end
+end
+
 io.write("\n", MODE, ": ", passes, " passed, ", fails, " failed\n")
 if fails > 0 then error(MODE .. ": " .. fails .. " check(s) failed", 0) end
 io.write("PASS\n")
