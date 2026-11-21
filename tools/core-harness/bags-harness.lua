@@ -562,6 +562,7 @@ do
         local slot = CreateFrame("Button", nil, UIParent)
         local okM = pcall(N.Mark, N, slot, 2318)
         check(okM and slot._needMark and slot._needMark:IsShown(), "a needed item's slot is marked")
+        check(N:IsNeeded(2589) == "quest" and N:IsNeeded(2318) == "recipe", "a quest's item and a recipe's material are told apart")
         N:Mark(slot, 6948)
         check(not slot._needMark:IsShown(), "and the mark goes when the slot holds something else")
         WB.db.options.showNeeded = false
