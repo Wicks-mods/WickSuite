@@ -41,9 +41,11 @@ QUALITY_NAME = { 0: "poor", 1: "common", 2: "uncommon", 3: "rare",
 # missing flag are both factions, and nothing is written for those.
 SIDE_NAME = {1: "A", 2: "H"}
 
-# A reward listed under a faction's city with no flag of its own comes from
-# a quest handed in there, which the other faction cannot do: its own
-# version of the quest is listed under its own city.
+# A reward listed under a faction's city, with no flag of its own or one
+# that says both factions, comes from a quest handed in there, which the
+# other faction cannot do: its own version of the quest is listed under
+# its own city. (Virtuous Mantle is flagged for both and listed under
+# Ironforge and Orgrimmar alike.)
 CITY_SIDE = {
     "Ironforge": "A", "Stormwind City": "A", "Stormwind": "A", "Darnassus": "A",
     "Orgrimmar": "H", "Thunder Bluff": "H", "Undercity": "H",
@@ -51,7 +53,7 @@ CITY_SIDE = {
 
 
 def side_of(it, zone=None):
-    return SIDE_NAME.get(it.get("side")) or (CITY_SIDE.get(zone) if zone and not it.get("side") else None)
+    return SIDE_NAME.get(it.get("side")) or (CITY_SIDE.get(zone) if zone else None)
 
 
 def entry_line(it, set_of, extra=""):
