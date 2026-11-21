@@ -611,17 +611,17 @@
       "short": "Gear",
       "client": "forever",
       "slash": "/wgear",
-      "tagline": "What to chase while levelling, and where it drops.",
-      "short_tagline": "What to chase while levelling, and where it drops.",
+      "tagline": "The best gear upgrade for every slot while leveling, and where to get it.",
+      "short_tagline": "Leveling gear upgrades for every slot, and where to get them.",
       "accent": "#4FC778",
       "accent_name": "Fel Green",
       "cf_slug": "wicks-gear",
       "cf_project_id": 1708290,
       "features": [
-        "Upgrades scored against what you wear",
-        "Dungeons, crafted, quest rewards and sets",
-        "Live set bonuses read from the client",
-        "Try on, dressing room, link in chat"
+        "Your best in slot pick for every slot, from dungeon drops and crafted gear",
+        "Dungeon loot by boss, crafted gear, quest rewards and sets",
+        "Set bonuses you have earned and what the next one needs",
+        "Try pieces on to see your stats change, green up and red down"
       ],
       "repo": "WicksGear"
     },
